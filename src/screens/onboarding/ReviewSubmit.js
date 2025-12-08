@@ -54,69 +54,55 @@ export default function ReviewSubmit({ navigation, route }) {
     images, // local URIs from ImagePicker
     profileImage, // optional
   } = route.params || {};
-
   const handleSubmit = async () => {
-
     try {
       // Step 1: Upload images to Cloudinary
       const uploadedImages = await uploadImages(images);
 
       // Step 2: Build registration payload
       const birthDateObj = birthdate ? new Date(birthdate) : null;
-      const formData = new FormData();
 
-      formData.append("name", name);
-      formData.append("email", email);
-      formData.append("password", password);
-      formData.append("gender", gender);
-
-      formData.append(
-        "birthDay",
-        birthDateObj ? birthDateObj.getDate().toString() : ""
-      );
-      formData.append(
-        "birthMonth",
-        birthDateObj ? (birthDateObj.getMonth() + 1).toString() : ""
-      );
-      formData.append(
-        "birthYear",
-        birthDateObj ? birthDateObj.getFullYear().toString() : ""
-      );
-
-      formData.append("location", JSON.stringify(location));
-      formData.append("occupation", occupation || "");
-      formData.append("education", education || "");
-      formData.append("religion", religion || "");
-      formData.append("bodyType", bodyType || "");
-      formData.append("appearance", appearance || "");
-      formData.append("smoking", smoking || "");
-      formData.append("drinking", drinking || "");
-      formData.append("hasChildren", hasChildren || "");
-      formData.append("wantsChildren", wantsChildren || "");
-      formData.append("relationshipStatus", relationshipStatus || "");
-      formData.append("willingToRelocate", willingToRelocate || "");
-      formData.append("bio", bio || "");
-      formData.append("lookingFor", lookingFor || "");
-      formData.append(
-        "preferredAge",
-        JSON.stringify([preferredAgeMin, preferredAgeMax])
-      );
-
-      // Use Cloudinary URLs
-      formData.append("images", JSON.stringify(uploadedImages));
-      formData.append("profileImage", uploadedImages[0]?.url || "");
+      // Instead of FormData, build a plain JSON payload
+      const payload = {
+        name,
+        email,
+        password,
+        gender: gender || "male",
+        birthDay: birthDateObj ? birthDateObj.getDate() : null,
+        birthMonth: birthDateObj ? birthDateObj.getMonth() + 1 : null,
+        birthYear: birthDateObj ? birthDateObj.getFullYear() : null,
+        location,
+        occupation: occupation || null,
+        education: education || null,
+        religion: religion || null,
+        bodyType: bodyType || null,
+        appearance: appearance || null,
+        // ✅ Only send enums if they exist
+        smoking: smoking || undefined,
+        drinking: drinking || undefined,
+        // ✅ Send proper booleans
+        hasChildren: !!hasChildren,
+        wantsChildren: !!wantsChildren,
+        willingToRelocate: !!willingToRelocate,
+        relationshipStatus: relationshipStatus || null,
+        bio: bio || null,
+        lookingFor: lookingFor || null,
+        preferredAge: [preferredAgeMin, preferredAgeMax],
+        images: uploadedImages,
+        profileImage: uploadedImages[0]?.url || "",
+      };
 
       // Step 3: Send to register API
-      const response = await fetch("http://localhost:3000/api/mobile/register", {
+      const response = await fetch("https://qup.dating/api/mobile/register", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
-      console.log("Registration response:", data);
 
       if (response.ok) {
-        navigation.replace("ProfileScreen", { user: data.user });
+        navigation.replace("MainTabs", { user: data.user });
       }
     } catch (err) {
       console.error("Error submitting form:", err);
@@ -125,6 +111,12 @@ export default function ReviewSubmit({ navigation, route }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate("LandingScreen")}
+      >
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
       <Text style={styles.heading}>Review Your Information</Text>
 
       {/* Summary */}
@@ -183,7 +175,7 @@ export default function ReviewSubmit({ navigation, route }) {
         <Text style={styles.label}>
           Bio: <Text style={styles.value}>{bio}</Text>
         </Text>
-              <Text style={styles.label}>
+        <Text style={styles.label}>
           Location: <Text style={styles.value}>{location.toString()}</Text>
         </Text>
         <Text style={styles.label}>
@@ -215,10 +207,21 @@ export default function ReviewSubmit({ navigation, route }) {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     backgroundColor: "#111827",
+    position: "relative",
     padding: 20,
     alignItems: "center",
+  },
+  backText: {
+    color: "#88C0D0",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
   },
   heading: {
     color: "#FFFFFF",

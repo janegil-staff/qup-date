@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { navigateWithParams } from "../utils/navigation";
+import { navigateWithParams } from "../../utils/navigation";
 
 // Reusable ButtonGroup
 function ButtonGroup({ options, selected, onSelect }) {
@@ -48,6 +48,12 @@ export default function LifestyleBasicsScreen({ navigation, route }) {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate("LandingScreen")}
+      >
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
       <Text style={styles.heading}>Lifestyle & Basics</Text>
 
       {/* Occupation */}
@@ -109,6 +115,16 @@ export default function LifestyleBasicsScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+  },
+  backText: {
+    color: "#88C0D0",
+    fontSize: 16,
+    fontWeight: "600",
+  },
   container: {
     flexGrow: 1,
     backgroundColor: "#111827",

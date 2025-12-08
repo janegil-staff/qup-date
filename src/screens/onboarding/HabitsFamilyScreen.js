@@ -7,7 +7,7 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { navigateWithParams } from "../utils/navigation";
+import { navigateWithParams } from "../../utils/navigation";
 
 function ButtonGroup({ options, selected, onSelect }) {
   return (
@@ -69,6 +69,12 @@ export default function HabitsFamilyScreen({ navigation, route }) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
       <ScrollView contentContainerStyle={styles.container}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate("LandingScreen")}
+        >
+          <Text style={styles.backText}>← Back</Text>
+        </TouchableOpacity>
         <Text style={styles.heading}>Habits & Family</Text>
 
         {/* Smoking */}
@@ -150,6 +156,16 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 20,
     textAlign: "center",
+  },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+  },
+  backText: {
+    color: "#88C0D0",
+    fontSize: 16,
+    fontWeight: "600",
   },
   label: {
     color: "#9CA3AF",

@@ -23,12 +23,12 @@ export default function LoginForm({ navigation }) {
       setLoading(true);
 
       // 1. Get CSRF token
-      const csrfRes = await fetch("http://localhost:3000/api/auth/csrf");
+      const csrfRes = await fetch("https://qup.dating/api/auth/csrf");
       const { csrfToken } = await csrfRes.json();
 
       // 2. Post credentials to NextAuth
       const response = await fetch(
-        "http://localhost:3000/api/auth/signin/credentials",
+        "https://qup.dating/api/auth/signin/credentials",
         {
           method: "POST",
           headers: {

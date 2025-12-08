@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { navigateWithParams } from "../utils/navigation";
-import LocationAutocomplete from "../components/LocationAutocomplete";
+import { navigateWithParams } from "../../utils/navigation";
+import LocationAutocomplete from "../../components/LocationAutocomplete";
 
 <GooglePlacesAutocomplete
   placeholder="Enter Location"
@@ -58,6 +58,12 @@ export default function OnboardingDetails({ navigation, route }) {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate("LandingScreen")}
+      >
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
       <Text style={styles.heading}>Personal Details</Text>
       {/* Gender */}
       <View style={styles.genderRow}>
@@ -125,6 +131,16 @@ export default function OnboardingDetails({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+  },
+  backText: {
+    color: "#88C0D0",
+    fontSize: 16,
+    fontWeight: "600",
+  },
   nextButton: {
     backgroundColor: "#10b981", // green when active
     paddingVertical: 14,

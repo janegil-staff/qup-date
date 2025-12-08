@@ -8,7 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import Slider from "@react-native-community/slider";
-import { navigateWithParams } from "../utils/navigation";
+import { navigateWithParams } from "../../utils/navigation";
 
 // Reusable ButtonGroup component
 function ButtonGroup({ options, selected, onSelect }) {
@@ -61,12 +61,18 @@ export default function BioPreferencesScreen({ navigation, route }) {
       bio,
       lookingFor,
       preferredAgeMin,
-      preferredAgeMax
+      preferredAgeMax,
     });
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate("LandingScreen")}
+      >
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
       <Text style={styles.heading}>Bio & Preferences</Text>
 
       {/* Bio */}
@@ -131,6 +137,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#111827",
     padding: 20,
     alignItems: "center",
+  },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+  },
+  backText: {
+    color: "#88C0D0",
+    fontSize: 16,
+    fontWeight: "600",
   },
   heading: {
     color: "#FFFFFF",

@@ -8,13 +8,13 @@ import {
   FlatList,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { navigateWithParams } from "../utils/navigation";
+import { navigateWithParams } from "../../utils/navigation";
 
 export default function ImageUploadScreen({ navigation, route }) {
   const { gender, birthdate, name, email, password } = route.params; // carry data forward
   const [images, setImages] = useState([]); // up to 6
   const [profileImage, setProfileImage] = useState(null);
-  console.log("ROUTE PARAMS ", route.params);
+
   const pickImage = async () => {
     if (images.length >= 6) return; // limit to 6
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -37,6 +37,12 @@ export default function ImageUploadScreen({ navigation, route }) {
   };
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate("LandingScreen")}
+      >
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
       <View style={styles.contentBlock}>
         <Text style={styles.heading}>Upload up to 6 Photos</Text>
 
@@ -145,6 +151,16 @@ const styles = StyleSheet.create({
   nextText: {
     color: "#FFFFFF",
     fontSize: 18,
+    fontWeight: "600",
+  },
+  backButton: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+  },
+  backText: {
+    color: "#88C0D0",
+    fontSize: 16,
     fontWeight: "600",
   },
 });

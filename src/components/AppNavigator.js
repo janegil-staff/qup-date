@@ -1,4 +1,3 @@
-import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -6,13 +5,13 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 // Screens
 import LandingScreen from "../screens/LandingScreen";
 import LoginForm from "./LoginForm";
-import AccountSetupScreen from "../screens/AccountSetupScreen";
-import OnboardingDetails from "../screens/OnboardingDetails";
-import LifestyleBasicsScreen from "../screens/LifestyleBasicsScreen";
-import HabitsFamilyScreen from "../screens/HabitsFamilyScreen";
-import BioPreferencesScreen from "../screens/BioPreferencesScreen";
-import ImageUploadScreen from "../screens/ImageUploadScreen";
-import ReviewSubmit from "../screens/ReviewSubmit";
+import AccountSetupScreen from "../screens/onboarding/AccountSetupScreen";
+import OnboardingDetails from "../screens/onboarding/OnboardingDetails";
+import LifestyleBasicsScreen from "../screens/onboarding/LifestyleBasicsScreen";
+import HabitsFamilyScreen from "../screens/onboarding/HabitsFamilyScreen";
+import BioPreferencesScreen from "../screens/onboarding/BioPreferencesScreen";
+import ImageUploadScreen from "../screens/onboarding/ImageUploadScreen";
+import ReviewSubmit from "../screens/onboarding/ReviewSubmit";
 
 // Logged-in screens
 import MatchesScreen from "../screens/MatchesScreen";
