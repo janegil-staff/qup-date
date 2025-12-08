@@ -54,46 +54,45 @@ export default function ReviewSubmit({ navigation, route }) {
     images, // local URIs from ImagePicker
     profileImage, // optional
   } = route.params || {};
-  const handleSubmit = async () => {
-    try {
-      // Step 1: Upload images to Cloudinary
-      const uploadedImages = await uploadImages(images);
 
-      const today = new Date();
-      const eighteenYearsAgo = new Date(
-        today.getFullYear() - 18,
-        today.getMonth(),
-        today.getDate()
-      );
-      // Instead of FormData, build a plain JSON payload
+  const handleSubmit = async () => {
+    const uploadedImages = await uploadImages(images);
+    try {
+      // Build payload with guards
       const payload = {
-        name,
-        email,
-        password,
-        gender: gender || "male",
-        birthdate: birthdate || eighteenYearsAgo,
-        location,
+        name: name || "",
+        email: email || "",
+        password: password || "",
+        gender: gender || null,
+        birthdate: birthdate || null,
+        location: location || null,
         occupation: occupation || null,
         education: education || null,
         religion: religion || null,
         bodyType: bodyType || null,
         appearance: appearance || null,
-        // ✅ Only send enums if they exist
-        smoking: smoking || undefined,
-        drinking: drinking || undefined,
-        // ✅ Send proper booleans
-        hasChildren: !!hasChildren,
-        wantsChildren: !!wantsChildren,
-        willingToRelocate: !!willingToRelocate,
+        smoking: smoking ?? null,
+        drinking: drinking ?? null,
+        hasChildren: hasChildren ?? null,
+        wantsChildren: wantsChildren ?? null,
+        willingToRelocate: willingToRelocate ?? null,
         relationshipStatus: relationshipStatus || null,
         bio: bio || null,
         lookingFor: lookingFor || null,
-        preferredAge: [preferredAgeMin, preferredAgeMax],
-        images: uploadedImages,
-        profileImage: uploadedImages[0]?.url || "",
+
+        // Preferred age range
+        preferredAge:
+          preferredAgeMin && preferredAgeMax
+            ? [preferredAgeMin, preferredAgeMax]
+            : null,
+
+        // Images
+        images: uploadedImages || [],
+        profileImage: uploadedImages?.[0]?.url || "",
       };
 
-      // Step 3: Send to register API
+      console.log("Submitting payload:", payload);
+
       const response = await fetch("https://qup.dating/api/mobile/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,10 +100,7 @@ export default function ReviewSubmit({ navigation, route }) {
       });
 
       const data = await response.json();
-
-      if (response.ok) {
-        navigation.replace("MainTabs", { user: data.user });
-      }
+      navigation.navigate("MainTabs");
     } catch (err) {
       console.error("Error submitting form:", err);
     }
@@ -207,7 +203,7 @@ export default function ReviewSubmit({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
- container: {
+  container: {
     flexGrow: 1,
     backgroundColor: "#111827",
     justifyContent: "center", // vertical centering
