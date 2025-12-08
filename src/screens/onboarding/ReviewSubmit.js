@@ -19,7 +19,7 @@ const uploadImages = async (selectedImages) => {
     });
   });
 
-  const response = await fetch("http://localhost:3000/api/upload", {
+  const response = await fetch("https://qup.dating/api/mobile/upload", {
     method: "POST",
     body: formData,
   });
@@ -59,18 +59,19 @@ export default function ReviewSubmit({ navigation, route }) {
       // Step 1: Upload images to Cloudinary
       const uploadedImages = await uploadImages(images);
 
-      // Step 2: Build registration payload
-      const birthDateObj = birthdate ? new Date(birthdate) : null;
-
+      const today = new Date();
+      const eighteenYearsAgo = new Date(
+        today.getFullYear() - 18,
+        today.getMonth(),
+        today.getDate()
+      );
       // Instead of FormData, build a plain JSON payload
       const payload = {
         name,
         email,
         password,
         gender: gender || "male",
-        birthDay: birthDateObj ? birthDateObj.getDate() : null,
-        birthMonth: birthDateObj ? birthDateObj.getMonth() + 1 : null,
-        birthYear: birthDateObj ? birthDateObj.getFullYear() : null,
+        birthdate: birthdate || eighteenYearsAgo,
         location,
         occupation: occupation || null,
         education: education || null,
@@ -133,7 +134,7 @@ export default function ReviewSubmit({ navigation, route }) {
         <Text style={styles.label}>
           Birthdate:{" "}
           <Text style={styles.value}>
-            Birthdate: <Text style={styles.value}>{birthdate}</Text>
+            <Text style={styles.value}>{birthdate}</Text>
           </Text>
         </Text>
 
