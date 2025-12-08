@@ -128,7 +128,12 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: "#111827",
+    justifyContent: "center", // vertical centering
+    alignItems: "center", // horizontal centering
     padding: 20,
+  },
+  centerBox: {
+    width: "100%",
     alignItems: "center",
   },
   heading: {

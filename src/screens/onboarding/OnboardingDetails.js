@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  ScrollView,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
@@ -57,76 +58,78 @@ export default function OnboardingDetails({ navigation, route }) {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity
         style={styles.backButton}
         onPress={() => navigation.navigate("LandingScreen")}
       >
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
-      <Text style={styles.heading}>Personal Details</Text>
-      {/* Gender */}
-      <View style={styles.genderRow}>
-        <TouchableOpacity
-          style={[
-            styles.genderButton,
-            gender === "male" && styles.selectedMale,
-          ]}
-          onPress={() => setGender("male")}
-        >
-          <Text style={styles.genderText}>Male</Text>
-        </TouchableOpacity>
+      <View style={styles.centerBox}>
+        <Text style={styles.heading}>Personal Details</Text>
+        {/* Gender */}
+        <View style={styles.genderRow}>
+          <TouchableOpacity
+            style={[
+              styles.genderButton,
+              gender === "male" && styles.selectedMale,
+            ]}
+            onPress={() => setGender("male")}
+          >
+            <Text style={styles.genderText}>Male</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.genderButton,
-            gender === "female" && styles.selectedFemale,
-          ]}
-          onPress={() => setGender("female")}
-        >
-          <Text style={styles.genderText}>Female</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.genderButton,
+              gender === "female" && styles.selectedFemale,
+            ]}
+            onPress={() => setGender("female")}
+          >
+            <Text style={styles.genderText}>Female</Text>
+          </TouchableOpacity>
 
+          <TouchableOpacity
+            style={[
+              styles.genderButton,
+              gender === "other" && styles.selectedOther,
+            ]}
+            onPress={() => setGender("other")}
+          >
+            <Text style={styles.genderText}>Other</Text>
+          </TouchableOpacity>
+        </View>
+        {/* Birthdate */}
+        <DateTimePicker
+          value={birthdate}
+          style={styles.input}
+          mode="date"
+          display="spinner"
+          maximumDate={maxDate}
+          themeVariant="light" // 👈 forces light theme on iOS
+          textColor="#ffffff"
+          onChange={(event, selectedDate) => {
+            setShowPicker(false);
+            if (selectedDate) setBirthdate(selectedDate);
+          }}
+        />
+        {/* Location */}
+        <LocationAutocomplete
+          onSelect={(location) => {
+            setLocation(location);
+          }}
+        />
+
+        {/* Next Button */}
         <TouchableOpacity
-          style={[
-            styles.genderButton,
-            gender === "other" && styles.selectedOther,
-          ]}
-          onPress={() => setGender("other")}
+          style={[styles.nextButton, !gender && styles.disabledButton]}
+          onPress={handleNext}
+          disabled={!gender} // 👈 disables until gender is selected
         >
-          <Text style={styles.genderText}>Other</Text>
+          <Text style={styles.nextText}>Next</Text>
         </TouchableOpacity>
       </View>
-      {/* Birthdate */}
-      <DateTimePicker
-        value={birthdate}
-        style={styles.input}
-        mode="date"
-        display="spinner"
-        maximumDate={maxDate}
-        themeVariant="light" // 👈 forces light theme on iOS
-        textColor="#ffffff"
-        onChange={(event, selectedDate) => {
-          setShowPicker(false);
-          if (selectedDate) setBirthdate(selectedDate);
-        }}
-      />
-      {/* Location */}
-      <LocationAutocomplete
-        onSelect={(location) => {
-          setLocation(location);
-        }}
-      />
-
-      {/* Next Button */}
-      <TouchableOpacity
-        style={[styles.nextButton, !gender && styles.disabledButton]}
-        onPress={handleNext}
-        disabled={!gender} // 👈 disables until gender is selected
-      >
-        <Text style={styles.nextText}>Next</Text>
-      </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -192,13 +195,16 @@ const styles = StyleSheet.create({
   selectedOther: {
     backgroundColor: "#10b981", // green highlight
   },
-
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#111827",
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: "center", // vertical centering
+    alignItems: "center", // horizontal centering
     padding: 20,
+  },
+  centerBox: {
+    width: "100%",
+    alignItems: "center",
   },
   heading: {
     color: "#FFFFFF",

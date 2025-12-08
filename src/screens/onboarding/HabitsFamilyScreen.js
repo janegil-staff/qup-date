@@ -62,7 +62,6 @@ export default function HabitsFamilyScreen({ navigation, route }) {
       hasChildren,
       wantsChildren,
       relationshipStatus,
-      willingToRelocate,
     });
   };
 
@@ -121,17 +120,6 @@ export default function HabitsFamilyScreen({ navigation, route }) {
           options={["Single", "In a relationship", "Married"]}
           selected={relationshipStatus}
           onSelect={setRelationshipStatus}
-        />
-
-        {/* Willing to Relocate */}
-        <Text style={styles.label}>Willing to Relocate</Text>
-        <ButtonGroup
-          options={[
-            { label: "Yes", value: true },
-            { label: "No", value: false },
-          ]}
-          selected={willingToRelocate}
-          onSelect={setWillingToRelocate}
         />
 
         {/* Next Button */}

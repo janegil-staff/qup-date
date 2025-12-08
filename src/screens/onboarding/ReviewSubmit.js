@@ -207,11 +207,15 @@ export default function ReviewSubmit({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+ container: {
+    flexGrow: 1,
     backgroundColor: "#111827",
-    position: "relative",
+    justifyContent: "center", // vertical centering
+    alignItems: "center", // horizontal centering
     padding: 20,
+  },
+  centerBox: {
+    width: "100%",
     alignItems: "center",
   },
   backText: {
