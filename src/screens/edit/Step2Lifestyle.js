@@ -14,7 +14,7 @@ export default function Step2Lifestyle({ form, setForm, setField }) {
 
   const dietOptions = ["Vegetarian", "Vegan", "Omnivore", "Other"];
   const exerciseOptions = ["Never", "Sometimes", "Regularly", "Daily"];
-  const smokingOptions = ["Yes", "No", "Occasionally"];
+  const smokingOptions = ["Yes", "No"];
   const drinkingOptions = ["None", "Light / social drinker", "Heavy"];
 
   // -------------------- Fetch existing values --------------------

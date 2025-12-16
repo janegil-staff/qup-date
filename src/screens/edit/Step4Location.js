@@ -10,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as Progress from "react-native-progress";
 import { saveProfile, prefillProfile } from "../../utils/profileService";
 import * as SecureStore from "expo-secure-store";
+import LocationAutocomplete from "../../components/LocationAutocomplete";
 
 export default function Step4Location({ form, setForm, setField }) {
   const navigation = useNavigation();
@@ -32,15 +33,28 @@ export default function Step4Location({ form, setForm, setField }) {
 
   const handleSaveAndNext = async () => {
     try {
+      if (!form.location) {
+        Alert.alert("Location required", "Please select a location");
+        return;
+      }
+
       const updatedUser = await saveProfile({
-        city: form.city,
-        country: form.country,
+        location: {
+          name: form.location.name,
+          lat: form.location.lat,
+          lng: form.location.lng,
+          country: form.location.country,
+        },
       });
 
-      // Navigate to next step (e.g. Bio)
+      setForm((prev) => ({
+        ...prev,
+        location: updatedUser.location,
+      }));
+
       navigation.navigate("EditImages", { user: updatedUser });
     } catch (err) {
-      // already logged inside saveProfile
+      Alert.alert("Error", "Failed to save location");
     }
   };
 
@@ -53,22 +67,17 @@ export default function Step4Location({ form, setForm, setField }) {
         style={styles.progress}
       />
 
-      <Text style={styles.label}>City</Text>
-      <TextInput
-        value={form?.city ?? ""}
-        onChangeText={(val) => setField("city", val)}
-        style={styles.input}
-        placeholder="Enter your city"
-        placeholderTextColor="#6b7280"
-      />
+      <Text style={styles.label}>Location</Text>
 
-      <Text style={styles.label}>Country</Text>
-      <TextInput
-        value={form?.country ?? ""}
-        onChangeText={(val) => setField("country", val)}
-        style={styles.input}
-        placeholder="Enter your country"
-        placeholderTextColor="#6b7280"
+      <LocationAutocomplete
+        value={form.location?.name || ""}
+        onChange={(text) =>
+          setField("location", {
+            ...(form.location || {}),
+            name: text,
+          })
+        }
+        onSelect={(location) => setField("location", location)}
       />
 
       <View style={styles.navRow}>

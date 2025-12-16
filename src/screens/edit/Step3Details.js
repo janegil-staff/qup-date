@@ -65,12 +65,11 @@ export default function Step3Details({ form, setForm, setField }) {
       setLoading(true);
       const token = await SecureStore.getItemAsync("authToken");
 
-      // Send fields directly to PATCH, not nested inside `user`
       const body = {
-        education: form.education || "",
-        religion: form.religion ? form.religion.toLowerCase() : "",
-        relationship: form.relationship ? form.relationship.toLowerCase() : "",
-        children: form.children ? form.children.toLowerCase() : "",
+        education: form.education,
+        religion: form.religion,
+        relationshipStatus: form.relationship,
+        hasChildren: form.children === "Has children",
       };
 
       const res = await fetch("https://qup.dating/api/mobile/me", {
