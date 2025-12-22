@@ -17,7 +17,7 @@ export async function registerUser({ name, email, password, day, month, year, ge
     });
   }
 
-  const res = await fetch("http://localhost:3000/api/register", {
+  const res = await fetch("https://qup.dating/api/register", {
     method: "POST",
     body: formData, // browser/React Native sets Content-Type automatically
   });

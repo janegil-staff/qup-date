@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -11,26 +11,43 @@ import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 
 export default function ProfileScreen({ route }) {
+  const userId = route?.params?.userId || null; // 🔥 safe destructure
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  /** ----------------------------------
-   * Fetch profile when screen is focused
-   * ---------------------------------- */
   const fetchProfile = async () => {
     try {
       setLoading(true);
+
       const token = await SecureStore.getItemAsync("authToken");
-      const res = await fetch("https://qup.dating/api/mobile/me", {
-        headers: { Authorization: `Bearer ${token}` },
+      if (!token) {
+        console.warn("No auth token found");
+        return;
+      }
+
+      // 🔥 If userId exists → fetch that user
+      // 🔥 If not → fetch your own profile
+      const url = userId
+        ? `https://qup.dating/api/mobile/user/${userId}`
+        : `https://qup.dating/api/mobile/me`;
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       const data = await res.json();
-      setProfile(data.user || data); // handle API returning user directly or wrapped
-      setLoading(false);
+
+      if (!res.ok) {
+        console.warn("Profile API error:", data);
+        return;
+      }
+
+      setProfile(data.user || data);
     } catch (err) {
-      console.error(err);
-      setError("Failed to load profile");
+      console.error("Profile fetch error:", err);
+    } finally {
       setLoading(false);
     }
   };
@@ -38,7 +55,7 @@ export default function ProfileScreen({ route }) {
   useFocusEffect(
     useCallback(() => {
       fetchProfile();
-    }, [])
+    }, [userId])
   );
 
   if (loading) {
@@ -50,18 +67,10 @@ export default function ProfileScreen({ route }) {
     );
   }
 
-  if (error) {
-    return (
-      <View style={styles.center}>
-        <Text style={styles.error}>{error}</Text>
-      </View>
-    );
-  }
-
   if (!profile) {
     return (
       <View style={styles.center}>
-        <Text style={styles.error}>No profile data found.</Text>
+        <Text style={styles.error}>Profile not found.</Text>
       </View>
     );
   }
@@ -116,7 +125,7 @@ export default function ProfileScreen({ route }) {
         </View>
       )}
 
-      {/* Other sections */}
+      {/* Appearance */}
       <SimpleSection
         title="Appearance"
         items={[
@@ -129,6 +138,7 @@ export default function ProfileScreen({ route }) {
         ]}
       />
 
+      {/* Lifestyle */}
       <SimpleSection
         title="Lifestyle"
         items={[
@@ -146,6 +156,7 @@ export default function ProfileScreen({ route }) {
         ]}
       />
 
+      {/* Personal Info */}
       <SimpleSection
         title="Personal Info"
         items={[
@@ -156,6 +167,7 @@ export default function ProfileScreen({ route }) {
         ]}
       />
 
+      {/* Looking For */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>What I'm Looking For</Text>
         <Text style={styles.sectionText}>
@@ -163,6 +175,7 @@ export default function ProfileScreen({ route }) {
         </Text>
       </View>
 
+      {/* Tags */}
       {profile.tags?.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>My Hashtags</Text>
@@ -182,6 +195,7 @@ export default function ProfileScreen({ route }) {
 function SimpleSection({ title, items }) {
   const valid = items.filter((i) => i.value);
   if (valid.length === 0) return null;
+
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
@@ -224,10 +238,19 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 20,
   },
-  sectionTitle: { fontSize: 18, fontWeight: "600", color: "#ff69b4", marginBottom: 8 },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#ff69b4",
+    marginBottom: 8,
+  },
   sectionText: { color: "#ddd", lineHeight: 20 },
   galleryImage: { width: 120, height: 120, borderRadius: 8, marginRight: 10 },
-  row: { flexDirection: "row", justifyContent: "space-between", marginBottom: 6 },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 6,
+  },
   label: { color: "#aaa", width: 140 },
   value: { color: "#fff", flex: 1 },
   tagsContainer: { flexDirection: "row", flexWrap: "wrap", marginTop: 8 },

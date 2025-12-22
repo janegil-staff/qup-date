@@ -1,5 +1,5 @@
 // src/api/testRegister.js
-const API_URL = "http://localhost:3000/api";
+const API_URL = "https://qup.dating/api";
 
 export async function testRegister() {
   try {

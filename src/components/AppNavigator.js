@@ -26,6 +26,7 @@ import EditLifestyleScreen from "../screens/edit/EditLifestyleScreen";
 import EditHabitsScreen from "../screens/edit/EditHabitsScreen";
 import EditDetailsScreen from "../screens/edit/EditDetailsScreen";
 import EditImagesScreen from "../screens/edit/EditImagesScreen";
+import ChatScreen from "../screens/ChatScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -103,6 +104,7 @@ export default function AppNavigator() {
 
         {/* Logged-in flow */}
         <Stack.Screen name="MainTabs" component={MainTabs} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

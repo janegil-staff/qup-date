@@ -2,7 +2,7 @@ import * as SecureStore from "expo-secure-store";
 
 export async function saveStepData(payload) {
   const token = await SecureStore.getItemAsync("authToken");
-  const res = await fetch("http://localhost:3000/api/mobile/me", {
+  const res = await fetch("https://qup.dating/api/mobile/me", {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
