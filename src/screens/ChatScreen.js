@@ -18,9 +18,11 @@ import ImagePreviewBar from "../components/ImagePreviewBar";
 import { useChat } from "../../hooks/useChat";
 import { useImageUpload } from "../../hooks/useImageUpload";
 import FullScreenImageModal from "../components/FullScreenImageModal";
+import EmojiSelector from "react-native-emoji-selector";
 
 export default function ChatScreen({ route, navigation }) {
   const { userId, user } = route.params;
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const [currentUserId, setCurrentUserId] = useState(null);
   const [text, setText] = useState("");
@@ -28,7 +30,15 @@ export default function ChatScreen({ route, navigation }) {
 
   const listRef = useRef(null);
 
-  // Decode JWT
+  useEffect(() => {
+    if (!messages || messages.length === 0) return;
+
+    // Delay ensures layout is complete
+    setTimeout(() => {
+      listRef.current?.scrollToEnd({ animated: false });
+    }, 50);
+  }, [messages]);
+
   useEffect(() => {
     (async () => {
       const token = await SecureStore.getItemAsync("authToken");
@@ -77,78 +87,141 @@ export default function ChatScreen({ route, navigation }) {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={90}
-    >
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.back}>‹</Text>
-        </TouchableOpacity>
+    <View style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={90}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity
+            onPress={() => {
+              if (navigation.canGoBack()) navigation.goBack();
+              else navigation.navigate("Matches"); // or your main screen
+            }}
+            style={styles.backBtn}
+          >
+            <Text style={styles.backText}>‹</Text>
+          </TouchableOpacity>
 
-        <View style={styles.userInfo}>
-          <Image source={{ uri: user.profileImage }} style={styles.avatar} />
-          <Text style={styles.name}>{user.name}</Text>
+          <View style={styles.userInfo}>
+            <Image source={{ uri: user.profileImage }} style={styles.avatar} />
+            <Text style={styles.name}>{user.name}</Text>
+          </View>
         </View>
-      </View>
 
-      {/* Image previews */}
-      <ImagePreviewBar images={selectedImages} remove={removeImage} />
+        {/* Image previews */}
+        <ImagePreviewBar images={selectedImages} remove={removeImage} />
 
-      {/* Messages */}
-      <FlatList
-        ref={listRef}
-        data={messages}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => (
-          <MessageBubble
-            item={item}
-            isSender={
-              item.sender === currentUserId ||
-              item.sender?._id === currentUserId
-            }
-            onImagePress={(url) => setFullscreenImage(url)}
-          />
-        )}
-        contentContainerStyle={{ padding: 12 }}
-      />
-
-      <FullScreenImageModal
-        visible={!!fullscreenImage}
-        imageUrl={fullscreenImage}
-        onClose={() => setFullscreenImage(null)}
-      />
-
-      {/* Input */}
-      <View style={styles.inputRow}>
-        <TouchableOpacity onPress={pickImages}>
-          <Text style={styles.icon}>📷</Text>
-        </TouchableOpacity>
-
-        <TextInput
-          style={styles.input}
-          value={text}
-          onChangeText={setText}
-          placeholder="Type a message…"
-          placeholderTextColor="#999"
-          multiline
+        <FlatList
+          ref={listRef}
+          data={messages}
+          renderItem={({ item }) => (
+            <MessageBubble
+              item={item}
+              isSender={
+                item.sender === currentUserId ||
+                item.sender?._id === currentUserId
+              }
+              onImagePress={(url) => setFullscreenImage(url)}
+            />
+          )}
+          keyExtractor={(item) => item._id.toString()}
+          contentContainerStyle={{ padding: 12 }}
+          onContentSizeChange={() => {
+            listRef.current?.scrollToEnd({ animated: false });
+          }}
         />
 
-        <TouchableOpacity
-          style={styles.sendBtn}
-          onPress={handleSend}
-          disabled={uploading}
-        >
-          <Text style={styles.sendText}>{uploading ? "Sending…" : "Send"}</Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+        <FullScreenImageModal
+          visible={!!fullscreenImage}
+          imageUrl={fullscreenImage}
+          onClose={() => setFullscreenImage(null)}
+        />
+
+        <View style={{ backgroundColor: "#1f2937" }}>
+          <View style={styles.inputRow}>
+            <TouchableOpacity
+              onPress={() => setShowEmojiPicker((prev) => !prev)}
+            >
+              <Text style={styles.icon}>😀</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={pickImages}>
+              <Text style={styles.icon}>📷</Text>
+            </TouchableOpacity>
+
+            <TextInput
+              style={styles.input}
+              value={text}
+              onChangeText={setText}
+              placeholder="Type a message…"
+              placeholderTextColor="#999"
+              multiline
+            />
+
+            <TouchableOpacity style={styles.sendBtn} onPress={handleSend}>
+              <Text style={styles.sendText}>Send</Text>
+            </TouchableOpacity>
+          </View>
+          {showEmojiPicker && (
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => setShowEmojiPicker(false)}
+              style={styles.emojiOverlay}
+            >
+              <View style={styles.emojiPickerContainer}>
+                <EmojiSelector
+                  onEmojiSelected={(emoji) => {
+                    setText((prev) => prev + emoji);
+                    setShowEmojiPicker(false);
+                  }}
+                  showSearchBar={false}
+                  showTabs={true}
+                  columns={8}
+                  theme="#1f2937"
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+      </KeyboardAvoidingView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  emojiOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "transparent",
+    zIndex: 50,
+    elevation: 50,
+    justifyContent: "flex-end",
+  },
+
+  emojiPickerContainer: {
+    height: 300,
+    backgroundColor: "#1f2937",
+    borderTopWidth: 1,
+    borderTopColor: "#374151",
+  },
+
+  emojiContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 300, // perfect height for emoji selector
+    backgroundColor: "#1f2937",
+    borderTopWidth: 1,
+    borderTopColor: "#374151",
+    zIndex: 50,
+  },
+
   container: { flex: 1, backgroundColor: "#111827" },
   loader: {
     flex: 1,
