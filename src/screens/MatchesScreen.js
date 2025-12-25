@@ -63,16 +63,13 @@ export default function MatchesScreen({ navigation }) {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       {/* Profile Image */}
-      <Link href={`/profile/${item._id}`} asChild>
-        <TouchableOpacity activeOpacity={0.85}>
-          <Image
-            source={{
-              uri: item.profileImage || "https://via.placeholder.com/300",
-            }}
-            style={styles.image}
-          />
-        </TouchableOpacity>
-      </Link>
+
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => navigation.navigate("UserProfile", { userId: item._id })}
+      >
+        <Image source={{ uri: item.profileImage }} style={styles.image} />
+      </TouchableOpacity>
 
       <Text style={styles.name}>{item.name}</Text>
       <Text style={styles.bio} numberOfLines={2}>
@@ -82,7 +79,9 @@ export default function MatchesScreen({ navigation }) {
       {/* Chat button using Link */}
       <TouchableOpacity
         style={styles.chatBtn}
-        onPress={() => navigation.navigate("ChatScreen", { userId: item._id, user: item })}
+        onPress={() =>
+          navigation.navigate("ChatScreen", { userId: item._id, user: item })
+        }
       >
         <Text style={styles.chatText}>Start Chat</Text>
       </TouchableOpacity>

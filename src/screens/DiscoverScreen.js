@@ -13,7 +13,7 @@ import MatchCongrats from "../components/MatchCongrats";
 import VerifiedBadge from "../components/VerifiedBadge";
 import { getAgeFromDate } from "../utils/getAgeFromDate";
 
-export default function DiscoverScreen({ navigation }) {
+export default function DiscoverScreen({navigation}) {
   const [users, setUsers] = useState([]);
   const [cursor, setCursor] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -72,7 +72,8 @@ export default function DiscoverScreen({ navigation }) {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate("UserProfile", { userId: item._id })}
+      onPress={() => navigation.navigate("UserProfile", { userId: item._id })
+}
     >
       <View style={styles.card}>
         <Image

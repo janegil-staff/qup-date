@@ -10,11 +10,12 @@ import {
 import Swiper from "react-native-deck-swiper";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
-import Ionicons from '@expo/vector-icons/Ionicons';
+import Ionicons from "@expo/vector-icons/Ionicons";
 import * as SecureStore from "expo-secure-store";
 
 import UserCard from "../components/UserCard";
 import ProfileCompletion from "../components/ProfileCompletion";
+import Screen from "../components/Screen";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -78,9 +79,12 @@ export default function DashboardScreen() {
     async function fetchCards() {
       try {
         const token = await SecureStore.getItemAsync("authToken");
-        const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(
+          `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await res.json();
         setCards(Array.isArray(data) ? data : []);
       } catch (err) {
@@ -98,7 +102,8 @@ export default function DashboardScreen() {
       const token = await SecureStore.getItemAsync("authToken");
       if (!token || !card?._id) return;
 
-      const endpoint = direction === "right" ? "/api/mobile/like" : "/api/mobile/dislike";
+      const endpoint =
+        direction === "right" ? "/api/mobile/like" : "/api/mobile/dislike";
 
       await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, {
         method: "POST",
@@ -133,92 +138,94 @@ export default function DashboardScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Welcome back 👋</Text>
-          <Text style={styles.subtitle}>
-            Here’s what’s happening on your profile
-          </Text>
-        </View>
+    <Screen style={{ backgroundColor: "#111827" }}>
+      <View style={styles.container}>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.title}>Welcome back 👋</Text>
+            <Text style={styles.subtitle}>
+              Here’s what’s happening on your profile
+            </Text>
+          </View>
 
-        {/* Stats Grid */}
-        <View style={styles.statsGrid}>
-          <StatCard
-            icon={<Ionicons name="flame-sharp" size={28} color="white" />}
-            label="Profile Views"
-            value={stats.profileViews}
-            colors={["#ec4899", "#8b5cf6"]}
-          />
-          <StatCard
-            icon={<Feather name="heart" size={28} color="white" />}
-            label="New Likes"
-            value={stats.newLikes}
-            colors={["#ef4444", "#f97316"]}
-          />
-          <StatCard
-            icon={<Feather name="users" size={28} color="white" />}
-            label="New Matches"
-            value={stats.newMatches}
-            colors={["#6366f1", "#3b82f6"]}
-          />
-          <StatCard
-            icon={<Feather name="message-circle" size={28} color="white" />}
-            label="New Messages"
-            value={stats.newMessages}
-            colors={["#10b981", "#22c55e"]}
-          />
-        </View>
-        <View style={styles.swipeSection}>
-          <Swiper
-            cards={cards}
-            renderCard={(card) => <UserCard user={card} />}
-            onSwipedLeft={(i) => handleSwipe("left", i)}
-            onSwipedRight={(i) => handleSwipe("right", i)}
-            backgroundColor="transparent"
-            stackSize={3}
-            stackSeparation={15}
-            animateCardOpacity
-            verticalSwipe={false}
-            cardVerticalMargin={0} // ⭐ important
-            containerStyle={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-            cardStyle={{
-              height: "100%", // ⭐ important
-              width: "100%",
-              borderRadius: 20,
-            }}
-          />
-        </View>
+          {/* Stats Grid */}
+          <View style={styles.statsGrid}>
+            <StatCard
+              icon={<Ionicons name="flame-sharp" size={28} color="white" />}
+              label="Profile Views"
+              value={stats.profileViews}
+              colors={["#ec4899", "#8b5cf6"]}
+            />
+            <StatCard
+              icon={<Feather name="heart" size={28} color="white" />}
+              label="New Likes"
+              value={stats.newLikes}
+              colors={["#ef4444", "#f97316"]}
+            />
+            <StatCard
+              icon={<Feather name="users" size={28} color="white" />}
+              label="New Matches"
+              value={stats.newMatches}
+              colors={["#6366f1", "#3b82f6"]}
+            />
+            <StatCard
+              icon={<Feather name="message-circle" size={28} color="white" />}
+              label="New Messages"
+              value={stats.newMessages}
+              colors={["#10b981", "#22c55e"]}
+            />
+          </View>
+          <View style={styles.swipeSection}>
+            <Swiper
+              cards={cards}
+              renderCard={(card) => <UserCard user={card} />}
+              onSwipedLeft={(i) => handleSwipe("left", i)}
+              onSwipedRight={(i) => handleSwipe("right", i)}
+              backgroundColor="transparent"
+              stackSize={3}
+              stackSeparation={15}
+              animateCardOpacity
+              verticalSwipe={false}
+              cardVerticalMargin={0} // ⭐ important
+              containerStyle={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              cardStyle={{
+                height: "100%", // ⭐ important
+                width: "100%",
+                borderRadius: 20,
+              }}
+            />
+          </View>
 
-        {/* Profile Completion */}
-        <ProfileCompletion user={user} />
+          {/* Profile Completion */}
+          <ProfileCompletion user={user} />
 
-        {/* Suggestions */}
-        <View style={styles.suggestions}>
-          <Text style={styles.suggestionsTitle}>Suggestions</Text>
-          <Text style={styles.suggestion}>
-            <Text style={styles.bullet}>• </Text>
-            Add more photos to get 3× more matches
-          </Text>
-          <Text style={styles.suggestion}>
-            <Text style={styles.bullet}>• </Text>
-            Write a short bio to improve your profile
-          </Text>
-          <Text style={styles.suggestion}>
-            <Text style={styles.bullet}>• </Text>
-            Enable location for better matches
-          </Text>
-        </View>
-      </ScrollView>
-    </View>
+          {/* Suggestions */}
+          <View style={styles.suggestions}>
+            <Text style={styles.suggestionsTitle}>Suggestions</Text>
+            <Text style={styles.suggestion}>
+              <Text style={styles.bullet}>• </Text>
+              Add more photos to get 3× more matches
+            </Text>
+            <Text style={styles.suggestion}>
+              <Text style={styles.bullet}>• </Text>
+              Write a short bio to improve your profile
+            </Text>
+            <Text style={styles.suggestion}>
+              <Text style={styles.bullet}>• </Text>
+              Enable location for better matches
+            </Text>
+          </View>
+        </ScrollView>
+      </View>
+    </Screen>
   );
 }
 
