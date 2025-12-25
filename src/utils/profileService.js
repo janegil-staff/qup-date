@@ -9,16 +9,12 @@ export function prefillProfile(user) {
   return {
     // basics
     education: user.education ?? "",
-    religion: user.religion ?? "",
+    
     relationship: user.relationshipStatus ?? "",
-    children:
-      user.hasChildren === true
-        ? "Has children"
-        : user.hasChildren === false
-        ? "No children"
-        : "",
+    religion: (user.religion || "").toLowerCase(),
+    relationship: (user.relationshipStatus || "").toLowerCase(),
+    children: user.hasChildren ? "has children" : "no children",
 
-    // lifestyle
     smoking: user.smoking ?? "",
     drinking: user.drinking ?? "",
     exercise: user.exercise ?? "",

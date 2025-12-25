@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import Step5Bio from "./Step5Bio"; // adjust filename if different
+import Screen from "../../components/Screen";
 
 export default function EditBioScreen({ navigation }) {
   const [form, setForm] = useState({ bio: "" });
@@ -11,13 +12,15 @@ export default function EditBioScreen({ navigation }) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <Step5Bio
-        form={form}
-        setForm={setForm}
-        setField={setField}
-        navigation={navigation}
-      />
-    </View>
+    <Screen style={{ backgroundColor: "#111827" }}>
+      <View style={{ flex: 1 }}>
+        <Step5Bio
+          form={form}
+          setForm={setForm}
+          setField={setField}
+          navigation={navigation}
+        />
+      </View>
+    </Screen>
   );
 }

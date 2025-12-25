@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import Step0Basic from "./Step0Basic";
+import Screen from "../../components/Screen";
 
 export default function EditBasicScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -45,13 +46,15 @@ export default function EditBasicScreen({ navigation }) {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Step0Basic
-        form={form}
-        setForm={setForm}
-        setField={setField}
-        navigation={navigation}
-      />
-    </View>
+    <Screen style={{ backgroundColor: "#111827" }}>
+      <View style={{ flex: 1 }}>
+        <Step0Basic
+          form={form}
+          setForm={setForm}
+          setField={setField}
+          navigation={navigation}
+        />
+      </View>
+    </Screen>
   );
 }

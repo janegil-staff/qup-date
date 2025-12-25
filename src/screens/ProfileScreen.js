@@ -10,54 +10,32 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 
-export default function ProfileScreen({ route }) {
-  const userId = route?.params?.userId || null; // 🔥 safe destructure
+function capitalize(str) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export default function ProfileScreen() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const fetchProfile = async () => {
+  const loadOwnProfile = async () => {
     try {
-      setLoading(true);
-
       const token = await SecureStore.getItemAsync("authToken");
-      if (!token) {
-        console.warn("No auth token found");
-        return;
-      }
-
-      // 🔥 If userId exists → fetch that user
-      // 🔥 If not → fetch your own profile
-      const url = userId
-        ? `https://qup.dating/api/mobile/user/${userId}`
-        : `https://qup.dating/api/mobile/me`;
-
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch("https://qup.dating/api/mobile/me", {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-        console.warn("Profile API error:", data);
-        return;
-      }
-
-      setProfile(data.user || data);
-    } catch (err) {
-      console.error("Profile fetch error:", err);
+      setProfile(data.user);
     } finally {
       setLoading(false);
     }
   };
-
   useFocusEffect(
     useCallback(() => {
-      fetchProfile();
-    }, [userId])
+      loadOwnProfile();
+    }, [])
   );
-
+  if (loading) return <ActivityIndicator color="#ff69b4" />;
   if (loading) {
     return (
       <View style={styles.center}>
@@ -95,9 +73,9 @@ export default function ProfileScreen({ route }) {
             {profile.relationshipStatus || "Undefined status"}
           </Text>
           <Text style={styles.sub}>
-            {age ? `${age} years • ${profile.gender}` : profile.gender}
+            {age ? `${age} years • ${capitalize(profile.gender)}` : capitalize(profile.gender)}
           </Text>
-          <Text style={styles.location}>{profile.location?.name}</Text>
+          <Text style={styles.location}>{capitalize(profile.location?.name)}</Text>
         </View>
       </View>
 
@@ -129,8 +107,8 @@ export default function ProfileScreen({ route }) {
       <SimpleSection
         title="Appearance"
         items={[
-          { label: "Appearance", value: profile.appearance },
-          { label: "Body Type", value: profile.bodyType },
+          { label: "Appearance", value: capitalize(profile.appearance) },
+          { label: "Body Type", value: capitalize(profile.bodyType) },
           {
             label: "Height",
             value: profile.height ? `${profile.height} cm` : null,
@@ -142,8 +120,8 @@ export default function ProfileScreen({ route }) {
       <SimpleSection
         title="Lifestyle"
         items={[
-          { label: "Smoking", value: profile.smoking },
-          { label: "Drinking", value: profile.drinking },
+          { label: "Smoking", value: capitalize(profile.smoking) },
+          { label: "Drinking", value: capitalize(profile.drinking) },
           { label: "Has Children", value: profile.hasChildren ? "Yes" : "No" },
           {
             label: "Wants Children",
@@ -160,10 +138,10 @@ export default function ProfileScreen({ route }) {
       <SimpleSection
         title="Personal Info"
         items={[
-          { label: "Religion", value: profile.religion },
-          { label: "Occupation", value: profile.occupation },
-          { label: "Education", value: profile.education },
-          { label: "Relationship Status", value: profile.relationshipStatus },
+          { label: "Religion", value: capitalize(profile.religion) },
+          { label: "Occupation", value: capitalize(profile.occupation) },
+          { label: "Education", value: capitalize(profile.education) },
+          { label: "Relationship Status", value: capitalize(profile.relationshipStatus) },
         ]}
       />
 
@@ -171,7 +149,7 @@ export default function ProfileScreen({ route }) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>What I'm Looking For</Text>
         <Text style={styles.sectionText}>
-          {profile.lookingFor || "Not specified yet."}
+          {capitalize(profile.lookingFor) || "Not specified yet."}
         </Text>
       </View>
 

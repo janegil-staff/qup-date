@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import Step3Details from "./Step3Details";
+import Screen from "../../components/Screen";
 
 export default function EditDetailsScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -15,13 +16,15 @@ export default function EditDetailsScreen({ navigation }) {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <Step3Details
-        form={form}
-        setForm={setForm}
-        setField={setField}
-        navigation={navigation}
-      />
-    </View>
+    <Screen style={{ backgroundColor: "#111827" }}>
+      <View style={{ flex: 1 }}>
+        <Step3Details
+          form={form}
+          setForm={setForm}
+          setField={setField}
+          navigation={navigation}
+        />
+      </View>
+    </Screen>
   );
 }

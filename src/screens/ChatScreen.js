@@ -12,6 +12,7 @@ import {
   StyleSheet,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { Ionicons } from "@expo/vector-icons";
 
 import MessageBubble from "../components/MessageBubble";
 import ImagePreviewBar from "../components/ImagePreviewBar";
@@ -88,6 +89,12 @@ export default function ChatScreen({ route, navigation }) {
 
   return (
     <View style={{ flex: 1 }}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Ionicons name="arrow-back" size={28} color="#fff" />
+      </TouchableOpacity>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -95,19 +102,20 @@ export default function ChatScreen({ route, navigation }) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => {
-              if (navigation.canGoBack()) navigation.goBack();
-              else navigation.navigate("Matches"); // or your main screen
-            }}
-            style={styles.backBtn}
-          >
-            <Text style={styles.backText}>‹</Text>
-          </TouchableOpacity>
-
           <View style={styles.userInfo}>
-            <Image source={{ uri: user.profileImage }} style={styles.avatar} />
-            <Text style={styles.name}>{user.name}</Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation
+                  .getParent()
+                  ?.navigate("UserProfile", { userId: user._id })
+              }
+            >
+              <Image
+                source={{ uri: user.profileImage }}
+                style={styles.avatar}
+              />
+              <Text style={styles.name}>{user.name}</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -191,6 +199,15 @@ export default function ChatScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  backButton: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    zIndex: 999,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 8,
+    borderRadius: 30,
+  },
   emojiOverlay: {
     position: "absolute",
     top: 0,

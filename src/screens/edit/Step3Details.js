@@ -18,20 +18,20 @@ export default function Step3Details({ form, setForm, setField }) {
   const [loading, setLoading] = useState(true);
 
   const religionOptions = [
-    "Christian",
-    "Muslim",
-    "Jewish",
-    "Buddhist",
-    "Ateist",
-    "Other",
+    "christian",
+    "muslim",
+    "jewish",
+    "buddhist",
+    "ateist",
+    "other",
   ];
   const relationshipOptions = [
-    "Single",
-    "In a relationship",
-    "Married",
-    "Divorced",
+    "single",
+    "in a relationship",
+    "married",
+    "divorced",
   ];
-  const childrenOptions = ["No children", "Has children"];
+  const childrenOptions = ["no children", "has children"];
 
   /** ----------------------------------
    * Fetch and prefill profile
@@ -153,9 +153,9 @@ export default function Step3Details({ form, setForm, setField }) {
         placeholderTextColor="#6b7280"
       />
 
-      {renderOptions("Religion", religionOptions, "religion")}
-      {renderOptions("Relationship", relationshipOptions, "relationship")}
-      {renderOptions("Children", childrenOptions, "children")}
+      {renderOptions("religion", religionOptions, "religion")}
+      {renderOptions("relationship", relationshipOptions, "relationship")}
+      {renderOptions("children", childrenOptions, "children")}
 
       <View style={styles.navRow}>
         <TouchableOpacity

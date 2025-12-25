@@ -117,7 +117,7 @@ export default function RegisterScreen({ navigation }) {
           birthMonth,
           birthYear,
           gender,
-          images: uploadedImages
+          images: uploadedImages,
         }),
       });
 
@@ -185,6 +185,7 @@ export default function RegisterScreen({ navigation }) {
         secureTextEntry
       />
       {errors.email && <Text style={styles.errorText}>{errors.password}</Text>}
+      <Text style={styles.birthdate}>Birthdate</Text>
       <View style={styles.row}>
         {/* Day */}
         <View style={styles.pickerWrapper}>
@@ -242,6 +243,7 @@ export default function RegisterScreen({ navigation }) {
         </View>
 
         {/* Year */}
+
         <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={birthYear}
@@ -338,7 +340,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 10,
   },
-
+  birthdate: {
+    color: "#ffffff",
+    padding: 5,
+  },
   submitButton: {
     backgroundColor: "#ff69b4",
     padding: 14,
@@ -354,9 +359,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#1f2937",
     borderRadius: 6,
     marginHorizontal: 4,
-    height: 40,
-    justifyContent: "center",
+    height: 55, // ⭐ increased height
   },
+
   picker: {
     color: "white", // ✅ Android text color
     height: 40,
@@ -366,6 +371,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 15,
+    marginTop: 150,
   },
 
   genderButton: {
@@ -392,7 +398,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: "#111827",
     padding: 20,
-    justifyContent: "center",
+    paddingBottom: 80, // gives breathing room at bottom
   },
 
   heading: {
@@ -412,8 +418,9 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 15,
+    marginBottom: 25, // ⭐ more spacing
   },
+
   genderButton: {
     backgroundColor: "#1f2937",
     padding: 10,
@@ -427,8 +434,10 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
+    marginTop: 10, // ⭐ new
     alignItems: "center",
   },
+
   previewRow: { flexDirection: "row", flexWrap: "wrap", marginBottom: 15 },
   previewWrapper: { position: "relative", marginRight: 10, marginBottom: 10 },
   previewImage: { width: 80, height: 80, borderRadius: 8 },
