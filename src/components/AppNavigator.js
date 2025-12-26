@@ -24,6 +24,7 @@ import EditImagesScreen from "../screens/edit/EditImagesScreen";
 import ChatScreen from "../screens/ChatScreen";
 import UserProfileScreen from "../screens/UserProfileScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -129,6 +130,7 @@ export default function AppNavigator() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="LandingScreen" component={LandingScreen} />
           <Stack.Screen name="LoginForm" component={LoginForm} />
+          <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="MainTabs" component={MainTabs} />
         </Stack.Navigator>

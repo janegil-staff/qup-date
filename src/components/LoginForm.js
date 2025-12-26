@@ -93,11 +93,26 @@ export default function LoginForm({ navigation }) {
           </Text>
         </Text>
       </View>
+
+      <Text
+        style={styles.forgotPassword}
+        onPress={() => navigation.navigate("ForgotPasswordScreen")}
+      >
+        Forgot your password?
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  forgotPassword: {
+    color: "#ff69b4",
+    textAlign: "center",
+    marginTop: 20,
+    marginBottom: 20,
+    fontWeight: "600",
+  },
+
   registerButton: {
     marginTop: 20,
     paddingVertical: 12,
