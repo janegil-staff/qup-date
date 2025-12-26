@@ -34,18 +34,23 @@ export default function ProfileCompletion({ user }) {
 
 function calculateCompletion(user) {
   let score = 0;
-  if (user.photos?.length) score += 30;
-  if (user.bio) score += 10;
+  if (user.images?.length) score += (user.images?.length * 5);
+  if (user.bio) score += 5;
   if (user.smoking) score += 5;
   if (user.drinking) score += 5;
   if (user.exercise) score += 5;
-  if (user.height) score += 10;
+  if (user.height) score += 5;
   if (user.occupation) score += 5;
   if (user.bodyType) score += 5;
   if (user.hasChildren) score += 5;
   if (user.lookingFor) score += 5;
-  if (user.location) score += 10;
+  if (user.location) score += 5;
   if (user.religion) score += 5;
+  if (user.diet) score += 5;
+  if (user.wantsChildren) score += 5;
+  if (user.relationshipStatus) score += 5;
+  if (user.willingToRelocate) score += 5;
+  console.log(score);
   return score;
 }
 

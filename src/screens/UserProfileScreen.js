@@ -12,6 +12,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import EnhancedImageViewing from "react-native-image-viewing";
+import Screen from "../components/Screen";
 
 export default function UserProfileScreen({ route, navigation }) {
   const userId = route.params?.userId;
@@ -73,151 +74,153 @@ export default function UserProfileScreen({ route, navigation }) {
     : null;
 
   return (
-    <View style={{ flex: 1 }}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons name="arrow-back" size={28} color="#fff" />{" "}
-      </TouchableOpacity>{" "}
-      <ScrollView
-        contentContainerStyle={[styles.container, { paddingTop: 80 }]}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Image
-            source={{
-              uri: profile.profileImage || "https://placehold.co/100x100",
-            }}
-            style={styles.avatar}
-          />
-          <View style={styles.headerText}>
-            <Text style={styles.name}>{profile.name}</Text>
+    <Screen style={{ backgroundColor: "#111827" }}>
+      <View style={{ flex: 1 }}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={28} color="#fff" />{" "}
+        </TouchableOpacity>{" "}
+        <ScrollView
+          contentContainerStyle={[styles.container, { paddingTop: 80 }]}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <Image
+              source={{
+                uri: profile.profileImage || "https://placehold.co/100x100",
+              }}
+              style={styles.avatar}
+            />
+            <View style={styles.headerText}>
+              <Text style={styles.name}>{profile.name}</Text>
 
-            <Text style={styles.status}>
-              {profile.relationshipStatus || "Undefined status"}
-            </Text>
+              <Text style={styles.status}>
+                {profile.relationshipStatus || "Undefined status"}
+              </Text>
 
-            <Text style={styles.sub}>
-              {age ? `${age} years • ${profile.gender}` : profile.gender}
-            </Text>
+              <Text style={styles.sub}>
+                {age ? `${age} years • ${profile.gender}` : profile.gender}
+              </Text>
 
-            <Text style={styles.location}>
-              {profile.location?.name || profile.location?.country}
-            </Text>
-          </View>
-        </View>
-
-        {/* Bio */}
-        {profile.bio ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About Me</Text>
-            <Text style={styles.sectionText}>{profile.bio}</Text>
-          </View>
-        ) : null}
-
-        {/* Photos Section */}
-        {Array.isArray(profile.images) && profile.images.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Photos</Text>
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {profile.images.map((img, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => {
-                    setCarouselIndex(index);
-                    setCarouselVisible(true);
-                  }}
-                >
-                  <Image
-                    source={{ uri: img.url || img.uri }}
-                    style={styles.galleryImage}
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
-        {/* Appearance */}
-        <SimpleSection
-          title="Appearance"
-          items={[
-            { label: "Appearance", value: profile.appearance },
-            { label: "Body Type", value: profile.bodyType },
-            {
-              label: "Height",
-              value: profile.height ? `${profile.height} cm` : null,
-            },
-          ]}
-        />
-
-        {/* Lifestyle */}
-        <SimpleSection
-          title="Lifestyle"
-          items={[
-            { label: "Smoking", value: profile.smoking },
-            { label: "Drinking", value: profile.drinking },
-            {
-              label: "Has Children",
-              value: profile.hasChildren ? "Yes" : "No",
-            },
-            {
-              label: "Wants Children",
-              value: profile.wantsChildren ? "Yes" : "No",
-            },
-            {
-              label: "Willing to Relocate",
-              value: profile.willingToRelocate ? "Yes" : "No",
-            },
-          ]}
-        />
-
-        {/* Personal Info */}
-        <SimpleSection
-          title="Personal Info"
-          items={[
-            { label: "Religion", value: profile.religion },
-            { label: "Occupation", value: profile.occupation },
-            { label: "Education", value: profile.education },
-            {
-              label: "Relationship Status",
-              value: profile.relationshipStatus,
-            },
-          ]}
-        />
-
-        {/* Looking For */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>What I'm Looking For</Text>
-          <Text style={styles.sectionText}>
-            {profile.lookingFor || "Not specified yet."}
-          </Text>
-        </View>
-
-        {/* Tags */}
-        {Array.isArray(profile.tags) && profile.tags.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>My Hashtags</Text>
-            <View style={styles.tagsContainer}>
-              {profile.tags.map((tag, i) => (
-                <Text key={i} style={styles.tag}>
-                  {String(tag)}
-                </Text>
-              ))}
+              <Text style={styles.location}>
+                {profile.location?.name || profile.location?.country}
+              </Text>
             </View>
           </View>
-        )}
-      </ScrollView>
-      <EnhancedImageViewing
-        images={profile.images.map((img) => ({
-          uri: img.url || img.uri,
-        }))}
-        imageIndex={carouselIndex}
-        visible={isCarouselVisible}
-        onRequestClose={() => setCarouselVisible(false)}
-      />
-    </View>
+
+          {/* Bio */}
+          {profile.bio ? (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>About Me</Text>
+              <Text style={styles.sectionText}>{profile.bio}</Text>
+            </View>
+          ) : null}
+
+          {/* Photos Section */}
+          {Array.isArray(profile.images) && profile.images.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Photos</Text>
+
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {profile.images.map((img, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      setCarouselIndex(index);
+                      setCarouselVisible(true);
+                    }}
+                  >
+                    <Image
+                      source={{ uri: img.url || img.uri }}
+                      style={styles.galleryImage}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          )}
+          {/* Appearance */}
+          <SimpleSection
+            title="Appearance"
+            items={[
+              { label: "Appearance", value: profile.appearance },
+              { label: "Body Type", value: profile.bodyType },
+              {
+                label: "Height",
+                value: profile.height ? `${profile.height} cm` : null,
+              },
+            ]}
+          />
+
+          {/* Lifestyle */}
+          <SimpleSection
+            title="Lifestyle"
+            items={[
+              { label: "Smoking", value: profile.smoking },
+              { label: "Drinking", value: profile.drinking },
+              {
+                label: "Has Children",
+                value: profile.hasChildren ? "Yes" : "No",
+              },
+              {
+                label: "Wants Children",
+                value: profile.wantsChildren ? "Yes" : "No",
+              },
+              {
+                label: "Willing to Relocate",
+                value: profile.willingToRelocate ? "Yes" : "No",
+              },
+            ]}
+          />
+
+          {/* Personal Info */}
+          <SimpleSection
+            title="Personal Info"
+            items={[
+              { label: "Religion", value: profile.religion },
+              { label: "Occupation", value: profile.occupation },
+              { label: "Education", value: profile.education },
+              {
+                label: "Relationship Status",
+                value: profile.relationshipStatus,
+              },
+            ]}
+          />
+
+          {/* Looking For */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>What I'm Looking For</Text>
+            <Text style={styles.sectionText}>
+              {profile.lookingFor || "Not specified yet."}
+            </Text>
+          </View>
+
+          {/* Tags */}
+          {Array.isArray(profile.tags) && profile.tags.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>My Hashtags</Text>
+              <View style={styles.tagsContainer}>
+                {profile.tags.map((tag, i) => (
+                  <Text key={i} style={styles.tag}>
+                    {String(tag)}
+                  </Text>
+                ))}
+              </View>
+            </View>
+          )}
+        </ScrollView>
+        <EnhancedImageViewing
+          images={profile.images.map((img) => ({
+            uri: img.url || img.uri,
+          }))}
+          imageIndex={carouselIndex}
+          visible={isCarouselVisible}
+          onRequestClose={() => setCarouselVisible(false)}
+        />
+      </View>
+    </Screen>
   );
 }
 

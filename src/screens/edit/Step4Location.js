@@ -45,7 +45,8 @@ export default function Step4Location({ form, setForm, setField }) {
           lng: form.location.lng,
           country: form.location.country,
         },
-        searchScope: form.searchScope || "national",
+        searchScope: form.searchScope || "worldwide",
+        willingToRelocate: form.willingToRelocate ?? false,
       });
 
       setForm((prev) => ({
@@ -60,10 +61,9 @@ export default function Step4Location({ form, setForm, setField }) {
   };
 
   const searchOptions = [
-  { key: "national", label: "Nearby" },
-  { key: "international", label: "Worldwide" },
-];
-
+    { key: "national", label: "Nearby" },
+    { key: "worldwide", label: "Worldwide" },
+  ];
 
   return (
     <View style={styles.container}>
@@ -103,6 +103,32 @@ export default function Step4Location({ form, setForm, setField }) {
               style={[
                 styles.radioText,
                 form.searchScope === opt.key && styles.radioTextActive,
+              ]}
+            >
+              {opt.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <Text style={styles.label}>Willing to Relocate</Text>
+
+      <View style={styles.row}>
+        {[
+          { key: true, label: "Yes" },
+          { key: false, label: "No" },
+        ].map((opt) => (
+          <TouchableOpacity
+            key={opt.label}
+            style={[
+              styles.radioButton,
+              form.willingToRelocate === opt.key && styles.radioActive,
+            ]}
+            onPress={() => setField("willingToRelocate", opt.key)}
+          >
+            <Text
+              style={[
+                styles.radioText,
+                form.willingToRelocate === opt.key && styles.radioTextActive,
               ]}
             >
               {opt.label}

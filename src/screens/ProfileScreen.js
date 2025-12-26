@@ -11,6 +11,7 @@ import * as SecureStore from "expo-secure-store";
 import { TouchableOpacity } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import EnhancedImageViewing from "react-native-image-viewing";
+import Screen from "../components/Screen";
 
 function capitalize(str) {
   if (!str) return "";
@@ -62,138 +63,143 @@ export default function ProfileScreen() {
     : null;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Image
-          source={{
-            uri: profile.profileImage || "https://placehold.co/100x100",
-          }}
-          style={styles.avatar}
-        />
-        <View style={styles.headerText}>
-          <Text style={styles.name}>{profile.name}</Text>
-          <Text style={styles.status}>
-            {profile.relationshipStatus || "Undefined status"}
-          </Text>
-          <Text style={styles.sub}>
-            {age
-              ? `${age} years • ${capitalize(profile.gender)}`
-              : capitalize(profile.gender)}
-          </Text>
-          <Text style={styles.location}>
-            {capitalize(profile.location?.name)}
-          </Text>
-        </View>
-      </View>
-
-      {/* Bio */}
-      {profile.bio && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About Me</Text>
-          <Text style={styles.sectionText}>{profile.bio}</Text>
-        </View>
-      )}
-
-      {/* Gallery */}
-      {Array.isArray(profile.images) && profile.images.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Photos</Text>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {profile.images.map((img, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => {
-                  setCarouselIndex(index);
-                  setCarouselVisible(true);
-                }}
-              >
-                <Image
-                  source={{ uri: img.url || img.uri }}
-                  style={styles.galleryImage}
-                />
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-      {/* Appearance */}
-      <SimpleSection
-        title="Appearance"
-        items={[
-          { label: "Appearance", value: capitalize(profile.appearance) },
-          { label: "Body Type", value: capitalize(profile.bodyType) },
-          {
-            label: "Height",
-            value: profile.height ? `${profile.height} cm` : null,
-          },
-        ]}
-      />
-
-      {/* Lifestyle */}
-      <SimpleSection
-        title="Lifestyle"
-        items={[
-          { label: "Smoking", value: capitalize(profile.smoking) },
-          { label: "Drinking", value: capitalize(profile.drinking) },
-          { label: "Has Children", value: profile.hasChildren ? "Yes" : "No" },
-          {
-            label: "Wants Children",
-            value: profile.wantsChildren ? "Yes" : "No",
-          },
-          {
-            label: "Willing to Relocate",
-            value: profile.willingToRelocate ? "Yes" : "No",
-          },
-        ]}
-      />
-
-      {/* Personal Info */}
-      <SimpleSection
-        title="Personal Info"
-        items={[
-          { label: "Religion", value: capitalize(profile.religion) },
-          { label: "Occupation", value: capitalize(profile.occupation) },
-          { label: "Education", value: capitalize(profile.education) },
-          {
-            label: "Relationship Status",
-            value: capitalize(profile.relationshipStatus),
-          },
-        ]}
-      />
-
-      {/* Looking For */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>What I'm Looking For</Text>
-        <Text style={styles.sectionText}>
-          {capitalize(profile.lookingFor) || "Not specified yet."}
-        </Text>
-      </View>
-
-      {/* Tags */}
-      {profile.tags?.length > 0 && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>My Hashtags</Text>
-          <View style={styles.tagsContainer}>
-            {profile.tags.map((tag, i) => (
-              <Text key={i} style={styles.tag}>
-                {tag}
-              </Text>
-            ))}
+    <Screen style={{ backgroundColor: "#111827" }}>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Image
+            source={{
+              uri: profile.profileImage || "https://placehold.co/100x100",
+            }}
+            style={styles.avatar}
+          />
+          <View style={styles.headerText}>
+            <Text style={styles.name}>{profile.name}</Text>
+            <Text style={styles.status}>
+              {profile.relationshipStatus || "Undefined status"}
+            </Text>
+            <Text style={styles.sub}>
+              {age
+                ? `${age} years • ${capitalize(profile.gender)}`
+                : capitalize(profile.gender)}
+            </Text>
+            <Text style={styles.location}>
+              {capitalize(profile.location?.name)}
+            </Text>
           </View>
         </View>
-      )}
 
-      <EnhancedImageViewing
-        images={profile.images.map((img) => ({
-          uri: img.url || img.uri,
-        }))}
-        imageIndex={carouselIndex}
-        visible={isCarouselVisible}
-        onRequestClose={() => setCarouselVisible(false)}
-      />
-    </ScrollView>
+        {/* Bio */}
+        {profile.bio && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>About Me</Text>
+            <Text style={styles.sectionText}>{profile.bio}</Text>
+          </View>
+        )}
+
+        {/* Gallery */}
+        {Array.isArray(profile.images) && profile.images.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Photos</Text>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {profile.images.map((img, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    setCarouselIndex(index);
+                    setCarouselVisible(true);
+                  }}
+                >
+                  <Image
+                    source={{ uri: img.url || img.uri }}
+                    style={styles.galleryImage}
+                  />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
+        {/* Appearance */}
+        <SimpleSection
+          title="Appearance"
+          items={[
+            { label: "Appearance", value: capitalize(profile.appearance) },
+            { label: "Body Type", value: capitalize(profile.bodyType) },
+            {
+              label: "Height",
+              value: profile.height ? `${profile.height} cm` : null,
+            },
+          ]}
+        />
+
+        {/* Lifestyle */}
+        <SimpleSection
+          title="Lifestyle"
+          items={[
+            { label: "Smoking", value: capitalize(profile.smoking) },
+            { label: "Drinking", value: capitalize(profile.drinking) },
+            {
+              label: "Has Children",
+              value: profile.hasChildren ? "Yes" : "No",
+            },
+            {
+              label: "Wants Children",
+              value: profile.wantsChildren ? "Yes" : "No",
+            },
+            {
+              label: "Willing to Relocate",
+              value: profile.willingToRelocate ? "Yes" : "No",
+            },
+          ]}
+        />
+
+        {/* Personal Info */}
+        <SimpleSection
+          title="Personal Info"
+          items={[
+            { label: "Religion", value: capitalize(profile.religion) },
+            { label: "Occupation", value: capitalize(profile.occupation) },
+            { label: "Education", value: capitalize(profile.education) },
+            {
+              label: "Relationship Status",
+              value: capitalize(profile.relationshipStatus),
+            },
+          ]}
+        />
+
+        {/* Looking For */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>What I'm Looking For</Text>
+          <Text style={styles.sectionText}>
+            {capitalize(profile.lookingFor) || "Not specified yet."}
+          </Text>
+        </View>
+
+        {/* Tags */}
+        {profile.tags?.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>My Hashtags</Text>
+            <View style={styles.tagsContainer}>
+              {profile.tags.map((tag, i) => (
+                <Text key={i} style={styles.tag}>
+                  {tag}
+                </Text>
+              ))}
+            </View>
+          </View>
+        )}
+
+        <EnhancedImageViewing
+          images={profile.images.map((img) => ({
+            uri: img.url || img.uri,
+          }))}
+          imageIndex={carouselIndex}
+          visible={isCarouselVisible}
+          onRequestClose={() => setCarouselVisible(false)}
+        />
+      </ScrollView>
+    </Screen>
   );
 }
 
