@@ -11,11 +11,14 @@ import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import EnhancedImageViewing from "react-native-image-viewing";
 
 export default function UserProfileScreen({ route, navigation }) {
   const userId = route.params?.userId;
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isCarouselVisible, setCarouselVisible] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   const fetchUser = async () => {
     try {
@@ -77,8 +80,9 @@ export default function UserProfileScreen({ route, navigation }) {
       >
         <Ionicons name="arrow-back" size={28} color="#fff" />{" "}
       </TouchableOpacity>{" "}
-      <ScrollView contentContainerStyle={[styles.container, { paddingTop: 80 }]}>
-
+      <ScrollView
+        contentContainerStyle={[styles.container, { paddingTop: 80 }]}
+      >
         {/* Header */}
         <View style={styles.header}>
           <Image
@@ -95,9 +99,7 @@ export default function UserProfileScreen({ route, navigation }) {
             </Text>
 
             <Text style={styles.sub}>
-              {age
-                ? `${age} years • ${profile.gender}`
-                : profile.gender}
+              {age ? `${age} years • ${profile.gender}` : profile.gender}
             </Text>
 
             <Text style={styles.location}>
@@ -114,22 +116,29 @@ export default function UserProfileScreen({ route, navigation }) {
           </View>
         ) : null}
 
-        {/* Gallery */}
+        {/* Photos Section */}
         {Array.isArray(profile.images) && profile.images.length > 0 && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Photos</Text>
+
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {profile.images.map((img, i) => (
-                <Image
-                  key={i}
-                  source={{ uri: img.url || img.uri }}
-                  style={styles.galleryImage}
-                />
+              {profile.images.map((img, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    setCarouselIndex(index);
+                    setCarouselVisible(true);
+                  }}
+                >
+                  <Image
+                    source={{ uri: img.url || img.uri }}
+                    style={styles.galleryImage}
+                  />
+                </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
         )}
-
         {/* Appearance */}
         <SimpleSection
           title="Appearance"
@@ -200,6 +209,14 @@ export default function UserProfileScreen({ route, navigation }) {
           </View>
         )}
       </ScrollView>
+      <EnhancedImageViewing
+        images={profile.images.map((img) => ({
+          uri: img.url || img.uri,
+        }))}
+        imageIndex={carouselIndex}
+        visible={isCarouselVisible}
+        onRequestClose={() => setCarouselVisible(false)}
+      />
     </View>
   );
 }

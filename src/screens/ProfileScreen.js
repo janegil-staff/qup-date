@@ -8,7 +8,9 @@ import {
   StyleSheet,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { TouchableOpacity } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import EnhancedImageViewing from "react-native-image-viewing";
 
 function capitalize(str) {
   if (!str) return "";
@@ -18,6 +20,8 @@ function capitalize(str) {
 export default function ProfileScreen() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isCarouselVisible, setCarouselVisible] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
   const loadOwnProfile = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
@@ -73,9 +77,13 @@ export default function ProfileScreen() {
             {profile.relationshipStatus || "Undefined status"}
           </Text>
           <Text style={styles.sub}>
-            {age ? `${age} years • ${capitalize(profile.gender)}` : capitalize(profile.gender)}
+            {age
+              ? `${age} years • ${capitalize(profile.gender)}`
+              : capitalize(profile.gender)}
           </Text>
-          <Text style={styles.location}>{capitalize(profile.location?.name)}</Text>
+          <Text style={styles.location}>
+            {capitalize(profile.location?.name)}
+          </Text>
         </View>
       </View>
 
@@ -88,21 +96,28 @@ export default function ProfileScreen() {
       )}
 
       {/* Gallery */}
-      {profile.images?.length > 0 && (
+      {Array.isArray(profile.images) && profile.images.length > 0 && (
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Photos</Text>
+
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {profile.images.map((img, i) => (
-              <Image
-                key={i}
-                source={{ uri: img.url || img.uri }}
-                style={styles.galleryImage}
-              />
+            {profile.images.map((img, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  setCarouselIndex(index);
+                  setCarouselVisible(true);
+                }}
+              >
+                <Image
+                  source={{ uri: img.url || img.uri }}
+                  style={styles.galleryImage}
+                />
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
       )}
-
       {/* Appearance */}
       <SimpleSection
         title="Appearance"
@@ -141,7 +156,10 @@ export default function ProfileScreen() {
           { label: "Religion", value: capitalize(profile.religion) },
           { label: "Occupation", value: capitalize(profile.occupation) },
           { label: "Education", value: capitalize(profile.education) },
-          { label: "Relationship Status", value: capitalize(profile.relationshipStatus) },
+          {
+            label: "Relationship Status",
+            value: capitalize(profile.relationshipStatus),
+          },
         ]}
       />
 
@@ -166,6 +184,15 @@ export default function ProfileScreen() {
           </View>
         </View>
       )}
+
+      <EnhancedImageViewing
+        images={profile.images.map((img) => ({
+          uri: img.url || img.uri,
+        }))}
+        imageIndex={carouselIndex}
+        visible={isCarouselVisible}
+        onRequestClose={() => setCarouselVisible(false)}
+      />
     </ScrollView>
   );
 }

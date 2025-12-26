@@ -16,13 +16,12 @@ export default function LocationAutocomplete({
   const [results, setResults] = useState([]);
   const [locked, setLocked] = useState(false);
 
-  /** Lock suggestions if value is prefilled */
   useEffect(() => {
-    if (value && value.length > 0) {
+    // Only lock if the value was prefilled AND user hasn't typed yet
+    if (value && results.length === 0) {
       setLocked(true);
-      setResults([]);
     }
-  }, [value]);
+  }, []);
 
   const search = async (text) => {
     onChange(text);

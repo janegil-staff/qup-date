@@ -93,10 +93,10 @@ function MainTabs() {
           switch (route.name) {
             case "Dashboard":
               return <Ionicons name="home" size={size} color={color} />;
-            case "Discover":
-              return <Ionicons name="search" size={size} color={color} />;
             case "Matches":
               return <FontAwesome name="heart" size={size} color={color} />;
+            case "Discover":
+              return <Ionicons name="search" size={size} color={color} />;
             case "Edit":
               return <FontAwesome name="pencil" size={size} color={color} />;
             case "Profile":
@@ -112,8 +112,9 @@ function MainTabs() {
       })}
     >
       <Tab.Screen name="Dashboard" component={DashboardStack} />
-      <Tab.Screen name="Discover" component={DiscoverStack} />
+
       <Tab.Screen name="Matches" component={MatchesStack} />
+      <Tab.Screen name="Discover" component={DiscoverStack} />
       <Tab.Screen name="Edit" component={EditStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
       <Tab.Screen name="Logout" component={LogoutScreen} />

@@ -45,6 +45,7 @@ export default function Step4Location({ form, setForm, setField }) {
           lng: form.location.lng,
           country: form.location.country,
         },
+        searchScope: form.searchScope || "national",
       });
 
       setForm((prev) => ({
@@ -57,6 +58,12 @@ export default function Step4Location({ form, setForm, setField }) {
       Alert.alert("Error", "Failed to save location");
     }
   };
+
+  const searchOptions = [
+  { key: "national", label: "Nearby" },
+  { key: "international", label: "Worldwide" },
+];
+
 
   return (
     <View style={styles.container}>
@@ -80,6 +87,30 @@ export default function Step4Location({ form, setForm, setField }) {
         onSelect={(location) => setField("location", location)}
       />
 
+      <Text style={styles.label}>Search Preference</Text>
+
+      <View style={styles.row}>
+        {searchOptions.map((opt) => (
+          <TouchableOpacity
+            key={opt.key}
+            style={[
+              styles.radioButton,
+              form.searchScope === opt.key && styles.radioActive,
+            ]}
+            onPress={() => setField("searchScope", opt.key)}
+          >
+            <Text
+              style={[
+                styles.radioText,
+                form.searchScope === opt.key && styles.radioTextActive,
+              ]}
+            >
+              {opt.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
       <View style={styles.navRow}>
         <TouchableOpacity
           style={[styles.navButton, styles.backButton]}
@@ -100,9 +131,40 @@ export default function Step4Location({ form, setForm, setField }) {
 }
 
 const styles = StyleSheet.create({
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+
+  radioButton: {
+    flex: 1,
+    marginRight: 10,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: "#1f2937",
+    borderWidth: 1,
+    borderColor: "#374151",
+    alignItems: "center",
+  },
+
+  radioActive: {
+    backgroundColor: "#ff69b4",
+    borderColor: "#ff69b4",
+  },
+
+  radioText: {
+    color: "#9ca3af",
+    fontWeight: "600",
+  },
+
+  radioTextActive: {
+    color: "white",
+  },
+
   progress: { marginBottom: 20 },
   container: { flex: 1, backgroundColor: "#111827", padding: 20 },
-  label: { color: "#ccc", marginBottom: 6, fontWeight: "600" },
+  label: { color: "#ccc", marginBottom: 6, fontWeight: "600", marginTop: 20 },
   input: {
     backgroundColor: "#1f2937",
     color: "white",
