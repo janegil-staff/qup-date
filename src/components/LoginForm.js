@@ -82,11 +82,35 @@ export default function LoginForm({ navigation }) {
           <Text style={styles.buttonText}>Login</Text>
         )}
       </TouchableOpacity>
+      <View style={{ marginTop: 20 }}>
+        <Text style={{ textAlign: "center", color: "#ccc" }}>
+          Don’t have an account?{" "}
+          <Text
+            style={{ color: "#ff69b4", fontWeight: "600" }}
+            onPress={() => navigation.navigate("RegisterScreen")}
+          >
+            Register here
+          </Text>
+        </Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  registerButton: {
+    marginTop: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ff69b4",
+    alignItems: "center",
+  },
+  registerText: {
+    color: "#ff69b4",
+    fontWeight: "600",
+  },
+
   container: {
     flex: 1,
     backgroundColor: "#111",

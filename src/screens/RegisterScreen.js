@@ -325,7 +325,7 @@ export default function RegisterScreen({ navigation }) {
         Already a member?{" "}
         <Text
           style={{ color: "#ff69b4" }}
-          onPress={() => navigation.navigate("LoginScreen")}
+          onPress={() => navigation.navigate("LoginForm")}
         >
           Log in here
         </Text>
