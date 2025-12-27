@@ -13,7 +13,7 @@ import MatchCongrats from "../components/MatchCongrats";
 import VerifiedBadge from "../components/VerifiedBadge";
 import { getAgeFromDate } from "../utils/getAgeFromDate";
 
-export default function DiscoverScreen({navigation}) {
+export default function DiscoverScreen({ navigation }) {
   const [users, setUsers] = useState([]);
   const [cursor, setCursor] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -72,18 +72,16 @@ export default function DiscoverScreen({navigation}) {
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
-      onPress={() => navigation.navigate("UserProfile", { userId: item._id })
-}
+      onPress={() => navigation.navigate("UserProfile", { userId: item._id })}
     >
       <View style={styles.card}>
+        {item.isVerified && <VerifiedBadge />}
         <Image
           source={{
             uri: item.profileImage || "https://via.placeholder.com/300",
           }}
           style={styles.image}
         />
-
-        {item.isVerified && <VerifiedBadge />}
 
         <Text style={styles.name}>
           {item.name}, {getAgeFromDate(item.birthdate)}
@@ -137,6 +135,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
+    position: "relative"
+  },
+  isVerified: {
+    position: "absolute",
+    top: 20,
+    right: 20
   },
   image: {
     width: "100%",

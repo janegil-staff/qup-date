@@ -24,7 +24,12 @@ export default function MessageBubble({ item, isSender, onImagePress }) {
       )}
 
       <Text style={styles.time}>
-        {new Date(item.createdAt).toLocaleTimeString()}
+        {(
+          new Date(item.createdAt).toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }) || ""
+        ).toString()}
       </Text>
     </View>
   );
@@ -47,13 +52,19 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     borderBottomLeftRadius: 4,
   },
-  text: { color: "#fff", fontSize: 15 },
+  text: {
+    color: "#fff",
+    fontSize: 15,
+    letterSpacing: 0, // ← REQUIRED FIX
+  },
   time: {
     fontSize: 10,
     color: "#d1d5db",
     marginTop: 4,
     textAlign: "right",
+    letterSpacing: 0,
   },
+
   image: {
     width: 200,
     height: 200,

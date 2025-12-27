@@ -12,6 +12,7 @@ import { TouchableOpacity } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
+import VerifyBanner from "../components/VerifyBanner";
 
 function capitalize(str) {
   if (!str) return "";
@@ -21,8 +22,10 @@ function capitalize(str) {
 export default function ProfileScreen() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+   const [isVerified, setIsVerified] = useState(false);
   const [isCarouselVisible, setCarouselVisible] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
+
   const loadOwnProfile = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
@@ -30,6 +33,7 @@ export default function ProfileScreen() {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
+      setIsVerified(data.user.isVerified);
       setProfile(data.user);
     } finally {
       setLoading(false);
@@ -65,6 +69,7 @@ export default function ProfileScreen() {
   return (
     <Screen style={{ backgroundColor: "#111827" }}>
       <ScrollView contentContainerStyle={styles.container}>
+        {!isVerified && <VerifyBanner user={profile} />}
         {/* Header */}
         <View style={styles.header}>
           <Image

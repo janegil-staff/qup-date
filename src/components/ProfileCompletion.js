@@ -50,7 +50,6 @@ function calculateCompletion(user) {
   if (user.wantsChildren) score += 5;
   if (user.relationshipStatus) score += 5;
   if (user.willingToRelocate) score += 5;
-  console.log(score);
   return score;
 }
 

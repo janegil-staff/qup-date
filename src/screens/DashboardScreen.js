@@ -16,6 +16,7 @@ import * as SecureStore from "expo-secure-store";
 import UserCard from "../components/UserCard";
 import ProfileCompletion from "../components/ProfileCompletion";
 import Screen from "../components/Screen";
+import VerifyBanner from "../components/VerifyBanner";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -122,7 +123,6 @@ export default function DashboardScreen() {
     const card = cards[index];
     if (!card) return;
 
-    console.log("SWIPED:", direction, card.name);
     handleSwipeApi(direction, card);
 
     // Remove from deck

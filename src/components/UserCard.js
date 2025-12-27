@@ -1,41 +1,39 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import VerifiedBadge from "./VerifiedBadge";
+
+const { width } = Dimensions.get("window");
 
 export default function UserCard({ user }) {
   if (!user) return null;
-  console.log("USERCARD USER:", user);
-
-  // Support multiple backend shapes
-  const image = user.profileImage || user.images?.[0].url || null;
 
   return (
     <View style={styles.card}>
-      {image ? (
-        <Image source={{ uri: image }} style={styles.image} />
-      ) : (
-        <View style={styles.placeholder}>
-          <Text style={{ color: "#9ca3af" }}>No image</Text>
-        </View>
-      )}
+      {/* Profile Image */}
+      <Image source={{ uri: user.profileImage }} style={styles.image} />
 
+      {/* Gradient Overlay */}
       <LinearGradient
-        colors={["transparent", "rgba(0,0,0,0.8)"]}
+        colors={["transparent", "rgba(0,0,0,0.7)"]}
         style={styles.overlay}
       />
 
-      <View style={styles.info}>
-        <Text style={styles.name}>
-          {user.name}
-          {user.age ? <Text style={styles.age}> {user.age}</Text> : null}
-        </Text>
+      {/* Bottom Info */}
+      <View style={styles.infoContainer}>
+        <View style={styles.row}>
+          <Text style={styles.name}>
+            {user.name}
+            {user.age ? `, ${user.age}` : ""}
+          </Text>
 
-        {user.bio ? (
+          {user.isVerified && <VerifiedBadge />}
+        </View>
+
+        {user.bio && (
           <Text style={styles.bio} numberOfLines={2}>
             {user.bio}
           </Text>
-        ) : (
-          <Text style={styles.bioPlaceholder}>No bio yet</Text>
         )}
       </View>
     </View>
@@ -44,54 +42,49 @@ export default function UserCard({ user }) {
 
 const styles = StyleSheet.create({
   card: {
-    width: "100%",
-    height: "100%", // ⭐ fills the 420px container, not the screen
+    width: width * 0.9,
+    height: "100%",
     borderRadius: 20,
     overflow: "hidden",
+    backgroundColor: "#1f2937",
+    alignSelf: "center",
   },
 
   image: {
     width: "100%",
     height: "100%",
+    position: "absolute",
   },
-  placeholder: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#374151",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   overlay: {
     position: "absolute",
     bottom: 0,
     width: "100%",
-    height: 180,
+    height: "45%",
   },
-  info: {
+
+  infoContainer: {
     position: "absolute",
     bottom: 20,
     left: 20,
     right: 20,
   },
+
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
   name: {
-    fontSize: 32,
-    fontWeight: "800",
     color: "white",
+    fontSize: 26,
+    fontWeight: "800",
   },
-  age: {
-    fontSize: 32,
-    fontWeight: "600",
-    color: "#d1d5db",
-  },
+
   bio: {
+    color: "#d1d5db",
     marginTop: 6,
-    fontSize: 16,
-    color: "#e5e7eb",
-  },
-  bioPlaceholder: {
-    marginTop: 6,
-    fontSize: 16,
-    color: "#9ca3af",
-    fontStyle: "italic",
+    fontSize: 14,
   },
 });

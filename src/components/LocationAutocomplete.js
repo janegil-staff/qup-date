@@ -1,88 +1,73 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-} from "react-native";
+import React, { useState } from "react";
+import { View, TextInput, FlatList, TouchableOpacity, Text, StyleSheet } from "react-native";
 
-export default function LocationAutocomplete({
-  value, // string shown in input
-  onChange, // (text) => void
-  onSelect, // (locationObj) => void
-}) {
+export default function LocationAutocomplete({ value, onChange, onSelect }) {
   const [results, setResults] = useState([]);
-  const [locked, setLocked] = useState(false);
 
-  useEffect(() => {
-    // Only lock if the value was prefilled AND user hasn't typed yet
-    if (value && results.length === 0) {
-      setLocked(true);
-    }
-  }, []);
-
-  const search = async (text) => {
+  const fetchPlaces = async (text) => {
     onChange(text);
-    setLocked(false);
 
-    if (text.length < 3) {
+    if (text.length < 2) {
       setResults([]);
       return;
     }
 
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
           text
-        )}`
+        )}&types=(cities)&key=${process.env.EXPO_PUBLIC_GOOGLE_ANDROID_KEY}`
       );
+
       const data = await res.json();
-      setResults(data);
+      setResults(data.predictions || []);
     } catch (err) {
-      console.error("Location search failed", err);
-      setResults([]);
+      console.log("PLACES ERROR:", err);
     }
   };
 
-  const handleSelect = (place) => {
+  const fetchDetails = async (placeId) => {
+    const res = await fetch(
+      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${process.env.EXPO_PUBLIC_GOOGLE_ANDROID_KEY}`
+    );
+
+    const data = await res.json();
+    const details = data.result;
+
     const location = {
-      name: place.display_name,
-      lat: Number(place.lat),
-      lng: Number(place.lon),
-      country: place.address?.country || "",
+      name: details.formatted_address,
+      lat: details.geometry.location.lat,
+      lng: details.geometry.location.lng,
+      country:
+        details.address_components.find((c) => c.types.includes("country"))
+          ?.long_name || "",
     };
 
-    onChange(place.display_name); // fill text field
-    onSelect(location); // store full object
-
+    onSelect(location);
     setResults([]);
-    setLocked(true); // hide suggestions
   };
 
   return (
-    <View style={styles.wrapper}>
+    <View>
       <TextInput
-        value={value}
-        onChangeText={search}
-        placeholder="Search city or country"
-        placeholderTextColor="#6b7280"
         style={styles.input}
+        value={value}
+        onChangeText={fetchPlaces}
+        placeholder="Search for your city"
+        placeholderTextColor="#666"
       />
 
-      {!locked && results.length > 0 && (
+      {results.length > 0 && (
         <FlatList
           data={results}
-          keyExtractor={(item) => item.place_id.toString()}
+          keyExtractor={(item) => item.place_id}
           style={styles.list}
-          keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => (
             <TouchableOpacity
               style={styles.item}
-              onPress={() => handleSelect(item)}
+              onPress={() => fetchDetails(item.place_id)}
             >
-              <Text style={styles.text}>{item.display_name}</Text>
+              <Text style={styles.text}>{item.description}</Text>
             </TouchableOpacity>
           )}
         />
@@ -92,39 +77,25 @@ export default function LocationAutocomplete({
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    position: "relative",
-    zIndex: 20,
-  },
   input: {
     backgroundColor: "#1f2937",
     color: "white",
-    paddingVertical: 12,
-    paddingHorizontal: 12,
+    padding: 12,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "#374151",
   },
   list: {
-    position: "absolute",
-    top: 52,
-    left: 0,
-    right: 0,
-    backgroundColor: "#111827",
+    backgroundColor: "#1f2937",
+    marginTop: 4,
     borderRadius: 8,
-    maxHeight: 220,
-    borderWidth: 1,
-    borderColor: "#374151",
-    zIndex: 50,
   },
   item: {
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#1f2937",
+    borderBottomColor: "#374151",
   },
   text: {
-    color: "#d1d5db",
-    fontSize: 14,
+    color: "white",
   },
 });

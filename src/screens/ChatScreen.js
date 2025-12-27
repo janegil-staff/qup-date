@@ -19,7 +19,7 @@ import ImagePreviewBar from "../components/ImagePreviewBar";
 import { useChat } from "../../hooks/useChat";
 import { useImageUpload } from "../../hooks/useImageUpload";
 import FullScreenImageModal from "../components/FullScreenImageModal";
-import EmojiSelector from "react-native-emoji-selector";
+import EmojiModal from "react-native-emoji-modal";
 
 export default function ChatScreen({ route, navigation }) {
   const { userId, user } = route.params;
@@ -114,7 +114,7 @@ export default function ChatScreen({ route, navigation }) {
                 source={{ uri: user.profileImage }}
                 style={styles.avatar}
               />
-              <Text style={styles.name}>{user.name}</Text>
+              <Text style={styles.name}>{user.name || ""}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -155,6 +155,7 @@ export default function ChatScreen({ route, navigation }) {
             >
               <Text style={styles.icon}>😀</Text>
             </TouchableOpacity>
+
             <TouchableOpacity onPress={pickImages}>
               <Text style={styles.icon}>📷</Text>
             </TouchableOpacity>
@@ -162,7 +163,7 @@ export default function ChatScreen({ route, navigation }) {
             <TextInput
               style={styles.input}
               value={text}
-              onChangeText={setText}
+              onChangeText={(t) => setText(t || "")} // prevent undefined
               placeholder="Type a message…"
               placeholderTextColor="#999"
               multiline
@@ -179,15 +180,22 @@ export default function ChatScreen({ route, navigation }) {
               style={styles.emojiOverlay}
             >
               <View style={styles.emojiPickerContainer}>
-                <EmojiSelector
+                <EmojiModal
+                  open={showEmojiPicker}
+                  onClose={() => setShowEmojiPicker(false)}
                   onEmojiSelected={(emoji) => {
-                    setText((prev) => prev + emoji);
+                    setText((prev) => (prev || "") + emoji);
                     setShowEmojiPicker(false);
                   }}
-                  showSearchBar={false}
-                  showTabs={true}
-                  columns={8}
-                  theme="#1f2937"
+                  modalStyle={{
+                    backgroundColor: "#1f2937",
+                  }}
+                  emojiStyle={{ fontSize: 28 }}
+                  containerStyle={{
+                    backgroundColor: "#1f2937",
+                    borderTopWidth: 1,
+                    borderTopColor: "#374151",
+                  }}
                 />
               </View>
             </TouchableOpacity>
@@ -257,14 +265,25 @@ const styles = StyleSheet.create({
   back: { color: "#22c55e", fontSize: 22, marginRight: 12 },
   userInfo: { flexDirection: "row", alignItems: "center" },
   avatar: { width: 36, height: 36, borderRadius: 18, marginRight: 10 },
-  name: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  name: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+    letterSpacing: 0, // ← important
+  },
+
   inputRow: {
     flexDirection: "row",
     padding: 10,
     backgroundColor: "#1f2937",
     alignItems: "flex-end",
   },
-  icon: { fontSize: 24, marginRight: 8 },
+  icon: {
+    fontSize: 24,
+    marginRight: 8,
+    letterSpacing: 0,
+  },
+
   input: {
     flex: 1,
     backgroundColor: "#111827",
@@ -273,7 +292,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     maxHeight: 100,
+    fontSize: 16, // ← REQUIRED FIX
   },
+
   sendBtn: {
     marginLeft: 8,
     backgroundColor: "#22c55e",
@@ -283,5 +304,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  sendText: { color: "#fff", fontWeight: "600" },
+  sendText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
+    letterSpacing: 0,
+  },
 });

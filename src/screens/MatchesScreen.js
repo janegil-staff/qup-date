@@ -8,8 +8,8 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
-import { Link } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import VerifiedBadge from "../components/VerifiedBadge";
 
 export default function MatchesScreen({ navigation }) {
   const [matches, setMatches] = useState([]);
@@ -71,7 +71,19 @@ export default function MatchesScreen({ navigation }) {
         <Image source={{ uri: item.profileImage }} style={styles.image} />
       </TouchableOpacity>
 
-      <Text style={styles.name}>{item.name}</Text>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        <Text style={styles.name}>{item.name}</Text>
+
+        {item.isVerified && <VerifiedBadge />}
+      </View>
+
       <Text style={styles.bio} numberOfLines={2}>
         {item.bio || "No bio yet"}
       </Text>

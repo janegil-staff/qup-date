@@ -14,21 +14,30 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.QupDatingMobile"
+      "bundleIdentifier": "dating.qup",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "dating.qup",
+      "permissions": [ "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION", "INTERNET" ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.anonymous.QupDatingMobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "94121dca-13d4-48d5-afca-6325e6b0b4b6"
+      }
+    }
   }
 }
