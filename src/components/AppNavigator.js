@@ -113,7 +113,6 @@ function MainTabs() {
       })}
     >
       <Tab.Screen name="Dashboard" component={DashboardStack} />
-
       <Tab.Screen name="Matches" component={MatchesStack} />
       <Tab.Screen name="Discover" component={DiscoverStack} />
       <Tab.Screen name="Edit" component={EditStack} />

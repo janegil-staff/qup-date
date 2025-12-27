@@ -13,16 +13,17 @@ import { useFocusEffect } from "@react-navigation/native";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
+import DeleteProfileButton from "../components/DeleteProfileButton";
 
 function capitalize(str) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export default function ProfileScreen() {
+export default function ProfileScreen({navigation}) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-   const [isVerified, setIsVerified] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
   const [isCarouselVisible, setCarouselVisible] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
 
@@ -195,6 +196,9 @@ export default function ProfileScreen() {
           </View>
         )}
 
+        <View style={{ marginTop: 20, alignItems: "flex-end" }}>
+          <DeleteProfileButton userId={profile._id} navigation={navigation} />
+        </View>
         <EnhancedImageViewing
           images={profile.images.map((img) => ({
             uri: img.url || img.uri,
