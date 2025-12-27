@@ -20,7 +20,7 @@ import VerifyBanner from "../components/VerifyBanner";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
-export default function DashboardScreen() {
+export default function DashboardScreen({navigation}) {
   const [stats, setStats] = useState({
     profileViews: 0,
     newLikes: 0,
@@ -182,7 +182,7 @@ export default function DashboardScreen() {
           <View style={styles.swipeSection}>
             <Swiper
               cards={cards}
-              renderCard={(card) => <UserCard user={card} />}
+              renderCard={(card) => <UserCard user={card} navigation={navigation} />}
               onSwipedLeft={(i) => handleSwipe("left", i)}
               onSwipedRight={(i) => handleSwipe("right", i)}
               backgroundColor="transparent"

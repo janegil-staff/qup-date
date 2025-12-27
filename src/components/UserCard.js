@@ -1,32 +1,23 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import VerifiedBadge from "./VerifiedBadge";
 
-const { width } = Dimensions.get("window");
-
-export default function UserCard({ user }) {
+export default function UserCard({ user, navigation }) {
   if (!user) return null;
 
   return (
     <View style={styles.card}>
-      {/* Profile Image */}
       <Image source={{ uri: user.profileImage }} style={styles.image} />
 
-      {/* Gradient Overlay */}
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.7)"]}
         style={styles.overlay}
       />
 
-      {/* Bottom Info */}
       <View style={styles.infoContainer}>
         <View style={styles.row}>
-          <Text style={styles.name}>
-            {user.name}
-            {user.age ? `, ${user.age}` : ""}
-          </Text>
-
+          <Text style={styles.name}>{user.name}</Text>
           {user.isVerified && <VerifiedBadge />}
         </View>
 
@@ -35,6 +26,16 @@ export default function UserCard({ user }) {
             {user.bio}
           </Text>
         )}
+
+        {/* ⭐ View Profile Button */}
+        <TouchableOpacity
+          style={styles.viewBtn}
+          onPress={() =>
+            navigation.navigate("UserProfile", { userId: user._id })
+          }
+        >
+          <Text style={styles.viewBtnText}>View Profile</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -42,49 +43,57 @@ export default function UserCard({ user }) {
 
 const styles = StyleSheet.create({
   card: {
-    width: width * 0.9,
+    width: "100%",
     height: "100%",
     borderRadius: 20,
     overflow: "hidden",
     backgroundColor: "#1f2937",
-    alignSelf: "center",
   },
-
   image: {
     width: "100%",
     height: "100%",
     position: "absolute",
   },
-
   overlay: {
     position: "absolute",
     bottom: 0,
     width: "100%",
     height: "45%",
   },
-
   infoContainer: {
     position: "absolute",
     bottom: 20,
     left: 20,
     right: 20,
   },
-
   row: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 6,
   },
-
   name: {
     color: "white",
     fontSize: 26,
     fontWeight: "800",
   },
-
   bio: {
     color: "#d1d5db",
     marginTop: 6,
+    fontSize: 14,
+  },
+
+  // ⭐ Button styles
+  viewBtn: {
+    marginTop: 12,
+    backgroundColor: "#ec4899",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    alignSelf: "flex-start",
+  },
+  viewBtnText: {
+    color: "white",
+    fontWeight: "600",
     fontSize: 14,
   },
 });
