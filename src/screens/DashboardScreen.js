@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import UserCard from "../components/UserCard";
 import ProfileCompletion from "../components/ProfileCompletion";
 import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -30,6 +31,39 @@ export default function DashboardScreen({ navigation }) {
   const [cards, setCards] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const swiperRef = useRef(null);
+
+  const fetchCards = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("authToken");
+
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await res.json();
+
+      if (Array.isArray(data)) {
+        setCards(data);
+      } else {
+        setCards([]);
+      }
+    } catch (err) {
+      console.error("Error fetching cards:", err);
+      setCards([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchCards();
+    }, [])
+  );
 
   // Fetch current user
   useEffect(() => {
@@ -75,28 +109,6 @@ export default function DashboardScreen({ navigation }) {
     fetchStats();
   }, []);
 
-  // Fetch swipe cards
-  useEffect(() => {
-    async function fetchCards() {
-      try {
-        const token = await SecureStore.getItemAsync("authToken");
-        const res = await fetch(
-          `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const data = await res.json();
-        setCards(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("Error fetching cards:", err);
-        setCards([]);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchCards();
-  }, []);
 
   const handleSwipeApi = async (direction, card) => {
     try {
@@ -181,6 +193,7 @@ export default function DashboardScreen({ navigation }) {
           </View>
           <View style={styles.swipeSection}>
             <Swiper
+              ref={swiperRef}
               cards={cards}
               renderCard={(card) => (
                 <UserCard user={card} navigation={navigation} />

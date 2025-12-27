@@ -13,10 +13,12 @@ import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
+import ToggleLikeButtonMobile from "../components/ToggleLikeButtonMobile";
 
 export default function UserProfileScreen({ route, navigation }) {
   const userId = route.params?.userId;
   const [profile, setProfile] = useState(null);
+  const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isCarouselVisible, setCarouselVisible] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
@@ -39,6 +41,7 @@ export default function UserProfileScreen({ route, navigation }) {
       }
 
       setProfile(data.user);
+      setLiked(data.user?.isLiked || false);
     } catch (err) {
       console.error("UserProfile fetch error:", err);
     } finally {
@@ -75,7 +78,7 @@ export default function UserProfileScreen({ route, navigation }) {
 
   return (
     <Screen style={{ backgroundColor: "#111827" }}>
-      <View style={{ flex: 1 }}>
+      <View style={styles.topContainer}>
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
@@ -85,6 +88,34 @@ export default function UserProfileScreen({ route, navigation }) {
         <ScrollView
           contentContainerStyle={[styles.container, { paddingTop: 80 }]}
         >
+          {!profile.isMatch && (
+            <View style={styles.actionButton}>
+              <TouchableOpacity
+                style={liked ? styles.dislikeBtn : styles.likeBtn}
+                onPress={async () => {
+                  const token = await SecureStore.getItemAsync("authToken");
+
+                  const endpoint = liked
+                    ? "/api/mobile/dislike"
+                    : "/api/mobile/like";
+
+                  await fetch(`https://qup.dating${endpoint}`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ targetUserId: profile._id }),
+                  });
+
+                  setLiked(!liked);
+                }}
+              >
+                <Text style={styles.btnText}>{liked ? "✕" : "♥"}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           {/* Header */}
           <View style={styles.header}>
             <Image
@@ -242,6 +273,35 @@ function SimpleSection({ title, items }) {
 }
 
 const styles = StyleSheet.create({
+  actionButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 999,
+  },
+
+  likeBtn: {
+    backgroundColor: "#ec4899",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 50,
+    elevation: 6,
+  },
+
+  dislikeBtn: {
+    backgroundColor: "#ef4444",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 50,
+    elevation: 6,
+  },
+
+  btnText: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+
   backButton: {
     position: "absolute",
     top: 50,
@@ -251,7 +311,10 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 30,
   },
-
+  topContainer: {
+    flex: 1,
+    position: "relative",
+  },
   container: { padding: 20, backgroundColor: "#111" },
   center: {
     flex: 1,

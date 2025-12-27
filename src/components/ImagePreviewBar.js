@@ -7,7 +7,7 @@ export default function ImagePreviewBar({ images, remove }) {
     <View style={styles.container}>
       {images.map((img, i) => (
         <View key={i} style={styles.item}>
-          <Image source={{ uri: img.uri }} style={styles.preview} />
+          <Image source={{ uri: img.url }} style={styles.preview} />
           <TouchableOpacity style={styles.remove} onPress={() => remove(i)}>
             <Text style={styles.removeText}>×</Text>
           </TouchableOpacity>

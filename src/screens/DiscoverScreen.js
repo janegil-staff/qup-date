@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import MatchCongrats from "../components/MatchCongrats";
 import VerifiedBadge from "../components/VerifiedBadge";
 import { getAgeFromDate } from "../utils/getAgeFromDate";
 import Screen from "../components/Screen";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function DiscoverScreen({ navigation }) {
   const [users, setUsers] = useState([]);
@@ -20,6 +21,36 @@ export default function DiscoverScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [showCongrats, setShowCongrats] = useState(false);
+
+  const fetchDiscoverUsers = async () => {
+    try {
+      const token = await SecureStore.getItemAsync("authToken");
+
+      const res = await fetch(
+        `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      const data = await res.json();
+
+      if (Array.isArray(data)) {
+        setUsers(data);
+      } else {
+        setUsers([]);
+      }
+    } catch (err) {
+      console.error("Error fetching discover users:", err);
+      setUsers([]);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchDiscoverUsers();
+    }, [])
+  );
 
   const fetchUsers = async () => {
     if (loading || !hasMore) return;
@@ -92,21 +123,23 @@ export default function DiscoverScreen({ navigation }) {
           {item.bio}
         </Text>
 
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.btn, styles.dislike]}
-            onPress={() => handleDislike(item._id)}
-          >
-            <Text>👎</Text>
-          </TouchableOpacity>
+        {!item.isMatch && (
+          <View style={styles.actions}>
+            <TouchableOpacity
+              style={[styles.btn, styles.dislike]}
+              onPress={() => handleDislike(item._id)}
+            >
+              <Text>👎</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.btn, styles.like]}
-            onPress={() => handleLike(item._id)}
-          >
-            <Text>👍</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={[styles.btn, styles.like]}
+              onPress={() => handleLike(item._id)}
+            >
+              <Text>👍</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   );
