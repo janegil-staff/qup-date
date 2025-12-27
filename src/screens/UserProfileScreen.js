@@ -80,8 +80,8 @@ export default function UserProfileScreen({ route, navigation }) {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={28} color="#fff" />{" "}
-        </TouchableOpacity>{" "}
+          <Ionicons name="arrow-back" size={28} color="#fff" />
+        </TouchableOpacity>
         <ScrollView
           contentContainerStyle={[styles.container, { paddingTop: 80 }]}
         >

@@ -12,6 +12,7 @@ import * as SecureStore from "expo-secure-store";
 import MatchCongrats from "../components/MatchCongrats";
 import VerifiedBadge from "../components/VerifiedBadge";
 import { getAgeFromDate } from "../utils/getAgeFromDate";
+import Screen from "../components/Screen";
 
 export default function DiscoverScreen({ navigation }) {
   const [users, setUsers] = useState([]);
@@ -111,20 +112,24 @@ export default function DiscoverScreen({ navigation }) {
   );
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={users}
-        renderItem={renderItem}
-        keyExtractor={(item) => item._id}
-        onEndReached={fetchUsers}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          loading ? <ActivityIndicator color="#ff69b4" /> : null
-        }
-      />
+    <Screen style={{ backgroundColor: "#111827" }}>
+      <View style={styles.container}>
+        <FlatList
+          data={users}
+          renderItem={renderItem}
+          keyExtractor={(item) => item._id}
+          onEndReached={fetchUsers}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={
+            loading ? <ActivityIndicator color="#ff69b4" /> : null
+          }
+        />
 
-      {showCongrats && <MatchCongrats onClose={() => setShowCongrats(false)} />}
-    </View>
+        {showCongrats && (
+          <MatchCongrats onClose={() => setShowCongrats(false)} />
+        )}
+      </View>
+    </Screen>
   );
 }
 
@@ -135,12 +140,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     marginBottom: 16,
-    position: "relative"
+    position: "relative",
   },
   isVerified: {
     position: "absolute",
     top: 20,
-    right: 20
+    right: 20,
   },
   image: {
     width: "100%",
