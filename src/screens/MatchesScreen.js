@@ -10,14 +10,17 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import VerifiedBadge from "../components/VerifiedBadge";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function MatchesScreen({ navigation }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchMatches();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchMatches();
+    }, [])
+  );
 
   const fetchMatches = async () => {
     try {

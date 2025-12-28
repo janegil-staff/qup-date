@@ -13,15 +13,71 @@ import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
-import ToggleLikeButtonMobile from "../components/ToggleLikeButtonMobile";
+import MatchCongrats from "../components/MatchCongrats";
 
 export default function UserProfileScreen({ route, navigation }) {
   const userId = route.params?.userId;
   const [profile, setProfile] = useState(null);
-  const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isCarouselVisible, setCarouselVisible] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [showCongrats, setShowCongrats] = useState(false);
+
+  const [likedUsers, setLikedUsers] = useState([]);
+  const [likedMeUsers, setLikedMeUsers] = useState([]);
+
+  const fetchLikedUsers = async () => {
+    const token = await SecureStore.getItemAsync("authToken");
+
+    const res = await fetch("https://qup.dating/api/mobile/likes", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const data = await res.json();
+
+    setLikedUsers(data.likedUsers || []);
+    setLikedMeUsers(data.likedMeUsers || []);
+  };
+
+  const isLikedByMe = likedUsers.some((u) => u._id === profile?._id);
+  const isLikedMeBack = likedMeUsers.some((u) => u._id === profile?._id);
+  const isMatched = isLikedByMe && isLikedMeBack;
+
+  const icon = isMatched ? "✕" : "♥";
+  const buttonStyle = isMatched ? styles.dislikeBtn : styles.likeBtn;
+  const canLike = !isLikedByMe || isMatched;
+
+  const toggleLike = async () => {
+    const token = await SecureStore.getItemAsync("authToken");
+
+    setLikedUsers((prev) => {
+      const alreadyLiked = prev.some((u) => u._id === profile._id);
+
+      return alreadyLiked
+        ? prev.filter((u) => u._id !== profile._id)
+        : [...prev, { _id: profile._id }];
+    });
+
+    const endpoint = isLikedByMe ? "/api/mobile/dislike" : "/api/mobile/like";
+
+    const res = await fetch(`https://qup.dating${endpoint}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ targetUserId: profile._id }),
+    });
+
+    const data = await res.json();
+
+    console.log(data);
+    console.log(data.match);
+    if (data.match === true) {
+      setShowCongrats(true);
+    }
+    fetchLikedUsers();
+  };
 
   const fetchUser = async () => {
     try {
@@ -41,7 +97,6 @@ export default function UserProfileScreen({ route, navigation }) {
       }
 
       setProfile(data.user);
-      setLiked(data.user?.isLiked || false);
     } catch (err) {
       console.error("UserProfile fetch error:", err);
     } finally {
@@ -52,6 +107,7 @@ export default function UserProfileScreen({ route, navigation }) {
   useFocusEffect(
     useCallback(() => {
       fetchUser();
+      fetchLikedUsers();
     }, [userId])
   );
 
@@ -88,33 +144,15 @@ export default function UserProfileScreen({ route, navigation }) {
         <ScrollView
           contentContainerStyle={[styles.container, { paddingTop: 80 }]}
         >
-          {!profile.isMatch && (
-            <View style={styles.actionButton}>
-              <TouchableOpacity
-                style={liked ? styles.dislikeBtn : styles.likeBtn}
-                onPress={async () => {
-                  const token = await SecureStore.getItemAsync("authToken");
-
-                  const endpoint = liked
-                    ? "/api/mobile/dislike"
-                    : "/api/mobile/like";
-
-                  await fetch(`https://qup.dating${endpoint}`, {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify({ targetUserId: profile._id }),
-                  });
-
-                  setLiked(!liked);
-                }}
-              >
-                <Text style={styles.btnText}>{liked ? "✕" : "♥"}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          <View style={styles.actionButton}>
+            <TouchableOpacity
+              disabled={!canLike}
+              style={[buttonStyle, !canLike && { opacity: 0.5 }]}
+              onPress={toggleLike}
+            >
+              <Text style={styles.btnText}>{icon}</Text>
+            </TouchableOpacity>
+          </View>
 
           {/* Header */}
           <View style={styles.header}>
@@ -242,6 +280,10 @@ export default function UserProfileScreen({ route, navigation }) {
             </View>
           )}
         </ScrollView>
+        {showCongrats && (
+          <MatchCongrats onClose={() => setShowCongrats(false)} />
+        )}
+
         <EnhancedImageViewing
           images={profile.images.map((img) => ({
             uri: img.url || img.uri,

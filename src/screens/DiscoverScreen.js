@@ -94,12 +94,44 @@ export default function DiscoverScreen({ navigation }) {
   }, []);
 
   const handleLike = async (id) => {
+    const token = await SecureStore.getItemAsync("authToken");
+
+    // Optimistic UI update
     setUsers((prev) => prev.filter((u) => u._id !== id));
-    // optional: POST /api/like
+
+    // Send like to backend
+    const res = await fetch(`https://qup.dating/api/mobile/like`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ targetUserId: id }),
+    });
+
+    const data = await res.json();
+
+    // If backend says it's a match → show popup
+    if (data.match === true) {
+      setShowCongrats(true);
+    }
   };
 
+
   const handleDislike = async (id) => {
+    const token = await SecureStore.getItemAsync("authToken");
+
+    // Optimistic UI update
     setUsers((prev) => prev.filter((u) => u._id !== id));
+
+    await fetch(`https://qup.dating/api/mobile/dislike`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ targetUserId: id }),
+    });
   };
 
   const renderItem = ({ item }) => (
@@ -174,11 +206,6 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 16,
     position: "relative",
-  },
-  isVerified: {
-    position: "absolute",
-    top: 20,
-    right: 20,
   },
   image: {
     width: "100%",
