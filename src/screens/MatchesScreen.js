@@ -11,6 +11,7 @@ import {
 import * as SecureStore from "expo-secure-store";
 import VerifiedBadge from "../components/VerifiedBadge";
 import { useFocusEffect } from "@react-navigation/native";
+import Screen from "../components/Screen";
 
 export default function MatchesScreen({ navigation }) {
   const [matches, setMatches] = useState([]);
@@ -112,22 +113,24 @@ export default function MatchesScreen({ navigation }) {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Your Matches</Text>
+    <Screen style={{ backgroundColor: "#111827" }}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Your Matches</Text>
 
-      {matches.length === 0 ? (
-        <Text style={styles.empty}>No matches yet. Keep swiping!</Text>
-      ) : (
-        <FlatList
-          data={matches}
-          renderItem={renderItem}
-          keyExtractor={(item) => item._id}
-          numColumns={2}
-          columnWrapperStyle={{ gap: 12 }}
-          contentContainerStyle={{ gap: 12, paddingBottom: 40 }}
-        />
-      )}
-    </View>
+        {matches.length === 0 ? (
+          <Text style={styles.empty}>No matches yet. Keep swiping!</Text>
+        ) : (
+          <FlatList
+            data={matches}
+            renderItem={renderItem}
+            keyExtractor={(item) => item._id}
+            numColumns={2}
+            columnWrapperStyle={{ gap: 12 }}
+            contentContainerStyle={{ gap: 12, paddingBottom: 40 }}
+          />
+        )}
+      </View>
+    </Screen>
   );
 }
 

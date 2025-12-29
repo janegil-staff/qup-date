@@ -32,6 +32,7 @@ export default function DashboardScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
+  const [swipeLabel, setSwipeLabel] = useState(null);
 
   const fetchCards = async () => {
     try {
@@ -109,7 +110,6 @@ export default function DashboardScreen({ navigation }) {
     fetchStats();
   }, []);
 
-
   const handleSwipeApi = async (direction, card) => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
@@ -134,10 +134,14 @@ export default function DashboardScreen({ navigation }) {
   const handleSwipe = (direction, index) => {
     const card = cards[index];
     if (!card) return;
-
+    if (direction === "right") {
+      setSwipeLabel("Liked");
+    } else {
+      setSwipeLabel("Disliked");
+    }
+    setTimeout(() => setSwipeLabel(null), 800);
     handleSwipeApi(direction, card);
 
-    // Remove from deck
     setCards((prev) => prev.filter((c) => c._id !== card._id));
   };
 
@@ -192,6 +196,12 @@ export default function DashboardScreen({ navigation }) {
             />
           </View>
           <View style={styles.swipeSection}>
+            {swipeLabel && (
+              <View style={styles.swipeFeedback}>
+                <Text style={styles.swipeFeedbackText}>{swipeLabel}</Text>
+              </View>
+            )}
+
             <Swiper
               ref={swiperRef}
               cards={cards}
@@ -259,6 +269,26 @@ function StatCard({ icon, label, value, colors }) {
 }
 
 const styles = StyleSheet.create({
+  swipeFeedback: {
+    position: "absolute",
+    top: 180,
+    left: 0,
+    right: 0,
+    zIndex: 999,
+    alignItems: "center",
+  },
+
+  swipeFeedbackText: {
+    fontSize: 32,
+    fontWeight: "800",
+    color: "white",
+    backgroundColor: "rgba(0,0,0,0.6)",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    overflow: "hidden",
+  },
+
   swiperInner: {
     flex: 1,
     justifyContent: "center",
