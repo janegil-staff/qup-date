@@ -142,14 +142,13 @@ export default function DashboardScreen({ navigation }) {
   const handleSwipe = (direction, index) => {
     const card = cards[index];
     if (!card) return;
-    if (direction === "right") {
-      setSwipeLabel("Liked");
-    } else {
-      setSwipeLabel("Disliked");
-    }
+
+    setSwipeLabel(direction === "right" ? "Liked" : "Disliked");
     setTimeout(() => setSwipeLabel(null), 800);
+
     handleSwipeApi(direction, card);
 
+    // ⭐ Remove by ID — never by index
     setCards((prev) => prev.filter((c) => c._id !== card._id));
   };
 
@@ -211,7 +210,7 @@ export default function DashboardScreen({ navigation }) {
             )}
 
             <Swiper
-              ref={swiperRef}
+              key={cards.map((c) => c._id).join("-")} // ⭐ forces correct re-render
               cards={cards}
               renderCard={(card) => (
                 <UserCard user={card} navigation={navigation} />
