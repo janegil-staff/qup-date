@@ -135,7 +135,6 @@ export default function RegisterScreen({ navigation }) {
 
       if (!res.ok) {
         const errText = await res.json();
-        console.log(errText);
         if (errText.error === "duplicate") {
           alert("This email is already registered. Please log in instead.");
           return;

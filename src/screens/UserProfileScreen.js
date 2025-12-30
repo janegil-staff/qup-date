@@ -70,9 +70,7 @@ export default function UserProfileScreen({ route, navigation }) {
     });
 
     const data = await res.json();
-
-    console.log(data);
-    console.log(data.match);
+    
     if (data.match === true) {
       setShowCongrats(true);
     }

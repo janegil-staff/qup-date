@@ -18,6 +18,7 @@ import ProfileCompletion from "../components/ProfileCompletion";
 import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
 import { useFocusEffect } from "@react-navigation/native";
+import MatchCongrats from "../components/MatchCongrats";
 
 const SCREEN_HEIGHT = Dimensions.get("window").height;
 
@@ -33,6 +34,7 @@ export default function DashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const swiperRef = useRef(null);
   const [swipeLabel, setSwipeLabel] = useState(null);
+  const [showCongrats, setShowCongrats] = useState(false);
 
   const fetchCards = async () => {
     try {
@@ -118,7 +120,7 @@ export default function DashboardScreen({ navigation }) {
       const endpoint =
         direction === "right" ? "/api/mobile/like" : "/api/mobile/dislike";
 
-      await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, {
+      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,6 +128,12 @@ export default function DashboardScreen({ navigation }) {
         },
         body: JSON.stringify({ targetUserId: card._id }),
       });
+
+      const data = await res.json();
+
+      if (data.match === true) {
+        setShowCongrats(true);
+      }
     } catch (err) {
       console.error("Swipe API error:", err);
     }
@@ -253,6 +261,9 @@ export default function DashboardScreen({ navigation }) {
             </Text>
           </View>
         </ScrollView>
+        {showCongrats && (
+          <MatchCongrats onClose={() => setShowCongrats(false)} />
+        )}
       </View>
     </Screen>
   );
