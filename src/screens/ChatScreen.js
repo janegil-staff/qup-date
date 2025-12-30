@@ -168,9 +168,16 @@ export default function ChatScreen({ route, navigation }) {
               placeholderTextColor="#999"
               multiline
             />
-
-            <TouchableOpacity style={styles.sendBtn} onPress={handleSend}>
-              <Text style={styles.sendText}>Send</Text>
+            <TouchableOpacity
+              style={[styles.sendBtn, uploading && { opacity: 0.5 }]}
+              onPress={handleSend}
+              disabled={uploading}
+            >
+              {uploading ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <Text style={styles.sendText}>Send</Text>
+              )}
             </TouchableOpacity>
           </View>
           {showEmojiPicker && (
