@@ -20,7 +20,7 @@ function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export default function ProfileScreen({navigation}) {
+export default function ProfileScreen({ navigation }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isVerified, setIsVerified] = useState(false);
@@ -67,10 +67,25 @@ export default function ProfileScreen({navigation}) {
     ? new Date().getFullYear() - new Date(profile.birthdate).getFullYear()
     : null;
 
+  const handleLogout = async () => {
+    await SecureStore.deleteItemAsync("authToken");
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "LoginForm" }],
+    });
+  };
+
   return (
     <Screen style={{ backgroundColor: "#111827" }}>
       <ScrollView contentContainerStyle={styles.container}>
         {!isVerified && <VerifyBanner user={profile} />}
+
+        <View style={styles.topRight}>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Header */}
         <View style={styles.header}>
           <Image
@@ -230,6 +245,25 @@ function SimpleSection({ title, items }) {
 }
 
 const styles = StyleSheet.create({
+  topRight: {
+    width: "100%",
+    alignItems: "flex-end",
+    marginBottom: 10,
+  },
+
+  logoutBtn: {
+    backgroundColor: "#ef4444",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+
+  logoutText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+
   container: { padding: 20, backgroundColor: "#111" },
   center: {
     flex: 1,

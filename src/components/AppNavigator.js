@@ -25,6 +25,7 @@ import ChatScreen from "../screens/ChatScreen";
 import UserProfileScreen from "../screens/UserProfileScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
+import LikesScreen from "../screens/LikesScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -104,8 +105,8 @@ function MainTabs() {
               return (
                 <Ionicons name="person-circle" size={size} color={color} />
               );
-            case "Logout":
-              return <Ionicons name="log-out" size={size} color={color} />;
+            case "Likes":
+              return <Ionicons name="heart-circle" size={size} color={color} />;
             default:
               return null;
           }
@@ -115,9 +116,9 @@ function MainTabs() {
       <Tab.Screen name="Dashboard" component={DashboardStack} />
       <Tab.Screen name="Matches" component={MatchesStack} />
       <Tab.Screen name="Discover" component={DiscoverStack} />
+      <Tab.Screen name="Likes" component={LikesScreen} />
       <Tab.Screen name="Edit" component={EditStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
-      <Tab.Screen name="Logout" component={LogoutScreen} />
     </Tab.Navigator>
   );
 }
@@ -129,7 +130,10 @@ export default function AppNavigator() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="LandingScreen" component={LandingScreen} />
           <Stack.Screen name="LoginForm" component={LoginForm} />
-          <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
+          <Stack.Screen
+            name="ForgotPasswordScreen"
+            component={ForgotPasswordScreen}
+          />
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="MainTabs" component={MainTabs} />
         </Stack.Navigator>
