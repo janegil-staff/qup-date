@@ -29,7 +29,16 @@ import LikesScreen from "../screens/LikesScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const LikesStack = createNativeStackNavigator();
 
+function LikesStackNavigator() {
+  return (
+    <LikesStack.Navigator screenOptions={{ headerShown: false }}>
+      <LikesStack.Screen name="LikesMain" component={LikesScreen} />
+      <LikesStack.Screen name="UserProfile" component={UserProfileScreen} />
+    </LikesStack.Navigator>
+  );
+}
 function EditStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -116,7 +125,7 @@ function MainTabs() {
       <Tab.Screen name="Dashboard" component={DashboardStack} />
       <Tab.Screen name="Matches" component={MatchesStack} />
       <Tab.Screen name="Discover" component={DiscoverStack} />
-      <Tab.Screen name="Likes" component={LikesScreen} />
+      <Tab.Screen name="Likes" component={LikesStackNavigator} />
       <Tab.Screen name="Edit" component={EditStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>

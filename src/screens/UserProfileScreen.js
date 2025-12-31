@@ -70,7 +70,7 @@ export default function UserProfileScreen({ route, navigation }) {
     });
 
     const data = await res.json();
-    
+
     if (data.match === true) {
       setShowCongrats(true);
     }
@@ -135,7 +135,13 @@ export default function UserProfileScreen({ route, navigation }) {
       <View style={styles.topContainer}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.goBack()}
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate("DashboardHome");
+            }
+          }}
         >
           <Ionicons name="arrow-back" size={28} color="#fff" />
         </TouchableOpacity>

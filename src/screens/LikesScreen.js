@@ -16,20 +16,19 @@ export default function LikesScreen({ navigation }) {
   const [activeTab, setActiveTab] = useState("likedMe");
   const [likedMe, setLikedMe] = useState([]);
   const [iLiked, setILiked] = useState([]);
+  const [disliked, setDisliked] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchLikes = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
-
       const res = await fetch("https://qup.dating/api/mobile/likes", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       const data = await res.json();
-
       setLikedMe(data.likedMeUsers || []);
       setILiked(data.likedUsers || []);
+      setDisliked(data.dislikedUsers || []);
     } catch (err) {
       console.error("Likes fetch error:", err);
     } finally {
@@ -43,7 +42,6 @@ export default function LikesScreen({ navigation }) {
       fetchLikes();
     }, [])
   );
-
   const renderList = (data) => (
     <FlatList
       data={data}
@@ -51,7 +49,18 @@ export default function LikesScreen({ navigation }) {
       contentContainerStyle={{ paddingBottom: 40 }}
       renderItem={({ item }) => (
         <View style={{ marginBottom: 20 }}>
-          <LikesCard user={item} navigation={navigation} />
+          <LikesCard
+            user={item}
+            navigation={navigation}
+            showRemoveLike={activeTab === "iLiked"}
+            showRestore={activeTab === "disliked"}
+            onRemoveLike={(id) => {
+              setILiked((prev) => prev.filter((u) => u._id !== id));
+            }}
+            onRestore={(id) => {
+              setDisliked((prev) => prev.filter((u) => u._id !== id));
+            }}
+          />
         </View>
       )}
       ListEmptyComponent={
@@ -59,7 +68,6 @@ export default function LikesScreen({ navigation }) {
       }
     />
   );
-
   if (loading) {
     return (
       <Screen style={styles.center}>
@@ -67,17 +75,12 @@ export default function LikesScreen({ navigation }) {
       </Screen>
     );
   }
-
   return (
     <Screen style={{ backgroundColor: "#111827" }}>
       <View style={styles.container}>
-        {/* Tabs */}
         <View style={styles.tabs}>
           <TouchableOpacity
-            style={[
-              styles.tab,
-              activeTab === "likedMe" && styles.activeTab,
-            ]}
+            style={[styles.tab, activeTab === "likedMe" && styles.activeTab]}
             onPress={() => setActiveTab("likedMe")}
           >
             <Text
@@ -89,12 +92,8 @@ export default function LikesScreen({ navigation }) {
               Liked You
             </Text>
           </TouchableOpacity>
-
           <TouchableOpacity
-            style={[
-              styles.tab,
-              activeTab === "iLiked" && styles.activeTab,
-            ]}
+            style={[styles.tab, activeTab === "iLiked" && styles.activeTab]}
             onPress={() => setActiveTab("iLiked")}
           >
             <Text
@@ -106,17 +105,29 @@ export default function LikesScreen({ navigation }) {
               You Liked
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === "disliked" && styles.activeTab]}
+            onPress={() => setActiveTab("disliked")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "disliked" && styles.activeTabText,
+              ]}
+            >
+              Disliked
+            </Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Content */}
         {activeTab === "likedMe"
           ? renderList(likedMe)
-          : renderList(iLiked)}
+          : activeTab === "iLiked"
+          ? renderList(iLiked)
+          : renderList(disliked)}
       </View>
     </Screen>
   );
 }
-
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20 },
   center: {
@@ -125,8 +136,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#111827",
   },
-
-  // Tabs
   tabs: {
     flexDirection: "row",
     marginBottom: 20,
@@ -134,24 +143,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 4,
   },
-  tab: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  activeTab: {
-    backgroundColor: "#ff69b4",
-  },
-  tabText: {
-    color: "#aaa",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  activeTabText: {
-    color: "white",
-  },
-
+  tab: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: "center" },
+  activeTab: { backgroundColor: "#ff69b4" },
+  tabText: { color: "#aaa", fontSize: 16, fontWeight: "600" },
+  activeTabText: { color: "white" },
   emptyText: {
     color: "#888",
     textAlign: "center",
