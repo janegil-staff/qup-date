@@ -15,14 +15,14 @@
     "ios": {
       "supportsTablet": true,
       "icon": "./assets/qup-logo.png",
-      "bundleIdentifier": "com.dating.qup",
+      "bundleIdentifier": "dating.qup",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
       "versionCode": 1,
-      "package": "com.dating.qup",
+      "package": "dating.qup",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -45,6 +45,6 @@
         "projectId": "94121dca-13d4-48d5-afca-6325e6b0b4b6"
       }
     },
-    "owner": "janegil-staff"
+    "owner": "janstovr"
   }
 }
