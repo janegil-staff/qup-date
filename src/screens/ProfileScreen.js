@@ -6,14 +6,35 @@ import {
   ScrollView,
   ActivityIndicator,
   StyleSheet,
+  TouchableOpacity,
+  Alert,
+  Linking
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { TouchableOpacity } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
 import DeleteProfileButton from "../components/DeleteProfileButton";
+
+const handleReport = async () => {
+  const email = "qup.dating@gmail.com";
+  const subject = encodeURIComponent("Safety concern report");
+  const body = encodeURIComponent("Please describe the issue:\n\n");
+
+  const url = `mailto:${email}?subject=${subject}&body=${body}`;
+
+  const canOpen = await Linking.canOpenURL(url);
+
+  if (canOpen) {
+    Linking.openURL(url);
+  } else {
+    Alert.alert(
+      "Email app not available",
+      "Please send your report to qup.dating@gmail.com"
+    );
+  }
+};
 
 function capitalize(str) {
   if (!str) return "";
@@ -210,6 +231,11 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
         )}
+        <TouchableOpacity onPress={handleReport} style={{ padding: 12 }}>
+          <Text style={{ color: "#ff4d4d", fontSize: 16, textAlign: "center" }}>
+            Report safety concern
+          </Text>
+        </TouchableOpacity>
 
         <View style={{ marginTop: 20, alignItems: "flex-end" }}>
           <DeleteProfileButton userId={profile._id} navigation={navigation} />
