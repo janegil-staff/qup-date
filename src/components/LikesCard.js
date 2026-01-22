@@ -76,7 +76,7 @@ export default function LikesCard({
       <TouchableOpacity
         onPress={() => navigation.navigate("UserProfile", { userId: user._id })}
       >
-        <Image source={{ uri: user.profileImage }} style={styles.image} />
+        <Image source={{ uri: (user.profileImage ? user.profileImage : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png") }} style={styles.image} />
         <Text style={styles.name}>{user.name}</Text>
         {user.bio ? <Text style={styles.bio}>{user.bio}</Text> : null}
       </TouchableOpacity>

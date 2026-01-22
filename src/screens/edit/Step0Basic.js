@@ -118,7 +118,7 @@ export default function Step0Basic({ form,setForm, setField, navigation }) {
       <View style={styles.field}>
         <Text style={styles.label}>Gender</Text>
         <View style={styles.genderRow}>
-          {["Male", "Female", "Other"].map((g) => (
+          {["Male", "Female"].map((g) => (
             <TouchableOpacity
               key={g}
               style={[

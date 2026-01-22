@@ -152,7 +152,7 @@ export default function Step5Images({ form, setForm, setField }) {
       let profileImage = form.profileImage;
       if (
         !finalImages.find(
-          (i) => i.url === profileImage || i.uri === profileImage
+          (i) => i.url === profileImage || i.uri === profileImage,
         )
       ) {
         profileImage = finalImages[0]?.url || null;
@@ -208,6 +208,8 @@ export default function Step5Images({ form, setForm, setField }) {
           );
         })}
       </ScrollView>
+      <Text style={styles.label}>* Long press to remove an image</Text>
+      <Text style={styles.label}>* Click to select profile image</Text>
 
       <TouchableOpacity
         style={styles.uploadButton}

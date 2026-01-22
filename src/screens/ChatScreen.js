@@ -48,7 +48,7 @@ export default function ChatScreen({ route, navigation }) {
       const payload = JSON.parse(
         global.atob
           ? atob(token.split(".")[1])
-          : Buffer.from(token.split(".")[1], "base64").toString("utf8")
+          : Buffer.from(token.split(".")[1], "base64").toString("utf8"),
       );
       setCurrentUserId(payload.id);
     })();
@@ -111,7 +111,11 @@ export default function ChatScreen({ route, navigation }) {
               }
             >
               <Image
-                source={{ uri: user.profileImage }}
+                source={{
+                  uri: user.profileImage
+                    ? user.profileImage
+                    : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
+                }}
                 style={styles.avatar}
               />
               <Text style={styles.name}>{user.name || ""}</Text>

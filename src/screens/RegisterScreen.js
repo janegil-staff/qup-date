@@ -152,7 +152,7 @@ export default function RegisterScreen({ navigation }) {
 
       // 🔹 Backend does NOT return token → do NOT auto-login
       alert(
-        "Please check your email to verify, and log in to your profile."
+        "Register success, you can log in to your profile."
       );
 
       // Force user to login manually (prevents wrong user session)
@@ -228,7 +228,7 @@ export default function RegisterScreen({ navigation }) {
 
         {/* Gender */}
         <View style={styles.genderRow}>
-          {["male", "female", "other"].map((g) => (
+          {["male", "female"].map((g) => (
             <TouchableOpacity
               key={g}
               style={[

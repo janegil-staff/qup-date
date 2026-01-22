@@ -111,7 +111,7 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.header}>
           <Image
             source={{
-              uri: profile.profileImage || "https://placehold.co/100x100",
+              uri: profile.profileImage || "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
             }}
             style={styles.avatar}
           />

@@ -142,7 +142,7 @@ export default function DiscoverScreen({ navigation }) {
         {item.isVerified && <VerifiedBadge />}
         <Image
           source={{
-            uri: item.profileImage || "https://via.placeholder.com/300",
+            uri: item.profileImage || "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
           }}
           style={styles.image}
         />

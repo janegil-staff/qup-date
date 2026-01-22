@@ -72,7 +72,7 @@ export default function MatchesScreen({ navigation }) {
         activeOpacity={0.85}
         onPress={() => navigation.navigate("UserProfile", { userId: item._id })}
       >
-        <Image source={{ uri: item.profileImage }} style={styles.image} />
+        <Image source={{ uri: (item.profileImage ? item.profileImage : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png") }} style={styles.image} />
       </TouchableOpacity>
 
       <View

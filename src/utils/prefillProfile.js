@@ -2,10 +2,9 @@
 
 // Normalize: always lowercase for consistency
 export function normalizeValue(val) {
-  return val ? val.toLowerCase() : "";
+  return typeof val === "string" ? val.toLowerCase() : val;
 }
 
-// Prefill profile: normalize values from backend
 export function prefillProfile(user) {
   if (!user) return {};
 
@@ -41,6 +40,17 @@ export function prefillProfile(user) {
     name: user.name || "",
     gender: normalizeValue(user.gender),
     birthdate: user.birthdate || "",
-    location: user.location || "",
+
+    location: user.location || null,
+
+    searchScope:
+      typeof user.searchScope === "string"
+        ? user.searchScope.toLowerCase()
+        : "worldwide",
+
+    willingToRelocate:
+      typeof user.willingToRelocate === "string"
+        ? user.willingToRelocate === "true"
+        : Boolean(user.willingToRelocate),
   };
 }

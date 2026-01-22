@@ -8,7 +8,7 @@ export default function UserCard({ user, navigation }) {
 
   return (
     <View style={styles.card}>
-      <Image source={{ uri: user.profileImage }} style={styles.image} />
+      <Image source={{ uri: (user.profileImage ? user.profileImage : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png") }} style={styles.image} />
 
       <LinearGradient
         colors={["transparent", "rgba(0,0,0,0.7)"]}
