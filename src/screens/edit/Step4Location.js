@@ -23,7 +23,9 @@ export default function Step4Location({ form, setForm, setField }) {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        setForm(prefillProfile(data.user));
+        setField("searchScope", data.user.searchScope || "");
+        setField("willingToRelocate", data.user.willingToRelocate || false);
+        setField("location", data.user.location || {});
       } catch (err) {
         console.error("Failed to load profile", err);
       }

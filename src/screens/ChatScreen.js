@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { Ionicons } from "@expo/vector-icons";
-
+import { SafeAreaView } from "react-native-safe-area-context";
 import MessageBubble from "../components/MessageBubble";
 import ImagePreviewBar from "../components/ImagePreviewBar";
 import { useChat } from "../../hooks/useChat";
@@ -88,140 +88,142 @@ export default function ChatScreen({ route, navigation }) {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <TouchableOpacity
-        style={styles.backButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Ionicons name="arrow-back" size={28} color="#fff" />
-      </TouchableOpacity>
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={90}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.userInfo}>
-            <TouchableOpacity
-              onPress={() =>
-                navigation
-                  .getParent()
-                  ?.navigate("UserProfile", { userId: user._id })
-              }
-            >
-              <Image
-                source={{
-                  uri: user.profileImage
-                    ? user.profileImage
-                    : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
-                }}
-                style={styles.avatar}
-              />
-              <Text style={styles.name}>{user.name || ""}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Image previews */}
-        <ImagePreviewBar images={selectedImages} remove={removeImage} />
-
-        <FlatList
-          ref={listRef}
-          data={messages}
-          renderItem={({ item }) => (
-            <MessageBubble
-              item={item}
-              isSender={
-                item.sender === currentUserId ||
-                item.sender?._id === currentUserId
-              }
-              onImagePress={(url) => setFullscreenImage(url)}
-            />
-          )}
-          keyExtractor={(item) => item._id.toString()}
-          contentContainerStyle={{ padding: 12 }}
-          onContentSizeChange={() => {
-            listRef.current?.scrollToEnd({ animated: false });
-          }}
-        />
-
-        <FullScreenImageModal
-          visible={!!fullscreenImage}
-          imageUrl={fullscreenImage}
-          onClose={() => setFullscreenImage(null)}
-        />
-
-        <View style={{ backgroundColor: "#1f2937" }}>
-          <View style={styles.inputRow}>
-            <TouchableOpacity
-              onPress={() => setShowEmojiPicker((prev) => !prev)}
-            >
-              <Text style={styles.icon}>😀</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={pickImages}>
-              <Text style={styles.icon}>📷</Text>
-            </TouchableOpacity>
-
-            <TextInput
-              style={styles.input}
-              value={text}
-              onChangeText={(t) => setText(t || "")} // prevent undefined
-              placeholder="Type a message…"
-              placeholderTextColor="#999"
-              multiline
-            />
-            <TouchableOpacity
-              style={[styles.sendBtn, uploading && { opacity: 0.5 }]}
-              onPress={handleSend}
-              disabled={uploading}
-            >
-              {uploading ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Text style={styles.sendText}>Send</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-          {showEmojiPicker && (
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() => setShowEmojiPicker(false)}
-              style={styles.emojiOverlay}
-            >
-              <View style={styles.emojiPickerContainer}>
-                <EmojiModal
-                  open={showEmojiPicker}
-                  onClose={() => setShowEmojiPicker(false)}
-                  onEmojiSelected={(emoji) => {
-                    setText((prev) => (prev || "") + emoji);
-                    setShowEmojiPicker(false);
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
+      <View style={{ flex: 1 }}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={28} color="#fff" />
+        </TouchableOpacity>
+        <KeyboardAvoidingView
+          style={styles.container}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={90}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.userInfo}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation
+                    .getParent()
+                    ?.navigate("UserProfile", { userId: user._id })
+                }
+              >
+                <Image
+                  source={{
+                    uri: user.profileImage
+                      ? user.profileImage
+                      : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
                   }}
-                  modalStyle={{
-                    backgroundColor: "#1f2937",
-                  }}
-                  emojiStyle={{ fontSize: 28 }}
-                  containerStyle={{
-                    backgroundColor: "#1f2937",
-                    borderTopWidth: 1,
-                    borderTopColor: "#374151",
-                  }}
+                  style={styles.avatar}
                 />
-              </View>
-            </TouchableOpacity>
-          )}
-        </View>
-      </KeyboardAvoidingView>
-    </View>
+                <Text style={styles.name}>{user.name || ""}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Image previews */}
+          <ImagePreviewBar images={selectedImages} remove={removeImage} />
+
+          <FlatList
+            ref={listRef}
+            data={messages}
+            renderItem={({ item }) => (
+              <MessageBubble
+                item={item}
+                isSender={
+                  item.sender === currentUserId ||
+                  item.sender?._id === currentUserId
+                }
+                onImagePress={(url) => setFullscreenImage(url)}
+              />
+            )}
+            keyExtractor={(item) => item._id.toString()}
+            contentContainerStyle={{ padding: 12 }}
+            onContentSizeChange={() => {
+              listRef.current?.scrollToEnd({ animated: false });
+            }}
+          />
+
+          <FullScreenImageModal
+            visible={!!fullscreenImage}
+            imageUrl={fullscreenImage}
+            onClose={() => setFullscreenImage(null)}
+          />
+
+          <View style={{ backgroundColor: "#1f2937" }}>
+            <View style={styles.inputRow}>
+              <TouchableOpacity
+                onPress={() => setShowEmojiPicker((prev) => !prev)}
+              >
+                <Text style={styles.icon}>😀</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={pickImages}>
+                <Text style={styles.icon}>📷</Text>
+              </TouchableOpacity>
+
+              <TextInput
+                style={styles.input}
+                value={text}
+                onChangeText={(t) => setText(t || "")} // prevent undefined
+                placeholder="Type a message…"
+                placeholderTextColor="#999"
+                multiline
+              />
+              <TouchableOpacity
+                style={[styles.sendBtn, uploading && { opacity: 0.5 }]}
+                onPress={handleSend}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.sendText}>Send</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+            {showEmojiPicker && (
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => setShowEmojiPicker(false)}
+                style={styles.emojiOverlay}
+              >
+                <View style={styles.emojiPickerContainer}>
+                  <EmojiModal
+                    open={showEmojiPicker}
+                    onClose={() => setShowEmojiPicker(false)}
+                    onEmojiSelected={(emoji) => {
+                      setText((prev) => (prev || "") + emoji);
+                      setShowEmojiPicker(false);
+                    }}
+                    modalStyle={{
+                      backgroundColor: "#1f2937",
+                    }}
+                    emojiStyle={{ fontSize: 28 }}
+                    containerStyle={{
+                      backgroundColor: "#1f2937",
+                      borderTopWidth: 1,
+                      borderTopColor: "#374151",
+                    }}
+                  />
+                </View>
+              </TouchableOpacity>
+            )}
+          </View>
+        </KeyboardAvoidingView>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   backButton: {
     position: "absolute",
-    top: 50,
-    left: 20,
+    top: 90,
+    left: 5,
     zIndex: 999,
     backgroundColor: "rgba(0,0,0,0.5)",
     padding: 8,

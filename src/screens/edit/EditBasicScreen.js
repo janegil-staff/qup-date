@@ -32,6 +32,9 @@ export default function EditBasicScreen({ navigation }) {
   }, []);
 
   const setField = (field, value) => {
+    if (field === "birthdate") {
+      value = new Date(value).toISOString().split("T")[0];
+    }
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 

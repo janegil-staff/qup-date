@@ -6,10 +6,9 @@ import Screen from "../../components/Screen";
 
 export default function EditHabitsScreen({ navigation }) {
   const [form, setForm] = useState({
-    sleep: "",
-    hobbies: "",
-    pets: "",
-    // add other habit fields here
+    location: null,
+    searchScope: "",
+    willingToRelocate: false,
   });
 
   const setField = (field, value) => {
