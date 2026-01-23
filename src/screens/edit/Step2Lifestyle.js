@@ -72,7 +72,6 @@ export default function Step2Lifestyle({ form, setForm, setField }) {
       }
 
       const updated = await res.json();
-      console.log("Updated user:", updated);
 
       navigation.navigate("EditDetails", { user: updated });
     } catch (err) {

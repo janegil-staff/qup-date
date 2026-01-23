@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import {FontAwesome } from "@expo/vector-icons";
 
 // Screens
 import LandingScreen from "../screens/LandingScreen";
@@ -12,7 +12,6 @@ import DashboardScreen from "../screens/DashboardScreen";
 import DiscoverScreen from "../screens/DiscoverScreen";
 import MatchesScreen from "../screens/MatchesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import LogoutScreen from "../screens/LogoutScreen";
 
 import EditBasicScreen from "../screens/edit/EditBasicScreen";
 import EditAppearanceScreen from "../screens/edit/EditAppearanceScreen";
@@ -103,19 +102,19 @@ function MainTabs() {
         tabBarIcon: ({ color, size }) => {
           switch (route.name) {
             case "Dashboard":
-              return <Ionicons name="home" size={size} color={color} />;
+              return <FontAwesome name="home" size={size} color={color} />;
             case "Matches":
               return <FontAwesome name="heart" size={size} color={color} />;
             case "Discover":
-              return <Ionicons name="search" size={size} color={color} />;
+              return <FontAwesome name="search" size={size} color={color} />;
             case "Edit":
               return <FontAwesome name="pencil" size={size} color={color} />;
             case "Profile":
               return (
-                <Ionicons name="person-circle" size={size} color={color} />
+                <FontAwesome name="user" size={size} color={color} />
               );
             case "Likes":
-              return <Ionicons name="heart-circle" size={size} color={color} />;
+              return <FontAwesome name="thumbs-up" size={size} color={color} />;
             default:
               return null;
           }
