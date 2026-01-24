@@ -11,7 +11,7 @@ import * as SecureStore from "expo-secure-store";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as Progress from "react-native-progress";
 
-export default function Step0Basic({ form,setForm, setField, navigation }) {
+export default function Step0Basic({ form, setForm, setField, navigation }) {
   const [loading, setLoading] = useState(true);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -28,6 +28,7 @@ export default function Step0Basic({ form,setForm, setField, navigation }) {
         setField("birthdate", data.user.birthdate || "");
         setField("gender", data.user.gender || "");
         setField("occupation", data.user.occupation || "");
+        setField("bio", data.user.bio || "");
       } catch (err) {
         console.error("Failed to load profile", err);
       } finally {
@@ -49,7 +50,12 @@ export default function Step0Basic({ form,setForm, setField, navigation }) {
         body: JSON.stringify(form),
       });
       // Navigate to next step
-      navigation.navigate("EditAppearance", { form, setForm, setField, navigation });
+      navigation.navigate("EditAppearance", {
+        form,
+        setForm,
+        setField,
+        navigation,
+      });
     } catch (err) {
       console.error("Failed to save profile", err);
     }
@@ -73,7 +79,6 @@ export default function Step0Basic({ form,setForm, setField, navigation }) {
         color="#ff69b4"
         style={styles.progress}
       />
-
       {/* Name */}
       <View style={styles.field}>
         <Text style={styles.label}>Name</Text>
@@ -85,7 +90,6 @@ export default function Step0Basic({ form,setForm, setField, navigation }) {
           placeholderTextColor="#6b7280"
         />
       </View>
-
       {/* Birthdate */}
       <View style={styles.field}>
         <Text style={styles.label}>Birthdate</Text>
@@ -113,7 +117,6 @@ export default function Step0Basic({ form,setForm, setField, navigation }) {
           />
         )}
       </View>
-
       {/* Gender */}
       <View style={styles.field}>
         <Text style={styles.label}>Gender</Text>
@@ -141,7 +144,6 @@ export default function Step0Basic({ form,setForm, setField, navigation }) {
           ))}
         </View>
       </View>
-
       {/* Occupation */}
       <View style={styles.field}>
         <Text style={styles.label}>Occupation</Text>
@@ -154,7 +156,19 @@ export default function Step0Basic({ form,setForm, setField, navigation }) {
         />
       </View>
 
-      {/* Next button */}
+      <View style={styles.field}>
+        <Text style={styles.label}>Bio</Text>
+        <TextInput
+          value={form?.bio ?? ""}
+          onChangeText={(val) => setField("bio", val)}
+          style={[styles.input, { height: 100, textAlignVertical: "top" }]}
+          placeholder="Tell us a bit about yourself"
+          placeholderTextColor="#6b7280"
+          multiline
+          numberOfLines={4}
+        />
+      </View>
+
       <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
         <Text style={styles.nextText}>Next</Text>
       </TouchableOpacity>
