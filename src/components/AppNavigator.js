@@ -100,7 +100,7 @@ function MainTabs() {
         tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "gray",
         headerShown: false,
-        tabBarStyle: { position: "absolute", height: 60, backgroundColor:"#111827" },
+        tabBarStyle: { position: "absolute", height: 80, backgroundColor:"#111827" },
         tabBarIcon: ({ color, size }) => {
           switch (route.name) {
             case "Dashboard":

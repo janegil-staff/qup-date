@@ -93,9 +93,7 @@ export default function ChatScreen({ route, navigation }) {
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
-        >
-         
-        </TouchableOpacity>
+        ></TouchableOpacity>
         <KeyboardAvoidingView
           style={styles.container}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -153,7 +151,12 @@ export default function ChatScreen({ route, navigation }) {
             onClose={() => setFullscreenImage(null)}
           />
 
-          <View style={{ backgroundColor: "#1f2937", marginBottom: 27 }}>
+          <View
+            style={{
+              backgroundColor: "#1f2937",
+              marginBottom: Platform.OS === "android" ? 58 : 47,
+            }}
+          >
             <View style={styles.inputRow}>
               <TouchableOpacity
                 onPress={() => setShowEmojiPicker((prev) => !prev)}
