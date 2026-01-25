@@ -12,6 +12,7 @@ import * as SecureStore from "expo-secure-store";
 import VerifiedBadge from "../components/VerifiedBadge";
 import { useFocusEffect } from "@react-navigation/native";
 import Screen from "../components/Screen";
+import UnreadBadge from "../components/UnreadBadge";
 
 export default function MatchesScreen({ navigation }) {
   const [matches, setMatches] = useState([]);
@@ -101,6 +102,7 @@ export default function MatchesScreen({ navigation }) {
       >
         <Text style={styles.chatText}>Start Chat</Text>
       </TouchableOpacity>
+      <UnreadBadge count={item.unreadCount} />
     </View>
   );
 

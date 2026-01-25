@@ -12,7 +12,6 @@ import {
   StyleSheet,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
-import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MessageBubble from "../components/MessageBubble";
 import ImagePreviewBar from "../components/ImagePreviewBar";
@@ -66,6 +65,20 @@ export default function ChatScreen({ route, navigation }) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    const clearUnread = async () => {
+      const token = await SecureStore.getItemAsync("authToken");
+      await fetch(`https://qup.dating/api/mobile/chat/${userId}/read`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    };
+
+    clearUnread();
+  }, [userId]);
 
   const handleSend = async () => {
     if (!text.trim() && selectedImages.length === 0) return;
