@@ -100,7 +100,11 @@ function MainTabs() {
         tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "gray",
         headerShown: false,
-        tabBarStyle: { position: "absolute", height: 80, backgroundColor:"#111827" },
+        tabBarStyle: {
+          position: "absolute",
+          height: 80,
+          backgroundColor: "#111827",
+        },
         tabBarIcon: ({ color, size }) => {
           switch (route.name) {
             case "Dashboard":
@@ -144,6 +148,8 @@ export default function AppNavigator() {
           />
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="MainTabs" component={MainTabs} />
+
+          <Stack.Screen name="UserProfile" component={UserProfileScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
