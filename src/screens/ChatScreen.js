@@ -94,7 +94,7 @@ export default function ChatScreen({ route, navigation }) {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="arrow-back" size={28} color="#fff" />
+         
         </TouchableOpacity>
         <KeyboardAvoidingView
           style={styles.container}
@@ -153,7 +153,7 @@ export default function ChatScreen({ route, navigation }) {
             onClose={() => setFullscreenImage(null)}
           />
 
-          <View style={{ backgroundColor: "#1f2937" }}>
+          <View style={{ backgroundColor: "#1f2937", marginBottom: 27 }}>
             <View style={styles.inputRow}>
               <TouchableOpacity
                 onPress={() => setShowEmojiPicker((prev) => !prev)}

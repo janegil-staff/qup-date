@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import {FontAwesome } from "@expo/vector-icons";
+import { FontAwesome } from "@expo/vector-icons";
 
 // Screens
 import LandingScreen from "../screens/LandingScreen";
@@ -99,6 +99,8 @@ function MainTabs() {
         tabBarStyle: { backgroundColor: "#111827" },
         tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "gray",
+        headerShown: false,
+        tabBarStyle: { position: "absolute", height: 60, backgroundColor:"#111827" },
         tabBarIcon: ({ color, size }) => {
           switch (route.name) {
             case "Dashboard":
@@ -110,9 +112,7 @@ function MainTabs() {
             case "Edit":
               return <FontAwesome name="pencil" size={size} color={color} />;
             case "Profile":
-              return (
-                <FontAwesome name="user" size={size} color={color} />
-              );
+              return <FontAwesome name="user" size={size} color={color} />;
             case "Likes":
               return <FontAwesome name="thumbs-up" size={size} color={color} />;
             default:
