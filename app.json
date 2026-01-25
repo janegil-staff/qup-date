@@ -2,7 +2,7 @@
   "expo": {
     "name": "Qup Dating Mobile",
     "slug": "QupDatingMobile",
-    "version": "3.8.0",
+    "version": "3.9.0",
     "orientation": "portrait",
     "icon": "./assets/qup-logo.png",
     "userInterfaceStyle": "light",
@@ -21,7 +21,9 @@
       }
     },
     "android": {
-      "versionCode": 65,
+      "softwareKeyboardLayoutMode": "resize",
+      "windowSoftInputMode": "adjustResize",
+      "versionCode": 68,
       "package": "dating.qup",
       "permissions": [
         "ACCESS_FINE_LOCATION",
@@ -37,9 +39,7 @@
     "web": {
       "favicon": "./assets/favicon.ico"
     },
-    "plugins": [
-      "expo-secure-store"
-    ],
+    "plugins": ["expo-secure-store"],
     "extra": {
       "eas": {
         "projectId": "94121dca-13d4-48d5-afca-6325e6b0b4b6"

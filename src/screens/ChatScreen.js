@@ -20,6 +20,7 @@ import { useChat } from "../../hooks/useChat";
 import { useImageUpload } from "../../hooks/useImageUpload";
 import FullScreenImageModal from "../components/FullScreenImageModal";
 import EmojiModal from "react-native-emoji-modal";
+import { Pressable } from "react-native";
 
 export default function ChatScreen({ route, navigation }) {
   const { userId, user } = route.params;
@@ -89,16 +90,17 @@ export default function ChatScreen({ route, navigation }) {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
-      <View style={{ flex: 1 }}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        ></TouchableOpacity>
-        <KeyboardAvoidingView
-          style={styles.container}
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          keyboardVerticalOffset={90}
-        >
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+      >
+        <View style={{ flex: 1 }}>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          />
+
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.userInfo}>
@@ -111,9 +113,9 @@ export default function ChatScreen({ route, navigation }) {
               >
                 <Image
                   source={{
-                    uri: user.profileImage
-                      ? user.profileImage
-                      : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
+                    uri:
+                      user.profileImage ||
+                      "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
                   }}
                   style={styles.avatar}
                 />
@@ -122,28 +124,36 @@ export default function ChatScreen({ route, navigation }) {
             </View>
           </View>
 
-          {/* Image previews */}
           <ImagePreviewBar images={selectedImages} remove={removeImage} />
 
-          <FlatList
-            ref={listRef}
-            data={messages}
-            renderItem={({ item }) => (
-              <MessageBubble
-                item={item}
-                isSender={
-                  item.sender === currentUserId ||
-                  item.sender?._id === currentUserId
-                }
-                onImagePress={(url) => setFullscreenImage(url)}
-              />
-            )}
-            keyExtractor={(item) => item._id.toString()}
-            contentContainerStyle={{ padding: 12 }}
-            onContentSizeChange={() => {
-              listRef.current?.scrollToEnd({ animated: false });
-            }}
-          />
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={() => setShowEmojiPicker(false)}
+          >
+            <FlatList
+              ref={listRef}
+              data={messages}
+              keyboardShouldPersistTaps="handled"
+              renderItem={({ item }) => (
+                <MessageBubble
+                  item={item}
+                  isSender={
+                    item.sender === currentUserId ||
+                    item.sender?._id === currentUserId
+                  }
+                  onImagePress={(url) => setFullscreenImage(url)}
+                />
+              )}
+              keyExtractor={(item) => item._id.toString()}
+              contentContainerStyle={{
+                padding: 12,
+                flexGrow: 1,
+              }}
+              onContentSizeChange={() => {
+                listRef.current?.scrollToEnd({ animated: false });
+              }}
+            />
+          </Pressable>
 
           <FullScreenImageModal
             visible={!!fullscreenImage}
@@ -151,16 +161,10 @@ export default function ChatScreen({ route, navigation }) {
             onClose={() => setFullscreenImage(null)}
           />
 
-          <View
-            style={{
-              backgroundColor: "#1f2937",
-              marginBottom: Platform.OS === "android" ? -23 : -33,
-            }}
-          >
+          {/* INPUT BAR */}
+          <View style={{ backgroundColor: "#1f2937" }}>
             <View style={styles.inputRow}>
-              <TouchableOpacity
-                onPress={() => setShowEmojiPicker((prev) => !prev)}
-              >
+              <TouchableOpacity onPress={() => setShowEmojiPicker((p) => !p)}>
                 <Text style={styles.icon}>😀</Text>
               </TouchableOpacity>
 
@@ -171,11 +175,13 @@ export default function ChatScreen({ route, navigation }) {
               <TextInput
                 style={styles.input}
                 value={text}
-                onChangeText={(t) => setText(t || "")} // prevent undefined
+                onChangeText={(t) => setText(t || "")}
                 placeholder="Type a message…"
                 placeholderTextColor="#999"
                 multiline
+                onFocus={() => setShowEmojiPicker(false)}
               />
+
               <TouchableOpacity
                 style={[styles.sendBtn, uploading && { opacity: 0.5 }]}
                 onPress={handleSend}
@@ -188,36 +194,29 @@ export default function ChatScreen({ route, navigation }) {
                 )}
               </TouchableOpacity>
             </View>
-            {showEmojiPicker && (
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={() => setShowEmojiPicker(false)}
-                style={styles.emojiOverlay}
-              >
-                <View style={styles.emojiPickerContainer}>
-                  <EmojiModal
-                    open={showEmojiPicker}
-                    onClose={() => setShowEmojiPicker(false)}
-                    onEmojiSelected={(emoji) => {
-                      setText((prev) => (prev || "") + emoji);
-                      setShowEmojiPicker(false);
-                    }}
-                    modalStyle={{
-                      backgroundColor: "#1f2937",
-                    }}
-                    emojiStyle={{ fontSize: 28 }}
-                    containerStyle={{
-                      backgroundColor: "#1f2937",
-                      borderTopWidth: 1,
-                      borderTopColor: "#374151",
-                    }}
-                  />
-                </View>
-              </TouchableOpacity>
-            )}
           </View>
-        </KeyboardAvoidingView>
-      </View>
+
+          {showEmojiPicker && (
+            <View style={styles.emojiPickerContainer}>
+              <EmojiModal
+                open
+                onClose={() => setShowEmojiPicker(false)}
+                onEmojiSelected={(emoji) => {
+                  setText((prev) => (prev || "") + emoji);
+                  setShowEmojiPicker(false);
+                }}
+                modalStyle={{ backgroundColor: "#1f2937" }}
+                emojiStyle={{ fontSize: 28 }}
+                containerStyle={{
+                  backgroundColor: "#1f2937",
+                  borderTopWidth: 1,
+                  borderTopColor: "#374151",
+                }}
+              />
+            </View>
+          )}
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -233,11 +232,6 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   emojiOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
     backgroundColor: "transparent",
     zIndex: 50,
     elevation: 50,
