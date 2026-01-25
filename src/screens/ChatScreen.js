@@ -154,7 +154,7 @@ export default function ChatScreen({ route, navigation }) {
           <View
             style={{
               backgroundColor: "#1f2937",
-              marginBottom: Platform.OS === "android" ? 58 : 47,
+              marginBottom: Platform.OS === "android" ? -23 : -33,
             }}
           >
             <View style={styles.inputRow}>
