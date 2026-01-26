@@ -53,12 +53,6 @@ export default function Step1Appearance({ form, setForm, setField }) {
     try {
       const token = await SecureStore.getItemAsync("authToken");
 
-      const heightNum = parseInt(form.height, 10);
-      if (isNaN(heightNum) || heightNum < 40 || heightNum > 250) {
-        alert("Height must be between 40 and 250 cm");
-        return;
-      }
-
       const res = await fetch("https://qup.dating/api/mobile/me", {
         method: "PATCH", // or PUT depending on backend
         headers: {
