@@ -10,7 +10,7 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
 import * as Progress from "react-native-progress";
-import { saveProfile, prefillProfile } from "../../utils/profileService";
+import { prefillProfile } from "../../utils/profileService";
 import { capitalizeLabel } from "../../utils/CapitalizeLabe";
 
 export default function Step3Details({ form, setForm, setField }) {
@@ -25,13 +25,19 @@ export default function Step3Details({ form, setForm, setField }) {
     "ateist",
     "other",
   ];
+
   const relationshipOptions = [
     "single",
     "in a relationship",
     "married",
     "divorced",
   ];
-  const childrenOptions = ["no children", "has children"];
+
+  // ⭐ Boolean options
+  const childrenOptions = [
+    { label: "No children", value: false },
+    { label: "Has children", value: true },
+  ];
 
   /** ----------------------------------
    * Fetch and prefill profile
@@ -43,10 +49,18 @@ export default function Step3Details({ form, setForm, setField }) {
         const res = await fetch("https://qup.dating/api/mobile/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
+
         if (!res.ok) throw new Error("Failed to fetch profile");
+
         const data = await res.json();
 
-        setForm(prefillProfile(data.user));
+        // ⭐ Prefill using backend boolean
+        setForm({
+          education: data.user.education || "",
+          religion: data.user.religion || "",
+          relationship: data.user.relationshipStatus || "",
+          hasChildren: data.user.hasChildren ?? false, // boolean
+        });
       } catch (err) {
         console.error("Failed to load profile", err);
         Alert.alert("Error", "Failed to load profile. Try again later.");
@@ -54,8 +68,9 @@ export default function Step3Details({ form, setForm, setField }) {
         setLoading(false);
       }
     };
+
     fetchProfile();
-  }, [setForm]);
+  }, []);
 
   /** ----------------------------------
    * Save updates
@@ -69,7 +84,7 @@ export default function Step3Details({ form, setForm, setField }) {
         education: form.education,
         religion: form.religion,
         relationshipStatus: form.relationship,
-        hasChildren: form.children === "Has children",
+        hasChildren: form.hasChildren, // ⭐ boolean directly
       };
 
       const res = await fetch("https://qup.dating/api/mobile/me", {
@@ -88,7 +103,6 @@ export default function Step3Details({ form, setForm, setField }) {
 
       const updatedUser = await res.json();
 
-      // Update local form to stay in sync
       setForm((prev) => ({ ...prev, ...updatedUser }));
 
       navigation.navigate("EditHabits", { user: updatedUser });
@@ -106,20 +120,20 @@ export default function Step3Details({ form, setForm, setField }) {
       <View style={styles.row}>
         {options.map((opt) => (
           <TouchableOpacity
-            key={opt}
+            key={opt.value}
             style={[
               styles.radioButton,
-              form?.[field] === opt && styles.radioActive,
+              form[field] === opt.value && styles.radioActive,
             ]}
-            onPress={() => setField(field, opt)}
+            onPress={() => setField(field, opt.value)}
           >
             <Text
               style={[
                 styles.radioText,
-                form?.[field] === opt && styles.radioTextActive,
+                form[field] === opt.value && styles.radioTextActive,
               ]}
             >
-              {capitalizeLabel(opt)}
+              {opt.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -146,16 +160,27 @@ export default function Step3Details({ form, setForm, setField }) {
 
       <Text style={styles.label}>Education</Text>
       <TextInput
-        value={form?.education ?? ""}
+        value={form.education}
         onChangeText={(val) => setField("education", val)}
         style={styles.input}
         placeholder="Enter your education"
         placeholderTextColor="#6b7280"
       />
 
-      {renderOptions("religion", religionOptions, "religion")}
-      {renderOptions("relationship", relationshipOptions, "relationship")}
-      {renderOptions("children", childrenOptions, "children")}
+      {renderOptions(
+        "Religion",
+        religionOptions.map((r) => ({ label: capitalizeLabel(r), value: r })),
+        "religion",
+      )}
+      {renderOptions(
+        "Relationship",
+        relationshipOptions.map((r) => ({
+          label: capitalizeLabel(r),
+          value: r,
+        })),
+        "relationship",
+      )}
+      {renderOptions("Children", childrenOptions, "hasChildren")}
 
       <View style={styles.navRow}>
         <TouchableOpacity

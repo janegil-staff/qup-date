@@ -8,7 +8,7 @@ export default function EditDetailsScreen({ navigation }) {
     education: "",
     religion: "",
     relationship: "",
-    children: "",
+    hasChildren: "",
   });
 
   const setField = (field, value) => {

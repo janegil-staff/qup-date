@@ -9,7 +9,7 @@ export function prefillProfile(user) {
   return {
     // basics
     education: user.education ?? "",
-    
+
     relationship: user.relationshipStatus ?? "",
     religion: (user.religion || "").toLowerCase(),
     relationship: (user.relationshipStatus || "").toLowerCase(),
@@ -71,4 +71,16 @@ export async function saveProfile(payload) {
     console.error("❌ saveProfile failed:", err);
     throw err;
   }
+}
+
+export async function fetchUser() {
+  const token = await SecureStore.getItemAsync("authToken");
+  const res = await fetch("https://qup.dating/api/mobile/me", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    throw new Error("Failed to fetch user");
+  }
+  const data = await res.json();
+  return data.user;
 }

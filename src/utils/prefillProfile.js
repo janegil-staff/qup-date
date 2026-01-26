@@ -24,7 +24,7 @@ export function prefillProfile(user) {
     education: user.education || "",
     religion: normalizeValue(user.religion),
     relationship: normalizeValue(user.relationship),
-    children: normalizeValue(user.children),
+    hasChildren: user.hasChildren ?? false,
 
     // Step 4: Habits
     sleep: normalizeValue(user.sleep),
@@ -35,6 +35,7 @@ export function prefillProfile(user) {
     bio: user.bio || "",
     profileImage: user.profileImage || "",
     images: user.images || [],
+    tags: user.tags || [],
 
     // Common fields
     name: user.name || "",

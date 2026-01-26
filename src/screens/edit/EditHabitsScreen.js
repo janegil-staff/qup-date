@@ -7,8 +7,9 @@ import Screen from "../../components/Screen";
 export default function EditHabitsScreen({ navigation }) {
   const [form, setForm] = useState({
     location: null,
-    searchScope: "",
+    searchScope: "worldwide",
     willingToRelocate: false,
+    tags: []
   });
 
   const setField = (field, value) => {

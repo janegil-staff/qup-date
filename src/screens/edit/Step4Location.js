@@ -8,33 +8,34 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Progress from "react-native-progress";
-import { saveProfile, prefillProfile } from "../../utils/profileService";
-import * as SecureStore from "expo-secure-store";
+import { saveProfile, fetchUser } from "../../utils/profileService";
 import LocationAutocomplete from "../../components/LocationAutocomplete";
 
 export default function Step4Location({ form, setForm, setField }) {
   const navigation = useNavigation();
   const [tagsText, setTagsText] = useState("");
 
+  // ⭐ Load user data ONCE and prefill the form
   useEffect(() => {
-    const fetchMe = async () => {
+    const load = async () => {
       try {
-        const token = await SecureStore.getItemAsync("authToken");
-        const res = await fetch("https://qup.dating/api/mobile/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
+        const user = await fetchUser();
 
-        // Prefill tags
-        const existingTags = data.user.tags || [];
-        setTagsText(existingTags.join(" "));
-        setField("tags", existingTags);
+        setForm((prev) => ({
+          ...prev,
+          location: user.location || null,
+          searchScope: user.searchScope || "worldwide",
+          willingToRelocate: user.willingToRelocate ?? false,
+          tags: user.tags || [],
+        }));
+
+        setTagsText((user.tags || []).join(" "));
       } catch (err) {
-        console.error("Failed to load profile", err);
+        console.error("Failed to load user", err);
       }
     };
 
-    fetchMe();
+    load();
   }, []);
 
   const handleSaveAndNext = async () => {
@@ -119,6 +120,7 @@ export default function Step4Location({ form, setForm, setField }) {
           </TouchableOpacity>
         ))}
       </View>
+
       <Text style={styles.label}>Willing to Relocate</Text>
 
       <View style={styles.row}>
@@ -145,18 +147,18 @@ export default function Step4Location({ form, setForm, setField }) {
           </TouchableOpacity>
         ))}
       </View>
-      <View>
-        <Text style={styles.label}>Tags</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="#hiking #coffee"
-          placeholderTextColor="#666"
-          value={tagsText}
-          onChangeText={(text) => {
-            setTagsText(text);
-          }}
-        />
-      </View>
+
+      <Text style={styles.label}>Tags</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="#hiking #coffee"
+        placeholderTextColor="#666"
+        value={tagsText}
+        onChangeText={(text) => {
+          setTagsText(text);
+        }}
+      />
+
       <View style={styles.navRow}>
         <TouchableOpacity
           style={[styles.navButton, styles.backButton]}
@@ -182,7 +184,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
   },
-
   radioButton: {
     flex: 1,
     marginRight: 10,
@@ -193,21 +194,17 @@ const styles = StyleSheet.create({
     borderColor: "#374151",
     alignItems: "center",
   },
-
   radioActive: {
     backgroundColor: "#ff69b4",
     borderColor: "#ff69b4",
   },
-
   radioText: {
     color: "#9ca3af",
     fontWeight: "600",
   },
-
   radioTextActive: {
     color: "white",
   },
-
   progress: { marginBottom: 20 },
   container: { flex: 1, backgroundColor: "#111827", padding: 20 },
   label: { color: "#ccc", marginBottom: 6, fontWeight: "600", marginTop: 20 },
