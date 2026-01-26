@@ -20,6 +20,7 @@ import { useImageUpload } from "../../hooks/useImageUpload";
 import FullScreenImageModal from "../components/FullScreenImageModal";
 import EmojiModal from "react-native-emoji-modal";
 import { Pressable } from "react-native";
+import { Keyboard } from "react-native";
 
 export default function ChatScreen({ route, navigation }) {
   const { userId, user } = route.params;
@@ -31,6 +32,23 @@ export default function ChatScreen({ route, navigation }) {
 
   const listRef = useRef(null);
 
+
+const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+useEffect(() => {
+  const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+    setKeyboardHeight(e.endCoordinates.height);
+  });
+
+  const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+    setKeyboardHeight(0);
+  });
+
+  return () => {
+    showSub.remove();
+    hideSub.remove();
+  };
+}, []);
   useEffect(() => {
     if (!messages || messages.length === 0) return;
 
@@ -101,13 +119,10 @@ export default function ChatScreen({ route, navigation }) {
     );
   }
 
+
   return (
     <View style={{ flex: 1, backgroundColor: "#111827", paddingTop: 40 }}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-      >
+      <View style={{ marginBottom: keyboardHeight, flex: 1 }}>
         <View style={{ flex: 1 }}>
           <TouchableOpacity
             style={styles.backButton}
@@ -229,12 +244,21 @@ export default function ChatScreen({ route, navigation }) {
             </View>
           )}
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  inputContainer: {
+    paddingBottom: Platform.OS === "ios" ? 20 : 10,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#111827",
+    paddingBottom: 0, // ← important
+  },
+
   backButton: {
     position: "absolute",
     top: 90,
