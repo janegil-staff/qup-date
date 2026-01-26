@@ -14,6 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
 import MatchCongrats from "../components/MatchCongrats";
+import MessageButton from "../components/MessageButton";
 
 export default function UserProfileScreen({ route, navigation }) {
   const userId = route.params?.userId;
@@ -106,7 +107,7 @@ export default function UserProfileScreen({ route, navigation }) {
     useCallback(() => {
       fetchUser();
       fetchLikedUsers();
-    }, [userId])
+    }, [userId]),
   );
 
   if (loading) {
@@ -133,6 +134,8 @@ export default function UserProfileScreen({ route, navigation }) {
   return (
     <Screen style={{ backgroundColor: "#111827" }}>
       <View style={styles.topContainer}>
+        {isMatched && <MessageButton otherUser={profile} />}
+
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => {
@@ -162,7 +165,9 @@ export default function UserProfileScreen({ route, navigation }) {
           <View style={styles.header}>
             <Image
               source={{
-                uri: profile.profileImage || "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
+                uri:
+                  profile.profileImage ||
+                  "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
               }}
               style={styles.avatar}
             />
