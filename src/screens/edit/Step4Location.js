@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import LocationAutocomplete from "../../components/LocationAutocomplete";
 
 export default function Step4Location({ form, setForm, setField }) {
   const navigation = useNavigation();
+  const [tagsText, setTagsText] = useState("");
 
   useEffect(() => {
     const fetchMe = async () => {
@@ -23,30 +24,36 @@ export default function Step4Location({ form, setForm, setField }) {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        setField("searchScope", data.user.searchScope || "");
-        setField("willingToRelocate", data.user.willingToRelocate || false);
-        setField("location", data.user.location || {});
+
+        // Prefill tags
+        const existingTags = data.user.tags || [];
+        setTagsText(existingTags.join(" "));
+        setField("tags", existingTags);
       } catch (err) {
         console.error("Failed to load profile", err);
       }
     };
+
     fetchMe();
-  }, [setForm]);
+  }, []);
 
   const handleSaveAndNext = async () => {
     try {
-      if (!form.location) {
-        Alert.alert("Location required", "Please select a location");
-        return;
-      }
+      const tags = tagsText
+        .split(" ")
+        .map((t) => t.trim())
+        .filter((t) => t.startsWith("#") && t.length > 1);
 
       const updatedUser = await saveProfile({
-        location: {
-          name: form.location.name,
-          lat: form.location.lat,
-          lng: form.location.lng,
-          country: form.location.country,
-        },
+        location: form.location?.name
+          ? {
+              name: form.location.name,
+              lat: form.location.lat,
+              lng: form.location.lng,
+              country: form.location.country,
+            }
+          : null,
+        tags,
         searchScope: form.searchScope || "worldwide",
         willingToRelocate: form.willingToRelocate ?? false,
       });
@@ -58,7 +65,7 @@ export default function Step4Location({ form, setForm, setField }) {
 
       navigation.navigate("EditImages", { user: updatedUser });
     } catch (err) {
-      Alert.alert("Error", "Failed to save location");
+      Alert.alert("Error", "Failed to save");
     }
   };
 
@@ -138,7 +145,18 @@ export default function Step4Location({ form, setForm, setField }) {
           </TouchableOpacity>
         ))}
       </View>
-
+      <View>
+        <Text style={styles.label}>Tags</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="#hiking #coffee"
+          placeholderTextColor="#666"
+          value={tagsText}
+          onChangeText={(text) => {
+            setTagsText(text);
+          }}
+        />
+      </View>
       <View style={styles.navRow}>
         <TouchableOpacity
           style={[styles.navButton, styles.backButton]}

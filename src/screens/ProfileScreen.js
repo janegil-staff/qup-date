@@ -8,7 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Linking
+  Linking,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
@@ -31,7 +31,7 @@ const handleReport = async () => {
   } else {
     Alert.alert(
       "Email app not available",
-      "Please send your report to qup.dating@gmail.com"
+      "Please send your report to qup.dating@gmail.com",
     );
   }
 };
@@ -64,7 +64,7 @@ export default function ProfileScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       loadOwnProfile();
-    }, [])
+    }, []),
   );
   if (loading) return <ActivityIndicator color="#ff69b4" />;
   if (loading) {
@@ -111,7 +111,9 @@ export default function ProfileScreen({ navigation }) {
         <View style={styles.header}>
           <Image
             source={{
-              uri: profile.profileImage || "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
+              uri:
+                profile.profileImage ||
+                "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
             }}
             style={styles.avatar}
           />
@@ -335,13 +337,35 @@ const styles = StyleSheet.create({
   value: { color: "#fff", flex: 1 },
   tagsContainer: { flexDirection: "row", flexWrap: "wrap", marginTop: 8 },
   tag: {
-    backgroundColor: "#ff69b4",
-    color: "#fff",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    backgroundColor: "#be185d",
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: 20,
     marginRight: 8,
     marginBottom: 8,
-    fontSize: 12,
+
+    // s⭐ Center the text inside the chip
+    justifyContent: "center",
+    alignItems: "center",
+
+    // Makes the chip auto-size to content
+    alignSelf: "flex-start",
+  },
+  tagText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 13,
+    textAlign: "center",
+  },
+
+  tagChip: {
+    backgroundColor: "#ff69b4",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

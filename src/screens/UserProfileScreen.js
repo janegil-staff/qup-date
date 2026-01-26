@@ -411,7 +411,7 @@ const styles = StyleSheet.create({
   value: { color: "#fff", flex: 1 },
   tagsContainer: { flexDirection: "row", flexWrap: "wrap", marginTop: 8 },
   tag: {
-    backgroundColor: "#ff69b4",
+    backgroundColor: "#be185d",
     color: "#fff",
     paddingHorizontal: 10,
     paddingVertical: 5,
