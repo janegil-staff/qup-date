@@ -102,7 +102,7 @@ export default function ChatScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#111827" }}>
+    <View style={{ flex: 1, backgroundColor: "#111827", paddingTop: 40 }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -230,7 +230,7 @@ export default function ChatScreen({ route, navigation }) {
           )}
         </View>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
