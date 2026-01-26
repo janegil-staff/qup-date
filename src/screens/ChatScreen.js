@@ -32,23 +32,22 @@ export default function ChatScreen({ route, navigation }) {
 
   const listRef = useRef(null);
 
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
-const [keyboardHeight, setKeyboardHeight] = useState(0);
+  useEffect(() => {
+    const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+    });
 
-useEffect(() => {
-  const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
-    setKeyboardHeight(e.endCoordinates.height);
-  });
+    const hideSub = Keyboard.addListener("keyboardDidHide", () => {
+      setKeyboardHeight(0);
+    });
 
-  const hideSub = Keyboard.addListener("keyboardDidHide", () => {
-    setKeyboardHeight(0);
-  });
-
-  return () => {
-    showSub.remove();
-    hideSub.remove();
-  };
-}, []);
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
   useEffect(() => {
     if (!messages || messages.length === 0) return;
 
@@ -119,7 +118,6 @@ useEffect(() => {
     );
   }
 
-
   return (
     <View style={{ flex: 1, backgroundColor: "#111827", paddingTop: 40 }}>
       <View style={{ marginBottom: keyboardHeight, flex: 1 }}>
@@ -150,6 +148,12 @@ useEffect(() => {
                 <Text style={styles.name}>{user.name || ""}</Text>
               </TouchableOpacity>
             </View>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.closeText}>✕</Text>
+            </TouchableOpacity>
           </View>
 
           <ImagePreviewBar images={selectedImages} remove={removeImage} />
@@ -250,6 +254,22 @@ useEffect(() => {
 }
 
 const styles = StyleSheet.create({
+  closeButton: {
+    position: "absolute",
+    top: 20,
+    right: 15,
+    zIndex: 999,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 8,
+    borderRadius: 30,
+  },
+
+  closeText: {
+    color: "#fff",
+    fontSize: 22,
+    fontWeight: "700",
+  },
+
   inputContainer: {
     paddingBottom: Platform.OS === "ios" ? 20 : 10,
   },
@@ -302,6 +322,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#111827",
   },
   header: {
+    position: "relative",
     flexDirection: "row",
     alignItems: "center",
     padding: 14,
