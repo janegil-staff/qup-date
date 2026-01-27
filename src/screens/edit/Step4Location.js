@@ -5,17 +5,20 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import * as Progress from "react-native-progress";
 import { saveProfile, fetchUser } from "../../utils/profileService";
 import LocationAutocomplete from "../../components/LocationAutocomplete";
+import normalizeCountry from "../../utils/normalizeCountry";
 
 export default function Step4Location({ form, setForm, setField }) {
   const navigation = useNavigation();
   const [tagsText, setTagsText] = useState("");
+  console.log("normalizeCountry:", normalizeCountry);
 
-  // ⭐ Load user data ONCE and prefill the form
+  // Load user data ONCE and prefill the form
   useEffect(() => {
     const load = async () => {
       try {
@@ -51,7 +54,7 @@ export default function Step4Location({ form, setForm, setField }) {
               name: form.location.name,
               lat: form.location.lat,
               lng: form.location.lng,
-              country: form.location.country,
+              country: normalizeCountry(form.location.country),
             }
           : null,
         tags,
@@ -66,6 +69,7 @@ export default function Step4Location({ form, setForm, setField }) {
 
       navigation.navigate("EditImages", { user: updatedUser });
     } catch (err) {
+      console.error("SAVE ERROR:", err);
       Alert.alert("Error", "Failed to save");
     }
   };
@@ -94,7 +98,14 @@ export default function Step4Location({ form, setForm, setField }) {
             name: text,
           })
         }
-        onSelect={(location) => setField("location", location)}
+        onSelect={(location) =>
+          setField("location", {
+            name: location.name,
+            lat: location.lat,
+            lng: location.lng,
+            country: normalizeCountry(location.country),
+          })
+        }
       />
 
       <Text style={styles.label}>Search Preference</Text>
@@ -154,9 +165,7 @@ export default function Step4Location({ form, setForm, setField }) {
         placeholder="#hiking #coffee"
         placeholderTextColor="#666"
         value={tagsText}
-        onChangeText={(text) => {
-          setTagsText(text);
-        }}
+        onChangeText={setTagsText}
       />
 
       <View style={styles.navRow}>

@@ -22,62 +22,33 @@ export default function DiscoverScreen({ navigation }) {
   const [hasMore, setHasMore] = useState(true);
   const [showCongrats, setShowCongrats] = useState(false);
 
-  const fetchDiscoverUsers = async () => {
-    try {
-      const token = await SecureStore.getItemAsync("authToken");
-
-      const res = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-
-      const data = await res.json();
-
-      if (Array.isArray(data)) {
-        setUsers(data);
-      } else {
-        setUsers([]);
-      }
-    } catch (err) {
-      console.error("Error fetching discover users:", err);
-      setUsers([]);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchDiscoverUsers();
-    }, [])
-  );
-
-  const fetchUsers = async () => {
-    if (loading || !hasMore) return;
+  const fetchUsers = async (reset = false) => {
+    if (loading || (!hasMore && !reset)) return;
     setLoading(true);
 
     try {
       const token = await SecureStore.getItemAsync("authToken");
 
-      const res = await fetch(
-        `https://qup.dating/api/mobile/discover${
-          cursor ? `?cursor=${cursor}` : ""
-        }`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const url = `https://qup.dating/api/mobile/discover${
+        !reset && cursor ? `?cursor=${cursor}` : ""
+      }`;
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error || "Fetch failed");
 
-      setUsers((prev) => {
-        const map = new Map([...prev, ...data.users].map((u) => [u._id, u]));
-        return Array.from(map.values());
-      });
+      if (reset) {
+        setUsers(data.users);
+      } else {
+        setUsers((prev) => {
+          const map = new Map([...prev, ...data.users].map((u) => [u._id, u]));
+          return Array.from(map.values());
+        });
+      }
 
       setCursor(data.nextCursor);
       setHasMore(data.users.length === 20);
@@ -89,17 +60,25 @@ export default function DiscoverScreen({ navigation }) {
     }
   };
 
+  // Refresh when screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      setCursor(null);
+      setHasMore(true);
+      fetchUsers(true); // reset = true
+    }, []),
+  );
+
+  // Initial load
   useEffect(() => {
-    fetchUsers();
+    fetchUsers(true);
   }, []);
 
   const handleLike = async (id) => {
     const token = await SecureStore.getItemAsync("authToken");
 
-    // Optimistic UI update
     setUsers((prev) => prev.filter((u) => u._id !== id));
 
-    // Send like to backend
     const res = await fetch(`https://qup.dating/api/mobile/like`, {
       method: "POST",
       headers: {
@@ -110,18 +89,12 @@ export default function DiscoverScreen({ navigation }) {
     });
 
     const data = await res.json();
-
-    // If backend says it's a match → show popup
-    if (data.match === true) {
-      setShowCongrats(true);
-    }
+    if (data.match === true) setShowCongrats(true);
   };
-
 
   const handleDislike = async (id) => {
     const token = await SecureStore.getItemAsync("authToken");
 
-    // Optimistic UI update
     setUsers((prev) => prev.filter((u) => u._id !== id));
 
     await fetch(`https://qup.dating/api/mobile/dislike`, {
@@ -142,7 +115,9 @@ export default function DiscoverScreen({ navigation }) {
         {item.isVerified && <VerifiedBadge />}
         <Image
           source={{
-            uri: item.profileImage || "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
+            uri:
+              item.profileImage ||
+              "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
           }}
           style={styles.image}
         />
@@ -183,7 +158,7 @@ export default function DiscoverScreen({ navigation }) {
           data={users}
           renderItem={renderItem}
           keyExtractor={(item) => item._id}
-          onEndReached={fetchUsers}
+          onEndReached={() => fetchUsers()}
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             loading ? <ActivityIndicator color="#ff69b4" /> : null

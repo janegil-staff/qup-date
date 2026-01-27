@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, TextInput, FlatList, TouchableOpacity, Text, StyleSheet } from "react-native";
+import {
+  View,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+} from "react-native";
 
 export default function LocationAutocomplete({ value, onChange, onSelect }) {
   const [results, setResults] = useState([]);
@@ -27,24 +34,33 @@ export default function LocationAutocomplete({ value, onChange, onSelect }) {
   };
 
   const fetchDetails = async (placeId) => {
-    const res = await fetch(
-      `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${process.env.EXPO_PUBLIC_GOOGLE_ANDROID_KEY}`
-    );
+    try {
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=formatted_address,geometry,address_components&key=${process.env.EXPO_PUBLIC_GOOGLE_ANDROID_KEY}`
+      );
 
-    const data = await res.json();
-    const details = data.result;
+      const data = await res.json();
+      const details = data.result;
 
-    const location = {
-      name: details.formatted_address,
-      lat: details.geometry.location.lat,
-      lng: details.geometry.location.lng,
-      country:
-        details.address_components.find((c) => c.types.includes("country"))
-          ?.long_name || "",
-    };
+      // Extract country safely
+      const countryComponent = details.address_components?.find((c) =>
+        c.types.includes("country")
+      );
 
-    onSelect(location);
-    setResults([]);
+      const country = countryComponent?.long_name || null;
+
+      const location = {
+        name: details.formatted_address,
+        lat: details.geometry.location.lat,
+        lng: details.geometry.location.lng,
+        country,
+      };
+
+      onSelect(location);
+      setResults([]);
+    } catch (err) {
+      console.log("DETAILS ERROR:", err);
+    }
   };
 
   return (

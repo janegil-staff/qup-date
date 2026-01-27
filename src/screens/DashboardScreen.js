@@ -39,21 +39,21 @@ export default function DashboardScreen({ navigation }) {
   const fetchCards = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
+      if (!token || !user?.location?.country) return;
 
-      const res = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      let url = `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`;
+
+      // ⭐ NATIONAL SCOPE
+      if (user.searchScope === "national") {
+        url += `?country=${user.location.country}`;
+      }
+
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       const data = await res.json();
-
-      if (Array.isArray(data)) {
-        setCards(data);
-      } else {
-        setCards([]);
-      }
+      setCards(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching cards:", err);
       setCards([]);
@@ -64,8 +64,8 @@ export default function DashboardScreen({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
-      fetchCards();
-    }, [])
+      if (user) fetchCards();
+    }, [user]),
   );
 
   // Fetch current user
@@ -77,7 +77,7 @@ export default function DashboardScreen({ navigation }) {
           `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/me`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         if (!res.ok) throw new Error("Failed to fetch user");
         const data = await res.json();
@@ -99,7 +99,7 @@ export default function DashboardScreen({ navigation }) {
           `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/stats`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         if (res.ok) {
           const data = await res.json();
