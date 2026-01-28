@@ -20,8 +20,7 @@ export default function MessageButton({ otherUser }) {
   if (!currentUserId) return null;
 
   const openChat = () => {
-    console.log(currentUserId);
-    console.log(otherUserId);
+
     navigation.navigate("ChatScreen", { userId: otherUserId, user: otherUser });
   };
 

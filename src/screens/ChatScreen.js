@@ -132,9 +132,7 @@ export default function ChatScreen({ route, navigation }) {
             <View style={styles.userInfo}>
               <TouchableOpacity
                 onPress={() =>
-                  navigation
-                    .getParent()
-                    ?.navigate("UserProfile", { userId: user._id })
+                  navigation.navigate("UserProfile", { userId: user._id })
                 }
               >
                 <Image
@@ -150,7 +148,7 @@ export default function ChatScreen({ route, navigation }) {
             </View>
             <TouchableOpacity
               style={styles.closeButton}
-              onPress={() => navigation.goBack()}
+              onPress={() => navigation.navigate("MatchesHome")}
             >
               <Text style={styles.closeText}>✕</Text>
             </TouchableOpacity>

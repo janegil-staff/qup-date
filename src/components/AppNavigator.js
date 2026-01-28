@@ -100,6 +100,7 @@ function MainTabs() {
         tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "gray",
         headerShown: false,
+
         tabBarIcon: ({ color, size }) => {
           switch (route.name) {
             case "Dashboard":
@@ -145,6 +146,10 @@ export default function AppNavigator() {
           <Stack.Screen name="MainTabs" component={MainTabs} />
 
           <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+
+          <Stack.Screen name="ChatScreen" component={ChatScreen} />
+          <Stack.Screen name="MatchesHome" component={MatchesScreen} />
+
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
