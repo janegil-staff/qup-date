@@ -12,11 +12,12 @@ import * as Progress from "react-native-progress";
 import { saveProfile, fetchUser } from "../../utils/profileService";
 import LocationAutocomplete from "../../components/LocationAutocomplete";
 import normalizeCountry from "../../utils/normalizeCountry";
+import AgeRangeSlider from "../../components/AgeRangeSlider";
 
 export default function Step4Location({ form, setForm, setField }) {
   const navigation = useNavigation();
   const [tagsText, setTagsText] = useState("");
-  console.log("normalizeCountry:", normalizeCountry);
+  const [ageRange, setAgeRange] = useState([18, 90]);
 
   // Load user data ONCE and prefill the form
   useEffect(() => {
@@ -30,6 +31,8 @@ export default function Step4Location({ form, setForm, setField }) {
           searchScope: user.searchScope || "worldwide",
           willingToRelocate: user.willingToRelocate ?? false,
           tags: user.tags || [],
+          preferredAgeMin: user.preferredAgeMin ?? 18,
+          preferredAgeMax: user.preferredAgeMax ?? 90,
         }));
 
         setTagsText((user.tags || []).join(" "));
@@ -60,6 +63,8 @@ export default function Step4Location({ form, setForm, setField }) {
         tags,
         searchScope: form.searchScope || "worldwide",
         willingToRelocate: form.willingToRelocate ?? false,
+        preferredAgeMin: form.preferredAgeMin ?? 18,
+        preferredAgeMax: form.preferredAgeMax ?? 90,
       });
 
       setForm((prev) => ({
@@ -166,6 +171,18 @@ export default function Step4Location({ form, setForm, setField }) {
         placeholderTextColor="#666"
         value={tagsText}
         onChangeText={setTagsText}
+      />
+      <Text></Text>
+      <AgeRangeSlider
+        preferredAgeMin={form.preferredAgeMin}
+        preferredAgeMax={form.preferredAgeMax}
+        onChange={([min, max]) =>
+          setForm((prev) => ({
+            ...prev,
+            preferredAgeMin: min,
+            preferredAgeMax: max,
+          }))
+        }
       />
 
       <View style={styles.navRow}>
