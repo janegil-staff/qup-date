@@ -233,6 +233,20 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
         )}
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SafetyGuidelines")}
+        >
+          <Text
+            style={{
+              color: "#ccc",
+              textAlign: "center",
+              fontSize: 15,
+              fontWeight: "500",
+            }}
+          >
+            Safety Guidelines
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleReport} style={{ padding: 12 }}>
           <Text style={{ color: "#ff4d4d", fontSize: 16, textAlign: "center" }}>
             Report safety concern

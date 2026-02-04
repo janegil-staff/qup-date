@@ -9,6 +9,7 @@ import {
   ScrollView,
   Image,
   Platform,
+  Alert,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import * as ImagePicker from "expo-image-picker";
@@ -22,10 +23,10 @@ export default function RegisterScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const currentDate = new Date();
   const [birthYear, setBirthYear] = useState(
-    String(currentDate.getFullYear() - 18)
+    String(currentDate.getFullYear() - 18),
   );
   const [birthMonth, setBirthMonth] = useState(
-    String(currentDate.getMonth() + 1)
+    String(currentDate.getMonth() + 1),
   ); // months are 0-based
   const [birthDay, setBirthDay] = useState(String(currentDate.getDate()));
   const [birthdate, setBirthdate] = useState(new Date());
@@ -33,6 +34,7 @@ export default function RegisterScreen({ navigation }) {
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [agreed, setAgreed] = useState(false);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -79,6 +81,10 @@ export default function RegisterScreen({ navigation }) {
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
+      return;
+    }
+    if (!agreed) {
+      Alert.alert("Terms Required", "You must agree to continue.");
       return;
     }
 
@@ -151,9 +157,7 @@ export default function RegisterScreen({ navigation }) {
       }
 
       // 🔹 Backend does NOT return token → do NOT auto-login
-      alert(
-        "Register success, you can log in to your profile."
-      );
+      alert("Register success, you can log in to your profile.");
 
       // Force user to login manually (prevents wrong user session)
       navigation.navigate("LoginForm");
@@ -263,6 +267,50 @@ export default function RegisterScreen({ navigation }) {
           ))}
         </View>
 
+        {/* Terms Agreement */}
+        <View style={{ marginVertical
+          : 20 }}>
+          <TouchableOpacity
+            style={{ flexDirection: "row", alignItems: "center" }}
+            onPress={() => setAgreed(!agreed)}
+          >
+            <View
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: 4,
+                borderWidth: 2,
+                borderColor: agreed ? "#ff69b4" : "#6b7280",
+                backgroundColor: agreed ? "#ff69b4" : "transparent",
+                marginRight: 10,
+              }}
+            />
+            <Text style={{ color: "#d1d5db", flex: 1 }}>
+              I agree to the{" "}
+              <Text
+                style={{ color: "#ff69b4" }}
+                onPress={() => navigation.navigate("TermsSafety")}
+              >
+                Terms of Service
+              </Text>{" "}
+              and{" "}
+              <Text
+                style={{ color: "#ff69b4" }}
+                onPress={() => navigation.navigate("TermsSafety")}
+              >
+                Privacy Policy
+              </Text>
+              . Qup Dating has zero tolerance for abusive or inappropriate
+              content.
+            </Text>
+          </TouchableOpacity>
+
+          {!agreed && (
+            <Text style={{ color: "#f87171", marginTop: 6 }}>
+              You must agree before creating an account.
+            </Text>
+          )}
+        </View>
         {/* Submit */}
         <TouchableOpacity
           style={[

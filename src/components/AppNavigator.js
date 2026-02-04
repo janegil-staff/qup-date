@@ -25,6 +25,8 @@ import UserProfileScreen from "../screens/UserProfileScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import LikesScreen from "../screens/LikesScreen";
+import TermsSafetyScreen from "../screens/TermsSafetyScreen";
+import SafetyGuidelinesScreen from "../screens/SafetyGuidelinesScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -77,6 +79,10 @@ function ProfileStack() {
       <Stack.Screen name="ProfileHome" component={ProfileScreen} />
       <Stack.Screen name="UserProfile" component={UserProfileScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
+      <Stack.Screen
+        name="SafetyGuidelines"
+        component={SafetyGuidelinesScreen}
+      />
     </Stack.Navigator>
   );
 }
@@ -135,21 +141,25 @@ export default function AppNavigator() {
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator
+          initialRouteName="TermsSafety"
+          screenOptions={{ headerShown: false }}
+        >
+          <Stack.Screen name="TermsSafety" component={TermsSafetyScreen} />
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="LandingScreen" component={LandingScreen} />
           <Stack.Screen name="LoginForm" component={LoginForm} />
           <Stack.Screen
             name="ForgotPasswordScreen"
             component={ForgotPasswordScreen}
           />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+
           <Stack.Screen name="MainTabs" component={MainTabs} />
 
           <Stack.Screen name="UserProfile" component={UserProfileScreen} />
 
           <Stack.Screen name="ChatScreen" component={ChatScreen} />
           <Stack.Screen name="MatchesHome" component={MatchesScreen} />
-
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

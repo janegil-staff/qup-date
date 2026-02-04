@@ -6,6 +6,7 @@ import {
   ScrollView,
   ActivityIndicator,
   StyleSheet,
+  Alert,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
@@ -15,6 +16,8 @@ import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
 import MatchCongrats from "../components/MatchCongrats";
 import MessageButton from "../components/MessageButton";
+import ReportUserModal from "../components/ReportUserModal";
+import BlockUserModal from "../components/BlockUserModal";
 
 export default function UserProfileScreen({ route, navigation }) {
   const userId = route.params?.userId;
@@ -26,7 +29,8 @@ export default function UserProfileScreen({ route, navigation }) {
 
   const [likedUsers, setLikedUsers] = useState([]);
   const [likedMeUsers, setLikedMeUsers] = useState([]);
-
+  const [reportVisible, setReportVisible] = useState(false);
+  const [blockModalVisible, setBlockModalVisible] = useState(false);
   const fetchLikedUsers = async () => {
     const token = await SecureStore.getItemAsync("authToken");
 
@@ -47,6 +51,67 @@ export default function UserProfileScreen({ route, navigation }) {
   const icon = isMatched ? "✕" : "♥";
   const buttonStyle = isMatched ? styles.dislikeBtn : styles.likeBtn;
   const canLike = !isLikedByMe || isMatched;
+
+  const handleBlockUser = async () => {
+ 
+    setBlockModalVisible(false);
+   const token = await SecureStore.getItemAsync("authToken");
+
+console.log(token);
+    try {
+      const response = await fetch("https://qup.dating/api/mobile/block-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          blockedUser: profile._id,
+        }),
+      });
+      console.log(response.ok);
+
+      if (!response.ok) {
+        throw new Error("Failed to submit report");
+      }
+
+      Alert.alert("User Blocked", "You will not see this user again.");
+    } catch (err) {
+      console.log("Block error:", err);
+    }
+  };
+
+  const sendReportToBackend = async ({ reason }) => {
+    const currentUserId = await SecureStore.getItemAsync("userId");
+
+    try {
+      const response = await fetch(
+        "https://qup.dating/api/mobile/report-user",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            reportedUser: userId,
+            reporter: currentUserId,
+            reason,
+            timestamp: Date.now(),
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to submit report");
+      }
+      Alert.alert(
+        "Report submitted",
+        "Thank you. We will review this within 24 hours.",
+      );
+    } catch (error) {
+      Alert.alert("Error", "Could not submit report. Please try again.");
+    }
+  };
 
   const toggleLike = async () => {
     const token = await SecureStore.getItemAsync("authToken");
@@ -160,6 +225,29 @@ export default function UserProfileScreen({ route, navigation }) {
               <Text style={styles.btnText}>{icon}</Text>
             </TouchableOpacity>
           </View>
+
+          <TouchableOpacity onPress={() => setReportVisible(true)}>
+            <Text style={styles.rightAligned}>Report</Text>
+          </TouchableOpacity>
+
+          <ReportUserModal
+            visible={reportVisible}
+            onClose={() => setReportVisible(false)}
+            userId={profile._id}
+            onSubmit={(payload) => {
+              setReportVisible(false);
+              sendReportToBackend(payload);
+            }}
+          />
+          <TouchableOpacity onPress={() => setBlockModalVisible(true)}>
+            <Text style={styles.rightAligned}>Block User</Text>
+          </TouchableOpacity>
+
+          <BlockUserModal
+            visible={blockModalVisible}
+            onClose={() => setBlockModalVisible(false)}
+            onConfirm={handleBlockUser}
+          />
 
           {/* Header */}
           <View style={styles.header}>
@@ -324,6 +412,11 @@ function SimpleSection({ title, items }) {
 }
 
 const styles = StyleSheet.create({
+  rightAligned: {
+    alignSelf: "flex-end",
+    color: "#ff6666",
+    fontSize: 16,
+  },
   actionButton: {
     position: "absolute",
     top: 20,
