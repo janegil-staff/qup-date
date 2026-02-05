@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
+  Keyboard,
+  Pressable
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,8 +21,6 @@ import { useChat } from "../../hooks/useChat";
 import { useImageUpload } from "../../hooks/useImageUpload";
 import FullScreenImageModal from "../components/FullScreenImageModal";
 import EmojiModal from "react-native-emoji-modal";
-import { Pressable } from "react-native";
-import { Keyboard } from "react-native";
 import ReportUserModal from "../components/ReportUserModal";
 
 export default function ChatScreen({ route, navigation }) {
@@ -109,6 +109,8 @@ export default function ChatScreen({ route, navigation }) {
     });
 
     setText("");
+
+    Keyboard.dismiss();
   };
 
   const sendReportToBackend = async ({ reason }) => {
