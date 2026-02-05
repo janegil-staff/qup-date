@@ -18,6 +18,7 @@ export default function MatchesScreen({ navigation }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reportedUsers, setReportedUsers] = useState([]);
+  const [blockedUsers, setBlockedUsers] = useState([]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -76,6 +77,19 @@ export default function MatchesScreen({ navigation }) {
       const reportedIds = reportsData.reports?.map((r) => r.reportedUser) || [];
 
       setReportedUsers(reportedIds);
+
+      // ⭐ Fetch blocked users
+      const blockedRes = await fetch("https://qup.dating/api/mobile/blocked", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const blockedData = await blockedRes.json();
+      const blockedIds = blockedData.blocked?.map((u) => u._id) || [];
+
+      setBlockedUsers(blockedIds);
     } catch (err) {
       console.error("Fetch matches error:", err);
     } finally {
@@ -138,7 +152,9 @@ export default function MatchesScreen({ navigation }) {
       </View>
     );
   }
-  const safeMatches = matches.filter((m) => !reportedUsers.includes(m._id));
+  const safeMatches = matches.filter(
+    (m) => !reportedUsers.includes(m._id) && !blockedUsers.includes(m._id),
+  );
 
   return (
     <Screen style={{ backgroundColor: "#111827" }}>

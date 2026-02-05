@@ -19,6 +19,7 @@ export default function LikesScreen({ navigation }) {
   const [disliked, setDisliked] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reportedUsers, setReportedUsers] = useState([]);
+  const [blockedUsers, setBlockedUsers] = useState([]);
 
   const fetchLikes = async () => {
     try {
@@ -46,6 +47,19 @@ export default function LikesScreen({ navigation }) {
       const reportedIds = reportsData.reports?.map((r) => r.reportedUser) || [];
 
       setReportedUsers(reportedIds);
+
+      // ⭐ Fetch blocked users
+      const blockedRes = await fetch("https://qup.dating/api/mobile/blocked", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const blockedData = await blockedRes.json();
+      const blockedIds = blockedData.blocked?.map((u) => u._id) || [];
+
+      setBlockedUsers(blockedIds);
     } catch (err) {
       console.error("Likes fetch error:", err);
     } finally {
@@ -60,11 +74,17 @@ export default function LikesScreen({ navigation }) {
     }, []),
   );
 
-  const safeLikedMe = likedMe.filter((u) => !reportedUsers.includes(u._id));
+  const safeLikedMe = likedMe.filter(
+    (u) => !reportedUsers.includes(u._id) && !blockedUsers.includes(u._id),
+  );
 
-  const safeILiked = iLiked.filter((u) => !reportedUsers.includes(u._id));
+  const safeILiked = iLiked.filter(
+    (u) => !reportedUsers.includes(u._id) && !blockedUsers.includes(u._id),
+  );
 
-  const safeDisliked = disliked.filter((u) => !reportedUsers.includes(u._id));
+  const safeDisliked = disliked.filter(
+    (u) => !reportedUsers.includes(u._id) && !blockedUsers.includes(u._id),
+  );
 
   const renderList = (data) => (
     <FlatList
