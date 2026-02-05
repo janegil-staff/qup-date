@@ -57,6 +57,7 @@ export default function UserProfileScreen({ route, navigation }) {
     setBlockModalVisible(false);
    const token = await SecureStore.getItemAsync("authToken");
 
+
     try {
       const response = await fetch("https://qup.dating/api/mobile/block-user", {
         method: "POST",
@@ -105,7 +106,7 @@ export default function UserProfileScreen({ route, navigation }) {
       }
       Alert.alert(
         "Report submitted",
-        "Thank you. We will review this within 24 hours.",
+        "Thank you. We will review this within 24 hours. Profiles violating our rules may be removed.",
       );
     } catch (error) {
       Alert.alert("Error", "Could not submit report. Please try again.");

@@ -136,7 +136,7 @@ export default function ChatScreen({ route, navigation }) {
       }
       Alert.alert(
         "Report submitted",
-        "Thank you. We will review this within 24 hours.",
+        "Thank you. We will review this within 24 hours. Profiles violating our rules may be removed.",
       );
     } catch (error) {
       Alert.alert("Error", "Could not submit report. Please try again.");
