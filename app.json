@@ -2,7 +2,7 @@
   "expo": {
     "name": "Qup Dating Mobile",
     "slug": "QupDatingMobile",
-    "version": "4.0.7",
+    "version": "4.0.8",
     "orientation": "default",
     "icon": "./assets/qup-logo.png",
     "userInterfaceStyle": "light",
@@ -23,7 +23,7 @@
     "android": {
       "softwareKeyboardLayoutMode": "resize",
       "windowSoftInputMode": "adjustResize",
-      "versionCode": 84,
+      "versionCode": 85,
       "package": "dating.qup",
       "permissions": [
         "ACCESS_FINE_LOCATION",

@@ -18,6 +18,7 @@ import MatchCongrats from "../components/MatchCongrats";
 import MessageButton from "../components/MessageButton";
 import ReportUserModal from "../components/ReportUserModal";
 import BlockUserModal from "../components/BlockUserModal";
+import getAge from "../utils/getAge";
 
 export default function UserProfileScreen({ route, navigation }) {
   const userId = route.params?.userId;
@@ -53,10 +54,8 @@ export default function UserProfileScreen({ route, navigation }) {
   const canLike = !isLikedByMe || isMatched;
 
   const handleBlockUser = async () => {
- 
     setBlockModalVisible(false);
-   const token = await SecureStore.getItemAsync("authToken");
-
+    const token = await SecureStore.getItemAsync("authToken");
 
     try {
       const response = await fetch("https://qup.dating/api/mobile/block-user", {
@@ -192,9 +191,7 @@ export default function UserProfileScreen({ route, navigation }) {
     );
   }
 
-  const age = profile.birthdate
-    ? new Date().getFullYear() - new Date(profile.birthdate).getFullYear()
-    : null;
+  const age = getAge(profile.birthdate);
 
   return (
     <Screen style={{ backgroundColor: "#111827" }}>

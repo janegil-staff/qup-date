@@ -16,6 +16,7 @@ import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
 import DeleteProfileButton from "../components/DeleteProfileButton";
+import getAge from "../utils/getAge";
 
 const handleReport = async () => {
   const email = "qup.dating@gmail.com";
@@ -47,7 +48,7 @@ export default function ProfileScreen({ navigation }) {
   const [isVerified, setIsVerified] = useState(false);
   const [isCarouselVisible, setCarouselVisible] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
- const [blockModalVisible, setBlockModalVisible] = useState(false);
+  const [blockModalVisible, setBlockModalVisible] = useState(false);
   const loadOwnProfile = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
@@ -84,9 +85,7 @@ export default function ProfileScreen({ navigation }) {
     );
   }
 
-  const age = profile.birthdate
-    ? new Date().getFullYear() - new Date(profile.birthdate).getFullYear()
-    : null;
+  const age = getAge(profile.birthdate);
 
   const handleLogout = async () => {
     await SecureStore.deleteItemAsync("authToken");
@@ -281,7 +280,7 @@ const styles = StyleSheet.create({
     color: "#ff4d4d",
     fontSize: 16,
     textAlign: "left",
-      fontSize: 15,
+    fontSize: 15,
   },
   bottomLeft: {
     color: "#ccc",
