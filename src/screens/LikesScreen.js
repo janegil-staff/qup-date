@@ -18,6 +18,7 @@ export default function LikesScreen({ navigation }) {
   const [iLiked, setILiked] = useState([]);
   const [disliked, setDisliked] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reportedUsers, setReportedUsers] = useState([]);
 
   const fetchLikes = async () => {
     try {
@@ -29,6 +30,22 @@ export default function LikesScreen({ navigation }) {
       setLikedMe(data.likedMeUsers || []);
       setILiked(data.likedUsers || []);
       setDisliked(data.dislikedUsers || []);
+
+      // Fetch reports created by this user
+      const reportsRes = await fetch(
+        "https://qup.dating/api/mobile/reports/mine",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const reportsData = await reportsRes.json();
+      const reportedIds = reportsData.reports?.map((r) => r.reportedUser) || [];
+
+      setReportedUsers(reportedIds);
     } catch (err) {
       console.error("Likes fetch error:", err);
     } finally {
@@ -40,8 +57,15 @@ export default function LikesScreen({ navigation }) {
     useCallback(() => {
       setLoading(true);
       fetchLikes();
-    }, [])
+    }, []),
   );
+
+  const safeLikedMe = likedMe.filter((u) => !reportedUsers.includes(u._id));
+
+  const safeILiked = iLiked.filter((u) => !reportedUsers.includes(u._id));
+
+  const safeDisliked = disliked.filter((u) => !reportedUsers.includes(u._id));
+
   const renderList = (data) => (
     <FlatList
       data={data}
@@ -75,6 +99,7 @@ export default function LikesScreen({ navigation }) {
       </Screen>
     );
   }
+
   return (
     <Screen style={{ backgroundColor: "#111827" }}>
       <View style={styles.container}>
@@ -120,10 +145,10 @@ export default function LikesScreen({ navigation }) {
           </TouchableOpacity>
         </View>
         {activeTab === "likedMe"
-          ? renderList(likedMe)
+          ? renderList(safeLikedMe)
           : activeTab === "iLiked"
-          ? renderList(iLiked)
-          : renderList(disliked)}
+            ? renderList(safeILiked)
+            : renderList(safeDisliked)}
       </View>
     </Screen>
   );

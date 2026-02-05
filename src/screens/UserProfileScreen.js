@@ -57,7 +57,6 @@ export default function UserProfileScreen({ route, navigation }) {
     setBlockModalVisible(false);
    const token = await SecureStore.getItemAsync("authToken");
 
-console.log(token);
     try {
       const response = await fetch("https://qup.dating/api/mobile/block-user", {
         method: "POST",

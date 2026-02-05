@@ -47,7 +47,7 @@ export default function ProfileScreen({ navigation }) {
   const [isVerified, setIsVerified] = useState(false);
   const [isCarouselVisible, setCarouselVisible] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
-
+ const [blockModalVisible, setBlockModalVisible] = useState(false);
   const loadOwnProfile = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
@@ -233,25 +233,6 @@ export default function ProfileScreen({ navigation }) {
             </View>
           </View>
         )}
-        <TouchableOpacity
-          onPress={() => navigation.navigate("SafetyGuidelines")}
-        >
-          <Text
-            style={{
-              color: "#ccc",
-              textAlign: "center",
-              fontSize: 15,
-              fontWeight: "500",
-            }}
-          >
-            Safety Guidelines
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleReport} style={{ padding: 12 }}>
-          <Text style={{ color: "#ff4d4d", fontSize: 16, textAlign: "center" }}>
-            Report safety concern
-          </Text>
-        </TouchableOpacity>
 
         <View style={{ marginTop: 20, alignItems: "flex-end" }}>
           <DeleteProfileButton userId={profile._id} navigation={navigation} />
@@ -264,6 +245,15 @@ export default function ProfileScreen({ navigation }) {
           visible={isCarouselVisible}
           onRequestClose={() => setCarouselVisible(false)}
         />
+
+        <TouchableOpacity onPress={handleReport}>
+          <Text style={styles.handleReport}>Report safety concern</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("SafetyGuidelines")}
+        >
+          <Text style={styles.bottomLeft}>Safety Guidelines</Text>
+        </TouchableOpacity>
       </ScrollView>
     </Screen>
   );
@@ -287,6 +277,19 @@ function SimpleSection({ title, items }) {
 }
 
 const styles = StyleSheet.create({
+  handleReport: {
+    color: "#ff4d4d",
+    fontSize: 16,
+    textAlign: "left",
+      fontSize: 15,
+  },
+  bottomLeft: {
+    color: "#ccc",
+    textAlign: "left",
+    fontSize: 15,
+    fontWeight: "500",
+    paddingVertical: 10,
+  },
   topRight: {
     width: "100%",
     alignItems: "flex-end",

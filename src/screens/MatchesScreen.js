@@ -17,11 +17,12 @@ import UnreadBadge from "../components/UnreadBadge";
 export default function MatchesScreen({ navigation }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reportedUsers, setReportedUsers] = useState([]);
 
   useFocusEffect(
     React.useCallback(() => {
       fetchMatches();
-    }, [])
+    }, []),
   );
 
   const fetchMatches = async () => {
@@ -34,6 +35,7 @@ export default function MatchesScreen({ navigation }) {
         return;
       }
 
+      // Fetch matches
       const res = await fetch("https://qup.dating/api/mobile/matches", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -58,6 +60,22 @@ export default function MatchesScreen({ navigation }) {
       }
 
       setMatches(data.matches || []);
+
+      // ⭐ Fetch reports created by this user
+      const reportsRes = await fetch(
+        "https://qup.dating/api/mobile/reports/mine",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const reportsData = await reportsRes.json();
+      const reportedIds = reportsData.reports?.map((r) => r.reportedUser) || [];
+
+      setReportedUsers(reportedIds);
     } catch (err) {
       console.error("Fetch matches error:", err);
     } finally {
@@ -73,7 +91,14 @@ export default function MatchesScreen({ navigation }) {
         activeOpacity={0.85}
         onPress={() => navigation.navigate("UserProfile", { userId: item._id })}
       >
-        <Image source={{ uri: item.profileImage || "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png" }} style={styles.image} />
+        <Image
+          source={{
+            uri:
+              item.profileImage ||
+              "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
+          }}
+          style={styles.image}
+        />
       </TouchableOpacity>
 
       <View
@@ -113,17 +138,18 @@ export default function MatchesScreen({ navigation }) {
       </View>
     );
   }
+  const safeMatches = matches.filter((m) => !reportedUsers.includes(m._id));
 
   return (
     <Screen style={{ backgroundColor: "#111827" }}>
       <View style={styles.container}>
         <Text style={styles.title}>Your Matches</Text>
 
-        {matches.length === 0 ? (
+        {safeMatches.length === 0 ? (
           <Text style={styles.empty}>No matches yet. Keep swiping!</Text>
         ) : (
           <FlatList
-            data={matches}
+            data={safeMatches}
             renderItem={renderItem}
             keyExtractor={(item) => item._id}
             numColumns={2}

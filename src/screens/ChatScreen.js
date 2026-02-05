@@ -21,6 +21,7 @@ import FullScreenImageModal from "../components/FullScreenImageModal";
 import EmojiModal from "react-native-emoji-modal";
 import { Pressable } from "react-native";
 import { Keyboard } from "react-native";
+import ReportUserModal from "../components/ReportUserModal";
 
 export default function ChatScreen({ route, navigation }) {
   const { userId, user } = route.params;
@@ -33,7 +34,7 @@ export default function ChatScreen({ route, navigation }) {
   const listRef = useRef(null);
 
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-
+  const [reportVisible, setReportVisible] = useState(false);
   useEffect(() => {
     const showSub = Keyboard.addListener("keyboardDidShow", (e) => {
       setKeyboardHeight(e.endCoordinates.height);
@@ -110,6 +111,37 @@ export default function ChatScreen({ route, navigation }) {
     setText("");
   };
 
+  const sendReportToBackend = async ({ reason }) => {
+    const currentUserId = await SecureStore.getItemAsync("userId");
+
+    try {
+      const response = await fetch(
+        "https://qup.dating/api/mobile/report-user",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            reportedUser: userId,
+            reporter: currentUserId,
+            reason,
+            timestamp: Date.now(),
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to submit report");
+      }
+      Alert.alert(
+        "Report submitted",
+        "Thank you. We will review this within 24 hours.",
+      );
+    } catch (error) {
+      Alert.alert("Error", "Could not submit report. Please try again.");
+    }
+  };
   if (!currentUserId || loading) {
     return (
       <View style={styles.loader}>
@@ -145,7 +177,25 @@ export default function ChatScreen({ route, navigation }) {
                 />
                 <Text style={styles.name}>{user.name || ""}</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.rightAligned}
+                onPress={() => setReportVisible(true)}
+              >
+                <Text style={{ color: "#ff6666" }}>Report</Text>
+              </TouchableOpacity>
+
+              <ReportUserModal
+                visible={reportVisible}
+                onClose={() => setReportVisible(false)}
+                userId={userId}
+                onSubmit={(payload) => {
+                  setReportVisible(false);
+                  sendReportToBackend(payload);
+                }}
+              />
             </View>
+
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => navigation.navigate("MatchesHome")}
@@ -252,6 +302,13 @@ export default function ChatScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
+  rightAligned: {
+    position: "absolute",
+    left: 50,
+    top: 0,
+    fontSize: 16,
+  },
+
   closeButton: {
     position: "absolute",
     top: 20,
