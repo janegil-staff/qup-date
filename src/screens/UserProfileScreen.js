@@ -413,6 +413,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     color: "#ff6666",
     fontSize: 16,
+    padding: 5
   },
   actionButton: {
     position: "absolute",

@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     textAlign: "left",
     fontSize: 15,
     fontWeight: "500",
-    paddingVertical: 10,
+    paddingVertical: 20,
   },
   topRight: {
     width: "100%",
