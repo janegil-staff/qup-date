@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
+  Keyboard,
   Platform,
   TouchableOpacity,
   StatusBar,
+  KeyboardAvoidingView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -123,6 +125,13 @@ function ChatContent({ userId, user, navigation }) {
   const { reportVisible, setReportVisible, submitReport } =
     useReportUser(userId);
 
+  // Dismiss keyboard when emoji picker opens
+  useEffect(() => {
+    if (showEmojiPicker) {
+      Keyboard.dismiss();
+    }
+  }, [showEmojiPicker]);
+
   // Hide tab bar when this screen is focused
   useFocusEffect(
     React.useCallback(() => {
@@ -173,43 +182,90 @@ function ChatContent({ userId, user, navigation }) {
     <GlassBackground>
       <StatusBar barStyle="light-content" />
       
-      <SafeAreaView style={styles.container} edges={["top"]}>
-        <View style={styles.chatContainer}>
-          <ChatHeader
-            user={user}
-            onBack={() => navigation?.goBack()}
-            onClose={() => navigation?.navigate("MatchesHome")}
-            onProfilePress={() =>
-              navigation?.navigate("UserProfile", { userId: user._id })
-            }
-            onReportPress={() => setReportVisible(true)}
-          />
+      <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+        {Platform.OS === 'ios' ? (
+          // iOS: Use KeyboardAvoidingView
+          <KeyboardAvoidingView 
+            style={styles.flex}
+            behavior="padding"
+            keyboardVerticalOffset={0}
+          >
+            <View style={styles.chatContainer}>
+              <ChatHeader
+                user={user}
+                onBack={() => navigation?.goBack()}
+                onClose={() => navigation?.navigate("MatchesHome")}
+                onProfilePress={() =>
+                  navigation?.navigate("UserProfile", { userId: user._id })
+                }
+                onReportPress={() => setReportVisible(true)}
+              />
 
-          <View style={styles.messagesContainer}>
-            <ChatMessageList
-              messages={messages}
-              currentUserId={currentUserId}
-              onImagePress={setFullscreenImage}
-              onDismissEmojiPicker={() => setShowEmojiPicker(false)}
+              <View style={styles.messagesContainer}>
+                <ChatMessageList
+                  messages={messages}
+                  currentUserId={currentUserId}
+                  onImagePress={setFullscreenImage}
+                  onDismissEmojiPicker={() => setShowEmojiPicker(false)}
+                />
+              </View>
+
+              {/* Image Preview Bar */}
+              {selectedImages.length > 0 && (
+                <ImagePreviewBar images={selectedImages} remove={removeImage} />
+              )}
+
+              {/* Input Bar */}
+              <ChatInputBar
+                text={text}
+                setText={setText}
+                showEmojiPicker={showEmojiPicker}
+                setShowEmojiPicker={setShowEmojiPicker}
+                uploading={uploading}
+                onSend={handleSend}
+                onPickImages={pickImages}
+              />
+            </View>
+          </KeyboardAvoidingView>
+        ) : (
+          // Android: No KeyboardAvoidingView, use native adjustPan
+          <View style={styles.chatContainer}>
+            <ChatHeader
+              user={user}
+              onBack={() => navigation?.goBack()}
+              onClose={() => navigation?.navigate("MatchesHome")}
+              onProfilePress={() =>
+                navigation?.navigate("UserProfile", { userId: user._id })
+              }
+              onReportPress={() => setReportVisible(true)}
+            />
+
+            <View style={styles.messagesContainer}>
+              <ChatMessageList
+                messages={messages}
+                currentUserId={currentUserId}
+                onImagePress={setFullscreenImage}
+                onDismissEmojiPicker={() => setShowEmojiPicker(false)}
+              />
+            </View>
+
+            {/* Image Preview Bar */}
+            {selectedImages.length > 0 && (
+              <ImagePreviewBar images={selectedImages} remove={removeImage} />
+            )}
+
+            {/* Input Bar */}
+            <ChatInputBar
+              text={text}
+              setText={setText}
+              showEmojiPicker={showEmojiPicker}
+              setShowEmojiPicker={setShowEmojiPicker}
+              uploading={uploading}
+              onSend={handleSend}
+              onPickImages={pickImages}
             />
           </View>
-
-          {/* Image Preview Bar */}
-          {selectedImages.length > 0 && (
-            <ImagePreviewBar images={selectedImages} remove={removeImage} />
-          )}
-
-          {/* Input Bar - No wrapper, no interference */}
-          <ChatInputBar
-            text={text}
-            setText={setText}
-            showEmojiPicker={showEmojiPicker}
-            setShowEmojiPicker={setShowEmojiPicker}
-            uploading={uploading}
-            onSend={handleSend}
-            onPickImages={pickImages}
-          />
-        </View>
+        )}
 
         {/* Modals */}
         <FullScreenImageModal
@@ -234,6 +290,9 @@ function ChatContent({ userId, user, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  flex: {
     flex: 1,
   },
   chatContainer: {
