@@ -21,6 +21,7 @@ import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
 import DeleteProfileButton from "../components/DeleteProfileButton";
 import getAge from "../utils/getAge";
+import SafeBottomView from "../components/SafeBottomView";
 
 const { width, height } = Dimensions.get('window');
 
@@ -146,7 +147,7 @@ export default function ProfileScreen({ navigation }) {
               {/* Avatar with Glow Effect */}
               <TouchableOpacity 
                 style={styles.avatarWrapper}
-                onPress={() => navigation.navigate("EditImagesScreen")}
+                onPress={() => navigation.navigate("EditImages")}
                 activeOpacity={0.8}
               >
                 <View style={styles.avatarGlow} />
@@ -352,6 +353,7 @@ export default function ProfileScreen({ navigation }) {
         visible={isCarouselVisible}
         onRequestClose={() => setCarouselVisible(false)}
       />
+       <SafeBottomView />
     </View>
   );
 }

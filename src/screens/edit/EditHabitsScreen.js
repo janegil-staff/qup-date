@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import GlassBackground from "../../components/GlassBackground";
 import Step4Location from "./Step4Location";
+import SafeBottomView from "../../components/SafeBottomView";
 
 export default function EditHabitsScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -24,6 +25,7 @@ export default function EditHabitsScreen({ navigation }) {
         setField={setField}
         navigation={navigation}
       />
+      <SafeBottomView />
     </GlassBackground>
   );
 }

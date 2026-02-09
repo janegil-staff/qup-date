@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import GlassBackground from "../../components/GlassBackground";
 import Step3Details from "./Step3Details";
+import SafeBottomView from "../../components/SafeBottomView";
 
 export default function EditDetailsScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -22,6 +23,7 @@ export default function EditDetailsScreen({ navigation }) {
         setField={setField}
         navigation={navigation}
       />
+      <SafeBottomView />
     </GlassBackground>
   );
 }

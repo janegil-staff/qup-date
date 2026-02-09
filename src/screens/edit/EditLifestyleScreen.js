@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import GlassBackground from "../../components/GlassBackground";
 import Step2Lifestyle from "./Step2Lifestyle";
+import SafeBottomView from "../../components/SafeBottomView";
 
 export default function EditLifestyleScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -22,6 +23,7 @@ export default function EditLifestyleScreen({ navigation }) {
         setField={setField}
         navigation={navigation}
       />
+      <SafeBottomView />
     </GlassBackground>
   );
 }

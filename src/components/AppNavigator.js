@@ -1,21 +1,28 @@
+import React from "react";
+import { Platform } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { FontAwesome } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Platform } from "react-native";
+import { FontAwesome } from "@expo/vector-icons";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import useNavigationBarColor from "../hooks/useNavigationBarColor";
 
-// Screens
+// Auth Screens
+import TermsSafetyScreen from "../screens/TermsSafetyScreen";
 import LandingScreen from "../screens/LandingScreen";
-import LoginForm from "./LoginForm";
 import RegisterScreen from "../screens/RegisterScreen";
+import LoginForm from "./LoginForm";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 
+// Main Screens
 import DashboardScreen from "../screens/DashboardScreen";
 import DiscoverScreen from "../screens/DiscoverScreen";
 import MatchesScreen from "../screens/MatchesScreen";
+import LikesScreen from "../screens/LikesScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 
+// Profile Edit Screens
 import EditBasicScreen from "../screens/edit/EditBasicScreen";
 import EditAppearanceScreen from "../screens/edit/EditAppearanceScreen";
 import EditLifestyleScreen from "../screens/edit/EditLifestyleScreen";
@@ -23,84 +30,17 @@ import EditDetailsScreen from "../screens/edit/EditDetailsScreen";
 import EditHabitsScreen from "../screens/edit/EditHabitsScreen";
 import EditImagesScreen from "../screens/edit/EditImagesScreen";
 
+// Shared Screens
 import ChatScreen from "../screens/ChatScreen";
 import UserProfileScreen from "../screens/UserProfileScreen";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
-import LikesScreen from "../screens/LikesScreen";
-import TermsSafetyScreen from "../screens/TermsSafetyScreen";
 import SafetyGuidelinesScreen from "../screens/SafetyGuidelinesScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-const LikesStack = createNativeStackNavigator();
 
-function LikesStackNavigator() {
-  return (
-    <LikesStack.Navigator screenOptions={{ headerShown: false }}>
-      <LikesStack.Screen name="LikesMain" component={LikesScreen} />
-      <LikesStack.Screen name="UserProfile" component={UserProfileScreen} />
-      <LikesStack.Screen name="ChatScreen" component={ChatScreen} />
-    </LikesStack.Navigator>
-  );
-}
-
-function EditStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="EditBasic" component={EditBasicScreen} />
-      <Stack.Screen name="EditAppearance" component={EditAppearanceScreen} />
-      <Stack.Screen name="EditLifestyle" component={EditLifestyleScreen} />
-      <Stack.Screen name="EditDetails" component={EditDetailsScreen} />
-      <Stack.Screen name="EditHabits" component={EditHabitsScreen} />
-      <Stack.Screen name="EditImages" component={EditImagesScreen} />
-    </Stack.Navigator>
-  );
-}
-
-function DiscoverStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="DiscoverHome" component={DiscoverScreen} />
-      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
-      <Stack.Screen name="ChatScreen" component={ChatScreen} />
-    </Stack.Navigator>
-  );
-}
-
-function MatchesStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="MatchesHome" component={MatchesScreen} />
-      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
-      <Stack.Screen name="ChatScreen" component={ChatScreen} />
-    </Stack.Navigator>
-  );
-}
-
-function ProfileStack() {
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="ProfileHome" component={ProfileScreen} />
-      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
-      <Stack.Screen name="ChatScreen" component={ChatScreen} />
-      <Stack.Screen name="EditImagesScreen" component={EditImagesScreen} />
-      <Stack.Screen name="EditBasic" component={EditBasicScreen} />
-      <Stack.Screen name="EditAppearance" component={EditAppearanceScreen} />
-      <Stack.Screen name="EditLifestyle" component={EditLifestyleScreen} />
-      <Stack.Screen name="EditDetails" component={EditDetailsScreen} />
-      <Stack.Screen name="EditHabits" component={EditHabitsScreen} />
-      <Stack.Screen name="EditImages" component={EditImagesScreen} />
-      <Stack.Screen name="Dashboard" component={DashboardScreen} />
-      <Stack.Screen name="Likes" component={LikesScreen} />
-      <Stack.Screen
-        name="SafetyGuidelines"
-        component={SafetyGuidelinesScreen}
-      />
-    </Stack.Navigator>
-  );
-}
-
+// ============================================================================
+// DASHBOARD TAB STACK
+// ============================================================================
 function DashboardStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -111,82 +51,175 @@ function DashboardStack() {
   );
 }
 
+// ============================================================================
+// MATCHES TAB STACK
+// ============================================================================
+function MatchesStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="MatchesHome" component={MatchesScreen} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// ============================================================================
+// DISCOVER TAB STACK
+// ============================================================================
+function DiscoverStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="DiscoverHome" component={DiscoverScreen} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// ============================================================================
+// LIKES TAB STACK
+// ============================================================================
+function LikesStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="LikesMain" component={LikesScreen} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// ============================================================================
+// EDIT TAB STACK - ALL PROFILE EDIT SCREENS
+// ============================================================================
+function EditStack() {
+  return (
+    <Stack.Navigator
+      screenOptions={{ headerShown: false }}
+      initialRouteName="EditBasic"
+    >
+      <Stack.Screen name="EditBasic" component={EditBasicScreen} />
+      <Stack.Screen name="EditAppearance" component={EditAppearanceScreen} />
+      <Stack.Screen name="EditLifestyle" component={EditLifestyleScreen} />
+      <Stack.Screen name="EditDetails" component={EditDetailsScreen} />
+      <Stack.Screen name="EditHabits" component={EditHabitsScreen} />
+      <Stack.Screen name="EditImages" component={EditImagesScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// ============================================================================
+// PROFILE TAB STACK
+// ============================================================================
+function ProfileStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="EditImages" component={EditImagesScreen} />
+      <Stack.Screen name="ProfileHome" component={ProfileScreen} />
+      <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
+
+      <Stack.Screen
+        name="SafetyGuidelines"
+        component={SafetyGuidelinesScreen}
+      />
+    </Stack.Navigator>
+  );
+}
+
+// ============================================================================
+// MAIN TABS NAVIGATOR
+// ============================================================================
 function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        
-        // Tab bar styling
+
+        // Tab Bar Styling
         tabBarStyle: {
-          position: 'absolute',
+          position: "absolute",
           borderTopWidth: 0,
           elevation: 0,
-          height: Platform.OS === 'ios' ? 88 : 70,
-          backgroundColor: 'transparent',
-          shadowColor: '#000',
+          height: Platform.OS === "ios" ? 88 : 85, // Increased height for Android
+          backgroundColor: "transparent",
+          shadowColor: "#000",
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
+          paddingBottom: Platform.OS === "android" ? 20 : 0, // More spacing from system bar
+          paddingTop: Platform.OS === "android" ? 8 : 0, // Additional top padding
         },
-        
-        // Tab bar background with gradient
+
+        // Glassmorphic Background
         tabBarBackground: () => (
           <LinearGradient
-            colors={[
-              'rgba(26, 26, 46, 0.95)',
-              'rgba(22, 33, 62, 0.90)',
-            ]}
+            colors={["rgba(26, 26, 46, 0.95)", "rgba(22, 33, 62, 0.90)"]}
             style={{ flex: 1 }}
           />
         ),
-        
-        // Label styling
+
+        // Label Styling
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '600',
-          marginBottom: Platform.OS === 'ios' ? 0 : 8,
+          fontWeight: "600",
+          marginBottom: Platform.OS === "ios" ? 0 : 2, // Reduced since we have paddingBottom
           letterSpacing: 0.5,
         },
-        
-        // Colors
-        tabBarActiveTintColor: '#e94560',
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.5)',
 
-      tabBarIcon: ({ color, size }) => {
+        // Colors
+        tabBarActiveTintColor: "#e94560",
+        tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
+
+        // Icons
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
           switch (route.name) {
             case "Dashboard":
-              return <FontAwesome name="home" size={size} color={color} />;
+              iconName = "home";
+              break;
             case "Matches":
-              return <FontAwesome name="heart" size={size} color={color} />;
+              iconName = "heart";
+              break;
             case "Discover":
-              return <FontAwesome name="search" size={size} color={color} />;
-            case "Edit":
-              return <FontAwesome name="pencil" size={size} color={color} />;
-            case "Profile":
-              return <FontAwesome name="user" size={size} color={color} />;
+              iconName = "search";
+              break;
             case "Likes":
-              return <FontAwesome name="thumbs-up" size={size} color={color} />;
+              iconName = "thumbs-up";
+              break;
+            case "Edit":
+              iconName = "pencil";
+              break;
+            case "Profile":
+              iconName = "user";
+              break;
             default:
-              return null;
+              iconName = "circle";
           }
+
+          return <FontAwesome name={iconName} size={size} color={color} />;
         },
       })}
     >
       <Tab.Screen name="Dashboard" component={DashboardStack} />
       <Tab.Screen name="Matches" component={MatchesStack} />
       <Tab.Screen name="Discover" component={DiscoverStack} />
-      <Tab.Screen name="Likes" component={LikesStackNavigator} />
+      <Tab.Screen name="Likes" component={LikesStack} />
       <Tab.Screen name="Edit" component={EditStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }
 
+// ============================================================================
+// ROOT NAVIGATOR
+// ============================================================================
 export default function AppNavigator() {
   // Set Android navigation bar color to match theme
   useNavigationBarColor();
-  
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
@@ -194,19 +227,18 @@ export default function AppNavigator() {
           initialRouteName="TermsSafety"
           screenOptions={{ headerShown: false }}
         >
+          {/* Auth Flow */}
           <Stack.Screen name="TermsSafety" component={TermsSafetyScreen} />
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="LandingScreen" component={LandingScreen} />
+          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="LoginForm" component={LoginForm} />
           <Stack.Screen
             name="ForgotPasswordScreen"
             component={ForgotPasswordScreen}
           />
 
+          {/* Main App */}
           <Stack.Screen name="MainTabs" component={MainTabs} />
-          
-          {/* Removed ChatScreen from here - it's in each nested stack */}
-          {/* Removed MatchesHome from here - it's in MatchesStack */}
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

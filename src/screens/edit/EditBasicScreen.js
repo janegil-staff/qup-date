@@ -4,6 +4,7 @@ import * as SecureStore from "expo-secure-store";
 import GlassBackground from "../../components/GlassBackground";
 import Step0Basic from "./Step0Basic";
 import theme from "../../theme";
+import SafeBottomView from "../../components/SafeBottomView";
 
 export default function EditBasicScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -58,6 +59,7 @@ export default function EditBasicScreen({ navigation }) {
         setField={setField}
         navigation={navigation}
       />
+      <SafeBottomView />
     </GlassBackground>
   );
 }

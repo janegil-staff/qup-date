@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ActivityIndicator,
-  Keyboard,
   Platform,
   TouchableOpacity,
   StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { useFocusEffect } from "@react-navigation/native";
 import GlassBackground from "../components/GlassBackground";
 import ChatHeader from "../components/chat/ChatHeader";
 import ChatMessageList from "../components/chat/ChatMessageList";
@@ -105,7 +105,6 @@ export default function ChatScreen({ route, navigation }) {
 // Main chat component with hooks
 function ChatContent({ userId, user, navigation }) {
   const [fullscreenImage, setFullscreenImage] = useState(null);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   const { currentUserId, loading: userLoading } = useCurrentUser();
   const {
@@ -124,29 +123,40 @@ function ChatContent({ userId, user, navigation }) {
   const { reportVisible, setReportVisible, submitReport } =
     useReportUser(userId);
 
-  // Track keyboard height
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
-      (e) => {
-        const offset = 50;
-        const adjustedHeight = Math.max(0, e.endCoordinates.height - offset);
-        setKeyboardHeight(adjustedHeight);
-      },
-    );
-
-    const hideSubscription = Keyboard.addListener(
-      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
-      () => {
-        setKeyboardHeight(0);
-      },
-    );
-
-    return () => {
-      showSubscription.remove();
-      hideSubscription.remove();
-    };
-  }, []);
+  // Hide tab bar when this screen is focused
+  useFocusEffect(
+    React.useCallback(() => {
+      const parent = navigation.getParent();
+      
+      if (parent) {
+        parent.setOptions({
+          tabBarStyle: { display: 'none' }
+        });
+      }
+      
+      // Show tab bar again when leaving
+      return () => {
+        if (parent) {
+          parent.setOptions({
+            tabBarStyle: {
+              display: 'flex',
+              position: 'absolute',
+              borderTopWidth: 0,
+              elevation: 0,
+              height: Platform.OS === 'ios' ? 88 : 85,
+              backgroundColor: 'transparent',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: -4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 8,
+              paddingBottom: Platform.OS === 'android' ? 20 : 0,
+              paddingTop: Platform.OS === 'android' ? 8 : 0,
+            }
+          });
+        }
+      };
+    }, [navigation])
+  );
 
   if (!currentUserId || userLoading || messagesLoading) {
     return (
@@ -164,28 +174,32 @@ function ChatContent({ userId, user, navigation }) {
       <StatusBar barStyle="light-content" />
       
       <SafeAreaView style={styles.container} edges={["top"]}>
-        <ChatHeader
-          user={user}
-          onBack={() => navigation?.goBack()}
-          onClose={() => navigation?.navigate("MatchesHome")}
-          onProfilePress={() =>
-            navigation?.navigate("UserProfile", { userId: user._id })
-          }
-          onReportPress={() => setReportVisible(true)}
-        />
-
-        <ImagePreviewBar images={selectedImages} remove={removeImage} />
-
-        <View style={{ flex: 1 }}>
-          <ChatMessageList
-            messages={messages}
-            currentUserId={currentUserId}
-            onImagePress={setFullscreenImage}
-            onDismissEmojiPicker={() => setShowEmojiPicker(false)}
+        <View style={styles.chatContainer}>
+          <ChatHeader
+            user={user}
+            onBack={() => navigation?.goBack()}
+            onClose={() => navigation?.navigate("MatchesHome")}
+            onProfilePress={() =>
+              navigation?.navigate("UserProfile", { userId: user._id })
+            }
+            onReportPress={() => setReportVisible(true)}
           />
-        </View>
 
-        <View style={{ marginBottom: keyboardHeight }}>
+          <View style={styles.messagesContainer}>
+            <ChatMessageList
+              messages={messages}
+              currentUserId={currentUserId}
+              onImagePress={setFullscreenImage}
+              onDismissEmojiPicker={() => setShowEmojiPicker(false)}
+            />
+          </View>
+
+          {/* Image Preview Bar */}
+          {selectedImages.length > 0 && (
+            <ImagePreviewBar images={selectedImages} remove={removeImage} />
+          )}
+
+          {/* Input Bar - No wrapper, no interference */}
           <ChatInputBar
             text={text}
             setText={setText}
@@ -197,6 +211,7 @@ function ChatContent({ userId, user, navigation }) {
           />
         </View>
 
+        {/* Modals */}
         <FullScreenImageModal
           visible={!!fullscreenImage}
           imageUrl={fullscreenImage}
@@ -219,6 +234,12 @@ function ChatContent({ userId, user, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  chatContainer: {
+    flex: 1,
+  },
+  messagesContainer: {
     flex: 1,
   },
 

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import GlassBackground from "../../components/GlassBackground";
 import Step5Images from "./Step5Images";
+import SafeBottomView from "../../components/SafeBottomView";
 
-export default function EditImagesScreen({ navigation }) {
+export default function ({ navigation }) {
   const [form, setForm] = useState({
     images: [], // start with empty array
   });
@@ -19,6 +20,7 @@ export default function EditImagesScreen({ navigation }) {
         setField={setField}
         navigation={navigation}
       />
+      <SafeBottomView />
     </GlassBackground>
   );
 }

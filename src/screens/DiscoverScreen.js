@@ -15,6 +15,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import GlassBackground from "../components/GlassBackground";
+import SafeBottomView from "../components/SafeBottomView";
 import MatchCongrats from "../components/MatchCongrats";
 import VerifiedBadge from "../components/VerifiedBadge";
 import { getAgeFromDate } from "../utils/getAgeFromDate";
@@ -215,11 +216,15 @@ export default function DiscoverScreen({ navigation }) {
   );
 
   const renderFooter = () => {
-    if (!loading) return null;
     return (
-      <View style={styles.footer}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.loadingText}>Loading more...</Text>
+      <View>
+        {loading && (
+          <View style={styles.footer}>
+            <ActivityIndicator size="large" color={theme.colors.primary} />
+            <Text style={styles.loadingText}>Loading more...</Text>
+          </View>
+        )}
+        <SafeBottomView />
       </View>
     );
   };

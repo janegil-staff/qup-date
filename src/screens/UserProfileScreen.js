@@ -17,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from "@expo/vector-icons";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
+import SafeBottomView from "../components/SafeBottomView";
 import MatchCongrats from "../components/MatchCongrats";
 import MessageButton from "../components/MessageButton";
 import ReportUserModal from "../components/ReportUserModal";
@@ -211,6 +212,15 @@ export default function UserProfileScreen({ route, navigation }) {
           </LinearGradient>
         </TouchableOpacity>
 
+        {/* Message Button - Center */}
+        {isMatched ? (
+          <View style={styles.messageButtonWrapper}>
+            <MessageButton otherUser={profile} />
+          </View>
+        ) : (
+          <View style={{ flex: 1 }} />
+        )}
+
         {/* Like/Unlike Button */}
         {canLike && (
           <TouchableOpacity
@@ -237,12 +247,6 @@ export default function UserProfileScreen({ route, navigation }) {
             colors={['rgba(233, 69, 96, 0.1)', 'rgba(15, 52, 96, 0.1)']}
             style={styles.headerGradient}
           >
-            {isMatched && (
-              <View style={styles.messageButtonWrapper}>
-                <MessageButton otherUser={profile} />
-              </View>
-            )}
-
             <View style={styles.profileHeader}>
               {/* Avatar with Glow */}
               <View style={styles.avatarWrapper}>
@@ -432,6 +436,9 @@ export default function UserProfileScreen({ route, navigation }) {
             </TouchableOpacity>
           </View>
         </View>
+        
+        {/* Safe bottom spacing for tab bar */}
+        <SafeBottomView />
       </ScrollView>
 
       {/* Modals */}
@@ -557,12 +564,19 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     zIndex: 100,
   },
   backButton: {
     borderRadius: 20,
     overflow: 'hidden',
+  },
+  messageButtonWrapper: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center', // Vertically center with other buttons
+    height: 48, // Match the icon button height
   },
   likeButton: {
     borderRadius: 20,
@@ -593,9 +607,6 @@ const styles = StyleSheet.create({
   },
   headerGradient: {
     padding: 24,
-  },
-  messageButtonWrapper: {
-    marginBottom: 16,
   },
   profileHeader: {
     alignItems: 'center',

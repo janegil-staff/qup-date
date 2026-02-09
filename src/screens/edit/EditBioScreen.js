@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { View } from "react-native";
 import Step5Bio from "./Step5Bio"; // adjust filename if different
 import Screen from "../../components/Screen";
+import SafeBottomView from "../../components/SafeBottomView";
 
 export default function EditBioScreen({ navigation }) {
   const [form, setForm] = useState({ bio: "" });
@@ -21,6 +22,7 @@ export default function EditBioScreen({ navigation }) {
           navigation={navigation}
         />
       </View>
+      <SafeBottomView />
     </Screen>
   );
 }
