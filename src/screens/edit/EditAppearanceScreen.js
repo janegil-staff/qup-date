@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View } from "react-native";
+import GlassBackground from "../../components/GlassBackground";
 import Step1Appearance from "./Step1Appearance";
-import Screen from "../../components/Screen";
 
 export default function EditAppearanceScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -15,15 +15,13 @@ export default function EditAppearanceScreen({ navigation }) {
   };
 
   return (
-    <Screen style={{ backgroundColor: "#111827" }}>
-      <View style={{ flex: 1 }}>
-        <Step1Appearance
-          form={form}
-          setForm={setForm}
-          setField={setField}
-          navigation={navigation}
-        />
-      </View>
-    </Screen>
+    <GlassBackground>
+      <Step1Appearance
+        form={form}
+        setForm={setForm}
+        setField={setField}
+        navigation={navigation}
+      />
+    </GlassBackground>
   );
 }

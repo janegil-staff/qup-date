@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import GlassBackground from "../../components/GlassBackground";
 import Step3Details from "./Step3Details";
-import Screen from "../../components/Screen";
 
 export default function EditDetailsScreen({ navigation }) {
   const [form, setForm] = useState({
     education: "",
     religion: "",
     relationship: "",
-    hasChildren: "",
+    hasChildren: false,
   });
 
   const setField = (field, value) => {
@@ -16,15 +15,13 @@ export default function EditDetailsScreen({ navigation }) {
   };
 
   return (
-    <Screen style={{ backgroundColor: "#111827" }}>
-      <View style={{ flex: 1 }}>
-        <Step3Details
-          form={form}
-          setForm={setForm}
-          setField={setField}
-          navigation={navigation}
-        />
-      </View>
-    </Screen>
+    <GlassBackground>
+      <Step3Details
+        form={form}
+        setForm={setForm}
+        setField={setField}
+        navigation={navigation}
+      />
+    </GlassBackground>
   );
 }

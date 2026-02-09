@@ -27,7 +27,6 @@ import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import LikesScreen from "../screens/LikesScreen";
 import TermsSafetyScreen from "../screens/TermsSafetyScreen";
 import SafetyGuidelinesScreen from "../screens/SafetyGuidelinesScreen";
-import ImageUploadTest from "./ImageUploadTest";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -82,6 +81,7 @@ function ProfileStack() {
       <Stack.Screen name="ProfileHome" component={ProfileScreen} />
       <Stack.Screen name="UserProfile" component={UserProfileScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
+      <Stack.Screen name="EditImagesScreen" component={EditImagesScreen} />
       <Stack.Screen
         name="SafetyGuidelines"
         component={SafetyGuidelinesScreen}
@@ -157,7 +157,9 @@ export default function AppNavigator() {
           />
 
           <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen name="ImageUploadTest" component={ImageUploadTest} />
+
+          {/* Removed ChatScreen from here - it's in each nested stack */}
+          {/* Removed MatchesHome from here - it's in MatchesStack */}
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

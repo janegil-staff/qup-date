@@ -7,13 +7,20 @@ import {
   FlatList,
   ActivityIndicator,
   StyleSheet,
+  StatusBar,
+  Dimensions,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { useFocusEffect } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
+import GlassBackground from "../components/GlassBackground";
 import MatchCongrats from "../components/MatchCongrats";
 import VerifiedBadge from "../components/VerifiedBadge";
 import { getAgeFromDate } from "../utils/getAgeFromDate";
-import Screen from "../components/Screen";
-import { useFocusEffect } from "@react-navigation/native";
+import theme from "../theme";
+
+const { width } = Dimensions.get('window');
 
 export default function DiscoverScreen({ navigation }) {
   const [users, setUsers] = useState([]);
@@ -28,7 +35,6 @@ export default function DiscoverScreen({ navigation }) {
 
     try {
       const token = await SecureStore.getItemAsync("authToken");
-
       const url = `https://qup.dating/api/mobile/discover${
         !reset && cursor ? `?cursor=${cursor}` : ""
       }`;
@@ -38,7 +44,6 @@ export default function DiscoverScreen({ navigation }) {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error || "Fetch failed");
 
       if (reset) {
@@ -60,23 +65,20 @@ export default function DiscoverScreen({ navigation }) {
     }
   };
 
-  // Refresh when screen is focused
   useFocusEffect(
     useCallback(() => {
       setCursor(null);
       setHasMore(true);
-      fetchUsers(true); // reset = true
+      fetchUsers(true);
     }, []),
   );
 
-  // Initial load
   useEffect(() => {
     fetchUsers(true);
   }, []);
 
   const handleLike = async (id) => {
     const token = await SecureStore.getItemAsync("authToken");
-
     setUsers((prev) => prev.filter((u) => u._id !== id));
 
     const res = await fetch(`https://qup.dating/api/mobile/like`, {
@@ -94,7 +96,6 @@ export default function DiscoverScreen({ navigation }) {
 
   const handleDislike = async (id) => {
     const token = await SecureStore.getItemAsync("authToken");
-
     setUsers((prev) => prev.filter((u) => u._id !== id));
 
     await fetch(`https://qup.dating/api/mobile/dislike`, {
@@ -110,102 +111,335 @@ export default function DiscoverScreen({ navigation }) {
   const renderItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => navigation.navigate("UserProfile", { userId: item._id })}
+      activeOpacity={0.9}
     >
       <View style={styles.card}>
-        {item.isVerified && <VerifiedBadge />}
-        <Image
-          source={{
-            uri:
-              item.profileImage ||
-              "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
-          }}
-          style={styles.image}
-        />
+        <LinearGradient
+          colors={theme.gradients.glass}
+          style={styles.cardGradient}
+        >
+          {/* Verified Badge */}
+          {item.isVerified && (
+            <View style={styles.verifiedBadgeContainer}>
+              <VerifiedBadge />
+            </View>
+          )}
 
-        <Text style={styles.name}>
-          {item.name}, {getAgeFromDate(item.birthdate)}
-        </Text>
-
-        <Text style={styles.bio} numberOfLines={2}>
-          {item.bio}
-        </Text>
-
-        {!item.isMatch && (
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={[styles.btn, styles.dislike]}
-              onPress={() => handleDislike(item._id)}
+          {/* Profile Image */}
+          <View style={styles.imageContainer}>
+            <Image
+              source={{
+                uri: item.profileImage ||
+                  "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
+              }}
+              style={styles.image}
+            />
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.7)']}
+              style={styles.imageOverlay}
             >
-              <Text>👎</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.btn, styles.like]}
-              onPress={() => handleLike(item._id)}
-            >
-              <Text>👍</Text>
-            </TouchableOpacity>
+              {/* Name & Age on Image */}
+              <View style={styles.imageInfo}>
+                <Text style={styles.imageName}>
+                  {item.name}, {getAgeFromDate(item.birthdate)}
+                </Text>
+                {item.location?.name && (
+                  <View style={styles.locationRow}>
+                    <Ionicons name="location" size={14} color="rgba(255,255,255,0.8)" />
+                    <Text style={styles.locationText}>
+                      {item.location.name.split(',')[0]}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </LinearGradient>
           </View>
-        )}
+
+          {/* Bio */}
+          {item.bio && (
+            <View style={styles.bioContainer}>
+              <Text style={styles.bio} numberOfLines={2}>
+                {item.bio}
+              </Text>
+            </View>
+          )}
+
+          {/* Action Buttons */}
+          {!item.isMatch && (
+            <View style={styles.actions}>
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  handleDislike(item._id);
+                }}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={['#ff4444', '#cc0000']}
+                  style={styles.actionGradient}
+                >
+                  <Ionicons name="close" size={28} color="white" />
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.actionButton, styles.likeButton]}
+                onPress={(e) => {
+                  e.stopPropagation();
+                  handleLike(item._id);
+                }}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={theme.gradients.primary}
+                  style={styles.actionGradient}
+                >
+                  <Ionicons name="heart" size={28} color="white" />
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          )}
+        </LinearGradient>
       </View>
     </TouchableOpacity>
   );
 
+  const renderHeader = () => (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>Discover 🔍</Text>
+      <Text style={styles.headerSubtitle}>
+        {users.length} profiles available
+      </Text>
+    </View>
+  );
+
+  const renderFooter = () => {
+    if (!loading) return null;
+    return (
+      <View style={styles.footer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading more...</Text>
+      </View>
+    );
+  };
+
+  const renderEmpty = () => (
+    <View style={styles.emptyContainer}>
+      <View style={styles.emptyCard}>
+        <LinearGradient
+          colors={theme.gradients.glass}
+          style={styles.emptyGradient}
+        >
+          <Text style={styles.emptyIcon}>🎯</Text>
+          <Text style={styles.emptyTitle}>No More Profiles</Text>
+          <Text style={styles.emptyText}>
+            You've seen all available profiles!
+          </Text>
+          <Text style={styles.emptySubtext}>
+            Check back later for new matches.
+          </Text>
+        </LinearGradient>
+      </View>
+    </View>
+  );
+
   return (
-    <Screen style={{ backgroundColor: "#111827" }}>
+    <GlassBackground>
+      <StatusBar barStyle="light-content" />
+      
       <View style={styles.container}>
         <FlatList
           data={users}
           renderItem={renderItem}
           keyExtractor={(item) => item._id}
+          ListHeaderComponent={renderHeader}
+          ListFooterComponent={renderFooter}
+          ListEmptyComponent={!loading ? renderEmpty : null}
           onEndReached={() => fetchUsers()}
           onEndReachedThreshold={0.5}
-          ListFooterComponent={
-            loading ? <ActivityIndicator color="#ff69b4" /> : null
-          }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
         />
 
         {showCongrats && (
           <MatchCongrats onClose={() => setShowCongrats(false)} />
         )}
       </View>
-    </Screen>
+    </GlassBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#111827", padding: 10 },
+  container: {
+    flex: 1,
+  },
+  listContent: {
+    padding: 20,
+    paddingTop: 60,
+    paddingBottom: 40,
+  },
+  
+  // Header
+  header: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: theme.colors.text,
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: theme.colors.textMuted,
+  },
+
+  // Card
   card: {
-    backgroundColor: "#1f2937",
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 16,
-    position: "relative",
+    marginBottom: 20,
+    borderRadius: theme.borderRadius.xl,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+    ...theme.shadows.lg,
+  },
+  cardGradient: {
+    padding: 16,
+  },
+  
+  // Verified Badge
+  verifiedBadgeContainer: {
+    position: 'absolute',
+    top: 24,
+    right: 24,
+    zIndex: 10,
+  },
+
+  // Image
+  imageContainer: {
+    position: 'relative',
+    borderRadius: theme.borderRadius.lg,
+    overflow: 'hidden',
+    marginBottom: 12,
   },
   image: {
-    width: "100%",
-    height: 300,
-    borderRadius: 12,
+    width: '100%',
+    height: 400,
+    backgroundColor: theme.colors.backgroundDark,
   },
-  name: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "700",
-    marginTop: 8,
+  imageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 120,
+    justifyContent: 'flex-end',
+    padding: 16,
+  },
+  imageInfo: {
+    // Info on image
+  },
+  imageName: {
+    color: theme.colors.text,
+    fontSize: 24,
+    fontWeight: '800',
+    marginBottom: 4,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  locationText: {
+    color: 'rgba(255,255,255,0.9)',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+
+  // Bio
+  bioContainer: {
+    marginBottom: 16,
   },
   bio: {
-    color: "#9ca3af",
-    marginTop: 4,
+    color: theme.colors.textSecondary,
+    fontSize: 15,
+    lineHeight: 22,
   },
+
+  // Actions
   actions: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
+  },
+  actionButton: {
+    borderRadius: 35,
+    overflow: 'hidden',
+    ...theme.shadows.md,
+  },
+  likeButton: {
+    ...theme.shadows.glow,
+  },
+  actionGradient: {
+    width: 70,
+    height: 70,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  // Footer
+  footer: {
+    paddingVertical: 24,
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: theme.colors.textMuted,
     marginTop: 12,
+    fontSize: 14,
   },
-  btn: {
-    padding: 12,
-    borderRadius: 50,
+
+  // Empty State
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
   },
-  like: { backgroundColor: "#22c55e" },
-  dislike: { backgroundColor: "#ef4444" },
+  emptyCard: {
+    borderRadius: theme.borderRadius.xl,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+    maxWidth: 300,
+  },
+  emptyGradient: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 8,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+  },
 });

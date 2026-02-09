@@ -6,9 +6,15 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ScrollView,
+  StatusBar,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Progress from "react-native-progress";
+import GlassCard from "../../components/GlassCard";
+import GlassButton from "../../components/GlassButton";
+import theme from "../../theme";
 import { saveProfile, fetchUser } from "../../utils/profileService";
 import LocationAutocomplete from "../../components/LocationAutocomplete";
 import normalizeCountry from "../../utils/normalizeCountry";
@@ -17,9 +23,8 @@ import AgeRangeSlider from "../../components/AgeRangeSlider";
 export default function Step4Location({ form, setForm, setField }) {
   const navigation = useNavigation();
   const [tagsText, setTagsText] = useState("");
-  const [ageRange, setAgeRange] = useState([18, 90]);
+  const [loading, setLoading] = useState(true);
 
-  // Load user data ONCE and prefill the form
   useEffect(() => {
     const load = async () => {
       try {
@@ -38,6 +43,8 @@ export default function Step4Location({ form, setForm, setField }) {
         setTagsText((user.tags || []).join(" "));
       } catch (err) {
         console.error("Failed to load user", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -75,7 +82,7 @@ export default function Step4Location({ form, setForm, setField }) {
       navigation.navigate("EditImages", { user: updatedUser });
     } catch (err) {
       console.error("SAVE ERROR:", err);
-      Alert.alert("Error", "Failed to save");
+      Alert.alert("Error", "Failed to save location preferences");
     }
   };
 
@@ -84,179 +91,311 @@ export default function Step4Location({ form, setForm, setField }) {
     { key: "worldwide", label: "Worldwide" },
   ];
 
+  const relocateOptions = [
+    { key: true, label: "Yes" },
+    { key: false, label: "No" },
+  ];
+
+  const renderOptions = (options, field, emoji) => (
+    <View style={styles.optionSection}>
+      <View style={styles.optionsGrid}>
+        {options.map((opt) => {
+          const isSelected = form[field] === opt.key;
+          return (
+            <TouchableOpacity
+              key={opt.label}
+              style={styles.optionButton}
+              onPress={() => setField(field, opt.key)}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={
+                  isSelected
+                    ? theme.gradients.primary
+                    : ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)']
+                }
+                style={styles.optionGradient}
+              >
+                <Text
+                  style={[
+                    styles.optionText,
+                    isSelected && styles.optionTextActive,
+                  ]}
+                >
+                  {opt.label}
+                </Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    </View>
+  );
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Loading preferences...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
-      <Progress.Bar
-        progress={0.8}
-        width={null}
-        color="#ff69b4"
-        style={styles.progress}
-      />
+      <StatusBar barStyle="light-content" />
 
-      <Text style={styles.label}>Location</Text>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Location & Preferences 🌍</Text>
+          <Text style={styles.subtitle}>Where are you looking?</Text>
+        </View>
 
-      <LocationAutocomplete
-        value={form.location?.name || ""}
-        onChange={(text) =>
-          setField("location", {
-            ...(form.location || {}),
-            name: text,
-          })
-        }
-        onSelect={(location) =>
-          setField("location", {
-            name: location.name,
-            lat: location.lat,
-            lng: location.lng,
-            country: normalizeCountry(location.country),
-          })
-        }
-      />
+        {/* Progress Bar */}
+        <View style={styles.progressContainer}>
+          <Progress.Bar
+            progress={1.0}
+            width={null}
+            height={6}
+            color={theme.colors.primary}
+            unfilledColor="rgba(255,255,255,0.1)"
+            borderWidth={0}
+            borderRadius={3}
+          />
+          <Text style={styles.progressText}>Step 5 of 5 - Final Step!</Text>
+        </View>
 
-      <Text style={styles.label}>Search Preference</Text>
+        {/* Form Card */}
+        <GlassCard>
+          {/* Location Field */}
+          <View style={styles.field}>
+            <Text style={styles.label}>📍 Your Location</Text>
+            <LocationAutocomplete
+              value={form.location?.name || ""}
+              onChange={(text) =>
+                setField("location", {
+                  ...(form.location || {}),
+                  name: text,
+                })
+              }
+              onSelect={(location) =>
+                setField("location", {
+                  name: location.name,
+                  lat: location.lat,
+                  lng: location.lng,
+                  country: normalizeCountry(location.country),
+                })
+              }
+            />
+          </View>
 
-      <View style={styles.row}>
-        {searchOptions.map((opt) => (
-          <TouchableOpacity
-            key={opt.key}
-            style={[
-              styles.radioButton,
-              form.searchScope === opt.key && styles.radioActive,
-            ]}
-            onPress={() => setField("searchScope", opt.key)}
-          >
-            <Text
-              style={[
-                styles.radioText,
-                form.searchScope === opt.key && styles.radioTextActive,
-              ]}
-            >
-              {opt.label}
+          {/* Search Preference */}
+          <View style={styles.field}>
+            <Text style={styles.label}>🔍 Search Preference</Text>
+            {renderOptions(searchOptions, "searchScope")}
+          </View>
+
+          {/* Willing to Relocate */}
+          <View style={styles.field}>
+            <Text style={styles.label}>✈️ Willing to Relocate</Text>
+            {renderOptions(relocateOptions, "willingToRelocate")}
+          </View>
+
+          {/* Tags */}
+          <View style={styles.field}>
+            <Text style={styles.label}>🏷️ Interests (Tags)</Text>
+            <View style={styles.inputContainer}>
+              <LinearGradient
+                colors={['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)']}
+                style={styles.inputGradient}
+              >
+                <TextInput
+                  style={styles.input}
+                  placeholder="#hiking #coffee #travel"
+                  placeholderTextColor={theme.colors.textDim}
+                  value={tagsText}
+                  onChangeText={setTagsText}
+                />
+              </LinearGradient>
+            </View>
+            <Text style={styles.hint}>
+              Add hashtags separated by spaces
             </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+          </View>
 
-      <Text style={styles.label}>Willing to Relocate</Text>
-
-      <View style={styles.row}>
-        {[
-          { key: true, label: "Yes" },
-          { key: false, label: "No" },
-        ].map((opt) => (
-          <TouchableOpacity
-            key={opt.label}
-            style={[
-              styles.radioButton,
-              form.willingToRelocate === opt.key && styles.radioActive,
-            ]}
-            onPress={() => setField("willingToRelocate", opt.key)}
-          >
-            <Text
-              style={[
-                styles.radioText,
-                form.willingToRelocate === opt.key && styles.radioTextActive,
-              ]}
-            >
-              {opt.label}
+          {/* Age Range */}
+          <View style={styles.field}>
+            <Text style={styles.label}>
+              🎯 Preferred Age Range: {form.preferredAgeMin} - {form.preferredAgeMax}
             </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+            <AgeRangeSlider
+              preferredAgeMin={form.preferredAgeMin}
+              preferredAgeMax={form.preferredAgeMax}
+              onChange={([min, max]) =>
+                setForm((prev) => ({
+                  ...prev,
+                  preferredAgeMin: min.toFixed(0),
+                  preferredAgeMax: max.toFixed(0),
+                }))
+              }
+            />
+          </View>
+        </GlassCard>
 
-      <Text style={styles.label}>Tags</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="#hiking #coffee"
-        placeholderTextColor="#666"
-        value={tagsText}
-        onChangeText={setTagsText}
-      />
-      <Text></Text>
-      <AgeRangeSlider
-        preferredAgeMin={form.preferredAgeMin}
-        preferredAgeMax={form.preferredAgeMax}
-        onChange={([min, max]) =>
-          setForm((prev) => ({
-            ...prev,
-            preferredAgeMin: min,
-            preferredAgeMax: max,
-          }))
-        }
-      />
+        {/* Navigation Buttons */}
+        <View style={styles.navRow}>
+          <GlassButton
+            title="← Back"
+            variant="ghost"
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          />
 
-      <View style={styles.navRow}>
-        <TouchableOpacity
-          style={[styles.navButton, styles.backButton]}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.navText}>Back</Text>
-        </TouchableOpacity>
+          <GlassButton
+            title="Finish 🎉"
+            variant="primary"
+            onPress={handleSaveAndNext}
+            style={styles.nextButton}
+          />
+        </View>
 
-        <TouchableOpacity
-          style={[styles.navButton, styles.nextButton]}
-          onPress={handleSaveAndNext}
-        >
-          <Text style={styles.navText}>Next</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Help Text */}
+        <Text style={styles.helpText}>
+          Almost done! These preferences help us find the best matches for you
+        </Text>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  radioButton: {
+  container: {
     flex: 1,
-    marginRight: 10,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: "#1f2937",
-    borderWidth: 1,
-    borderColor: "#374151",
-    alignItems: "center",
   },
-  radioActive: {
-    backgroundColor: "#ff69b4",
-    borderColor: "#ff69b4",
+  scrollContent: {
+    padding: 20,
+    paddingTop: 60,
+    paddingBottom: 40,
   },
-  radioText: {
-    color: "#9ca3af",
-    fontWeight: "600",
-  },
-  radioTextActive: {
-    color: "white",
-  },
-  progress: { marginBottom: 20 },
-  container: { flex: 1, backgroundColor: "#111827", padding: 20 },
-  label: { color: "#ccc", marginBottom: 6, fontWeight: "600", marginTop: 20 },
-  input: {
-    backgroundColor: "#1f2937",
-    color: "white",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: "#374151",
-  },
-  navRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 30,
-  },
-  navButton: {
+  loadingContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+  },
+
+  // Header
+  header: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: theme.colors.textMuted,
+  },
+
+  // Progress
+  progressContainer: {
+    marginBottom: 24,
+  },
+  progressText: {
+    color: theme.colors.primary,
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+
+  // Fields
+  field: {
+    marginBottom: 24,
+  },
+  label: {
+    color: theme.colors.textSecondary,
+    fontSize: 15,
+    marginBottom: 12,
+    fontWeight: '600',
+  },
+  inputContainer: {
+    borderRadius: theme.borderRadius.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+  },
+  inputGradient: {
     paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    marginHorizontal: 6,
+    paddingHorizontal: 16,
   },
-  backButton: { backgroundColor: "#374151" },
-  nextButton: { backgroundColor: "#ff69b4" },
-  navText: { color: "white", fontWeight: "700", fontSize: 16 },
+  input: {
+    color: theme.colors.text,
+    fontSize: 16,
+  },
+  hint: {
+    color: theme.colors.textDim,
+    fontSize: 12,
+    marginTop: 6,
+    fontStyle: 'italic',
+  },
+
+  // Options
+  optionSection: {
+    // Section wrapper
+  },
+  optionsGrid: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  optionButton: {
+    flex: 1,
+    borderRadius: theme.borderRadius.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+  },
+  optionGradient: {
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  optionText: {
+    color: theme.colors.textMuted,
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  optionTextActive: {
+    color: theme.colors.text,
+  },
+
+  // Navigation
+  navRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 24,
+    marginBottom: 16,
+  },
+  backButton: {
+    flex: 1,
+  },
+  nextButton: {
+    flex: 1,
+  },
+
+  // Help Text
+  helpText: {
+    color: theme.colors.textDim,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
 });

@@ -1,8 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+  StatusBar,
+  ActivityIndicator,
+} from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Progress from "react-native-progress";
+import GlassCard from "../../components/GlassCard";
+import GlassButton from "../../components/GlassButton";
+import theme from "../../theme";
 import {
   normalizeValue,
   capitalizeWords,
@@ -17,7 +30,6 @@ export default function Step2Lifestyle({ form, setForm, setField }) {
   const smokingOptions = ["Yes", "No"];
   const drinkingOptions = ["None", "Light / social drinker", "Heavy"];
 
-  // -------------------- Fetch existing values --------------------
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -27,7 +39,7 @@ export default function Step2Lifestyle({ form, setForm, setField }) {
         });
         const data = await res.json();
 
-        const user = data.user || data; // adapt depending on API response
+        const user = data.user || data;
         setForm((prev) => ({
           ...prev,
           exercise: normalizeValue(user.exercise),
@@ -47,7 +59,6 @@ export default function Step2Lifestyle({ form, setForm, setField }) {
     fetchProfile();
   }, [setForm]);
 
-  // -------------------- Save updated values --------------------
   const handleSaveAndNext = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
@@ -72,7 +83,6 @@ export default function Step2Lifestyle({ form, setForm, setField }) {
       }
 
       const updated = await res.json();
-
       navigation.navigate("EditDetails", { user: updated });
     } catch (err) {
       console.error("Failed to save lifestyle", err);
@@ -80,117 +90,219 @@ export default function Step2Lifestyle({ form, setForm, setField }) {
     }
   };
 
-  // -------------------- Render radio options --------------------
-  const renderOptions = (label, options, field) => (
-    <>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.row}>
+  const renderOptions = (label, options, field, emoji) => (
+    <View style={styles.optionSection}>
+      <Text style={styles.sectionLabel}>
+        {emoji} {label}
+      </Text>
+      <View style={styles.optionsGrid}>
         {options.map((opt) => {
           const value = normalizeValue(opt);
+          const isSelected = form?.[field] === value;
           return (
             <TouchableOpacity
               key={opt}
-              style={[
-                styles.radioButton,
-                form?.[field] === value && styles.radioActive,
-              ]}
+              style={styles.optionButton}
               onPress={() => setField(field, value)}
+              activeOpacity={0.8}
             >
-              <Text
-                style={[
-                  styles.radioText,
-                  form?.[field] === value && styles.radioTextActive,
-                ]}
+              <LinearGradient
+                colors={
+                  isSelected
+                    ? theme.gradients.primary
+                    : ['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)']
+                }
+                style={styles.optionGradient}
               >
-                {capitalizeWords(opt)}
-              </Text>
+                <Text
+                  style={[
+                    styles.optionText,
+                    isSelected && styles.optionTextActive,
+                  ]}
+                >
+                  {capitalizeWords(opt)}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
           );
         })}
       </View>
-    </>
+    </View>
   );
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <Text style={{ color: "#ccc" }}>Loading…</Text>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading your preferences...</Text>
       </View>
     );
   }
 
-  // -------------------- Render component --------------------
   return (
     <View style={styles.container}>
-      <Progress.Bar
-        progress={0.4}
-        width={null}
-        color="#ff69b4"
-        style={styles.progress}
-      />
+      <StatusBar barStyle="light-content" />
 
-      {renderOptions("Exercise", exerciseOptions, "exercise")}
-      {renderOptions("Smoking", smokingOptions, "smoking")}
-      {renderOptions("Drinking", drinkingOptions, "drinking")}
-      {renderOptions("Diet", dietOptions, "diet")}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Lifestyle 🌿</Text>
+          <Text style={styles.subtitle}>Share your habits</Text>
+        </View>
 
-      <View style={styles.navRow}>
-        <TouchableOpacity
-          style={[styles.navButton, styles.backButton]}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.navText}>Back</Text>
-        </TouchableOpacity>
+        {/* Progress Bar */}
+        <View style={styles.progressContainer}>
+          <Progress.Bar
+            progress={0.6}
+            width={null}
+            height={6}
+            color={theme.colors.primary}
+            unfilledColor="rgba(255,255,255,0.1)"
+            borderWidth={0}
+            borderRadius={3}
+          />
+          <Text style={styles.progressText}>Step 3 of 5</Text>
+        </View>
 
-        <TouchableOpacity
-          style={[styles.navButton, styles.nextButton]}
-          onPress={handleSaveAndNext}
-        >
-          <Text style={styles.navText}>Next</Text>
-        </TouchableOpacity>
-      </View>
+        {/* Form Card */}
+        <GlassCard>
+          {renderOptions("Exercise", exerciseOptions, "exercise", "💪")}
+          {renderOptions("Smoking", smokingOptions, "smoking", "🚭")}
+          {renderOptions("Drinking", drinkingOptions, "drinking", "🍷")}
+          {renderOptions("Diet", dietOptions, "diet", "🥗")}
+        </GlassCard>
+
+        {/* Navigation Buttons */}
+        <View style={styles.navRow}>
+          <GlassButton
+            title="← Back"
+            variant="ghost"
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          />
+
+          <GlassButton
+            title="Next →"
+            variant="primary"
+            onPress={handleSaveAndNext}
+            style={styles.nextButton}
+          />
+        </View>
+
+        {/* Help Text */}
+        <Text style={styles.helpText}>
+          Your lifestyle choices help us match you with compatible people
+        </Text>
+      </ScrollView>
     </View>
   );
 }
 
-// -------------------- Styles --------------------
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#111827", padding: 20 },
-  progress: { marginBottom: 20 },
-  label: { color: "#ccc", marginBottom: 6, fontWeight: "600" },
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 16,
-    justifyContent: "space-between",
-  },
-  radioButton: {
-    width: "48%",
-    marginBottom: 10,
-    paddingVertical: 10,
-    borderRadius: 8,
-    backgroundColor: "#1f2937",
-    borderWidth: 1,
-    borderColor: "#374151",
-    alignItems: "center",
-  },
-  radioActive: { backgroundColor: "#ff69b4", borderColor: "#ff69b4" },
-  radioText: { color: "#9ca3af", fontWeight: "600" },
-  radioTextActive: { color: "white" },
-  navRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 30,
-  },
-  navButton: {
+  container: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: "center",
-    marginHorizontal: 6,
   },
-  backButton: { backgroundColor: "#374151" },
-  nextButton: { backgroundColor: "#ff69b4" },
-  navText: { color: "white", fontWeight: "700", fontSize: 16 },
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  scrollContent: {
+    padding: 20,
+    paddingTop: 60,
+    paddingBottom: 40,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: theme.colors.textSecondary,
+    marginTop: 16,
+    fontSize: 16,
+  },
+
+  // Header
+  header: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: theme.colors.textMuted,
+  },
+
+  // Progress
+  progressContainer: {
+    marginBottom: 24,
+  },
+  progressText: {
+    color: theme.colors.textMuted,
+    fontSize: 12,
+    marginTop: 8,
+    textAlign: 'center',
+  },
+
+  // Options Section
+  optionSection: {
+    marginBottom: 24,
+  },
+  sectionLabel: {
+    color: theme.colors.textSecondary,
+    fontSize: 15,
+    marginBottom: 12,
+    fontWeight: '600',
+  },
+  optionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  optionButton: {
+    width: '48%',
+    borderRadius: theme.borderRadius.md,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+  },
+  optionGradient: {
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  optionText: {
+    color: theme.colors.textMuted,
+    fontWeight: '600',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  optionTextActive: {
+    color: theme.colors.text,
+  },
+
+  // Navigation
+  navRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 24,
+    marginBottom: 16,
+  },
+  backButton: {
+    flex: 1,
+  },
+  nextButton: {
+    flex: 1,
+  },
+
+  // Help Text
+  helpText: {
+    color: theme.colors.textDim,
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
 });

@@ -9,24 +9,28 @@ import {
   TouchableOpacity,
   Alert,
   Linking,
+  Dimensions,
+  StatusBar,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
 import DeleteProfileButton from "../components/DeleteProfileButton";
 import getAge from "../utils/getAge";
 
+const { width, height } = Dimensions.get('window');
+
 const handleReport = async () => {
   const email = "qup.dating@gmail.com";
   const subject = encodeURIComponent("Safety concern report");
   const body = encodeURIComponent("Please describe the issue:\n\n");
-
   const url = `mailto:${email}?subject=${subject}&body=${body}`;
-
+  
   const canOpen = await Linking.canOpenURL(url);
-
   if (canOpen) {
     Linking.openURL(url);
   } else {
@@ -48,7 +52,7 @@ export default function ProfileScreen({ navigation }) {
   const [isVerified, setIsVerified] = useState(false);
   const [isCarouselVisible, setCarouselVisible] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
-  const [blockModalVisible, setBlockModalVisible] = useState(false);
+
   const loadOwnProfile = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
@@ -62,25 +66,29 @@ export default function ProfileScreen({ navigation }) {
       setLoading(false);
     }
   };
+
   useFocusEffect(
     useCallback(() => {
       loadOwnProfile();
     }, []),
   );
-  if (loading) return <ActivityIndicator color="#ff69b4" />;
+
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#ff69b4" />
-        <Text style={styles.loading}>Loading profile…</Text>
-      </View>
+      <LinearGradient
+        colors={['#1a1a2e', '#16213e', '#0f3460']}
+        style={styles.loadingContainer}
+      >
+        <ActivityIndicator size="large" color="#e94560" />
+        <Text style={styles.loadingText}>Loading your profile...</Text>
+      </LinearGradient>
     );
   }
 
   if (!profile) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.error}>Profile not found.</Text>
+      <View style={styles.loadingContainer}>
+        <Text style={styles.errorText}>Profile not found.</Text>
       </View>
     );
   }
@@ -88,300 +96,622 @@ export default function ProfileScreen({ navigation }) {
   const age = getAge(profile.birthdate);
 
   const handleLogout = async () => {
-    await SecureStore.deleteItemAsync("authToken");
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "LoginForm" }],
-    });
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Logout",
+          style: "destructive",
+          onPress: async () => {
+            await SecureStore.deleteItemAsync("authToken");
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "LoginForm" }],
+            });
+          },
+        },
+      ]
+    );
   };
 
   return (
-    <Screen style={{ backgroundColor: "#111827" }}>
-      <ScrollView contentContainerStyle={styles.container}>
-        {!isVerified && <VerifyBanner user={profile} />}
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
+      
+      {/* Animated Background */}
+      <LinearGradient
+        colors={['#1a1a2e', '#16213e', '#0f3460', '#16213e']}
+        style={styles.backgroundGradient}
+      />
 
-        <View style={styles.topRight}>
-          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Floating Header Card */}
+        <View style={styles.headerCard}>
+          <LinearGradient
+            colors={['rgba(233, 69, 96, 0.1)', 'rgba(15, 52, 96, 0.1)']}
+            style={styles.headerGradient}
+          >
+            {!isVerified && (
+              <View style={styles.verifyBannerWrapper}>
+                <VerifyBanner user={profile} />
+              </View>
+            )}
 
-        {/* Header */}
-        <View style={styles.header}>
-          <Image
-            source={{
-              uri:
-                profile.profileImage ||
-                "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
-            }}
-            style={styles.avatar}
-          />
-          <View style={styles.headerText}>
-            <Text style={styles.name}>{profile.name}</Text>
-            <Text style={styles.status}>
-              {profile.relationshipStatus || "Undefined status"}
-            </Text>
-            <Text style={styles.sub}>
-              {age
-                ? `${age} years • ${capitalize(profile.gender)}`
-                : capitalize(profile.gender)}
-            </Text>
-            <Text style={styles.location}>
-              {capitalize(profile.location?.name)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Bio */}
-        {profile.bio && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>About Me</Text>
-            <Text style={styles.sectionText}>{profile.bio}</Text>
-          </View>
-        )}
-
-        {/* Gallery */}
-        {Array.isArray(profile.images) && profile.images.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Photos</Text>
-
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {profile.images.map((img, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => {
-                    setCarouselIndex(index);
-                    setCarouselVisible(true);
+            <View style={styles.profileHeader}>
+              {/* Avatar with Glow Effect */}
+              <TouchableOpacity 
+                style={styles.avatarWrapper}
+                onPress={() => navigation.navigate("EditImagesScreen")}
+                activeOpacity={0.8}
+              >
+                <View style={styles.avatarGlow} />
+                <Image
+                  source={{
+                    uri: profile.profileImage ||
+                      "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
                   }}
-                >
-                  <Image
-                    source={{ uri: img.url || img.uri }}
-                    style={styles.galleryImage}
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-        )}
-        {/* Appearance */}
-        <SimpleSection
-          title="Appearance"
-          items={[
-            { label: "Appearance", value: capitalize(profile.appearance) },
-            { label: "Body Type", value: capitalize(profile.bodyType) },
-            {
-              label: "Height",
-              value: profile.height ? `${profile.height} cm` : null,
-            },
-          ]}
-        />
+                  style={styles.avatar}
+                />
+                {/* Camera Icon Overlay */}
+                <View style={styles.cameraIconContainer}>
+                  <LinearGradient
+                    colors={['rgba(233, 69, 96, 0.9)', 'rgba(255, 107, 157, 0.9)']}
+                    style={styles.cameraIconGradient}
+                  >
+                    <Text style={styles.cameraIcon}>📷</Text>
+                  </LinearGradient>
+                </View>
+              </TouchableOpacity>
 
-        {/* Lifestyle */}
-        <SimpleSection
-          title="Lifestyle"
-          items={[
-            { label: "Smoking", value: capitalize(profile.smoking) },
-            { label: "Drinking", value: capitalize(profile.drinking) },
-            {
-              label: "Has Children",
-              value: profile.hasChildren ? "Yes" : "No",
-            },
-            {
-              label: "Wants Children",
-              value: profile.wantsChildren ? "Yes" : "No",
-            },
-            {
-              label: "Willing to Relocate",
-              value: profile.willingToRelocate ? "Yes" : "No",
-            },
-          ]}
-        />
+              {/* Name & Info */}
+              <View style={styles.profileInfo}>
+                <Text style={styles.profileName}>{profile.name}</Text>
+                
+                <View style={styles.metaRow}>
+                  {age && (
+                    <View style={styles.metaChip}>
+                      <Text style={styles.metaText}>{age} years</Text>
+                    </View>
+                  )}
+                  <View style={styles.metaChip}>
+                    <Text style={styles.metaText}>{capitalize(profile.gender)}</Text>
+                  </View>
+                </View>
 
-        {/* Personal Info */}
-        <SimpleSection
-          title="Personal Info"
-          items={[
-            { label: "Religion", value: capitalize(profile.religion) },
-            { label: "Occupation", value: capitalize(profile.occupation) },
-            { label: "Education", value: capitalize(profile.education) },
-            {
-              label: "Relationship Status",
-              value: capitalize(profile.relationshipStatus),
-            },
-          ]}
-        />
-
-        {/* Looking For */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>What I'm Looking For</Text>
-          <Text style={styles.sectionText}>
-            {capitalize(profile.lookingFor) || "Not specified yet."}
-          </Text>
-        </View>
-
-        {/* Tags */}
-        {profile.tags?.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>My Hashtags</Text>
-            <View style={styles.tagsContainer}>
-              {profile.tags.map((tag, i) => (
-                <Text key={i} style={styles.tag}>
-                  {tag}
-                </Text>
-              ))}
+                {profile.location?.name && (
+                  <View style={styles.locationRow}>
+                    <Text style={styles.locationIcon}>📍</Text>
+                    <Text style={styles.locationText}>
+                      {capitalize(profile.location.name)}
+                    </Text>
+                  </View>
+                )}
+              </View>
             </View>
+          </LinearGradient>
+        </View>
+
+        {/* Content Cards */}
+        <View style={styles.contentContainer}>
+          
+          {/* About Me Glass Card */}
+          {profile.bio && (
+            <GlassCard icon="💭" title="About Me">
+              <Text style={styles.bioText}>{profile.bio}</Text>
+            </GlassCard>
+          )}
+
+          {/* Photo Gallery */}
+          {Array.isArray(profile.images) && profile.images.length > 0 && (
+            <GlassCard 
+              icon="🎨" 
+              title="Gallery"
+              badge={profile.images.length}
+            >
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.gallery}
+              >
+                {profile.images.map((img, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => {
+                      setCarouselIndex(index);
+                      setCarouselVisible(true);
+                    }}
+                    activeOpacity={0.9}
+                    style={styles.galleryItem}
+                  >
+                    <Image
+                      source={{ uri: img.url || img.uri }}
+                      style={styles.galleryImage}
+                    />
+                    <LinearGradient
+                      colors={['transparent', 'rgba(0,0,0,0.4)']}
+                      style={styles.galleryOverlay}
+                    />
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </GlassCard>
+          )}
+
+          {/* Info Sections */}
+          <InfoSection
+            icon="✨"
+            title="Appearance"
+            items={[
+              { key: "Style", value: capitalize(profile.appearance) },
+              { key: "Build", value: capitalize(profile.bodyType) },
+              { key: "Height", value: profile.height ? `${profile.height} cm` : null },
+            ]}
+          />
+
+          <InfoSection
+            icon="🌱"
+            title="Lifestyle"
+            items={[
+              { key: "Smoking", value: capitalize(profile.smoking) },
+              { key: "Drinking", value: capitalize(profile.drinking) },
+              { key: "Children", value: profile.hasChildren ? "Has children" : "No children" },
+              { key: "Future kids", value: profile.wantsChildren ? "Open to it" : "Not planning" },
+              { key: "Relocation", value: profile.willingToRelocate ? "Flexible" : "Staying local" },
+            ]}
+          />
+
+          <InfoSection
+            icon="🎓"
+            title="Background"
+            items={[
+              { key: "Faith", value: capitalize(profile.religion) },
+              { key: "Career", value: capitalize(profile.occupation) },
+              { key: "Education", value: capitalize(profile.education) },
+              { key: "Status", value: capitalize(profile.relationshipStatus) },
+            ]}
+          />
+
+          {/* Looking For */}
+          {profile.lookingFor && (
+            <GlassCard icon="🎯" title="Looking For">
+              <Text style={styles.bioText}>
+                {capitalize(profile.lookingFor)}
+              </Text>
+            </GlassCard>
+          )}
+
+          {/* Interests */}
+          {profile.tags?.length > 0 && (
+            <GlassCard icon="💫" title="Interests">
+              <View style={styles.interestsGrid}>
+                {profile.tags.map((tag, i) => (
+                  <View key={i} style={styles.interestChip}>
+                    <LinearGradient
+                      colors={['rgba(233, 69, 96, 0.2)', 'rgba(15, 52, 96, 0.2)']}
+                      style={styles.interestGradient}
+                    >
+                      <Text style={styles.interestText}>{tag}</Text>
+                    </LinearGradient>
+                  </View>
+                ))}
+              </View>
+            </GlassCard>
+          )}
+
+          {/* Action Buttons */}
+          <View style={styles.actionsContainer}>
+            <TouchableOpacity 
+              style={styles.logoutButton}
+              onPress={handleLogout}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#e94560', '#d63447']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.buttonGradient}
+              >
+                <Text style={styles.logoutText}>Logout</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+
+            <DeleteProfileButton userId={profile._id} navigation={navigation} />
           </View>
-        )}
 
-        <View style={{ marginTop: 20, alignItems: "flex-end" }}>
-          <DeleteProfileButton userId={profile._id} navigation={navigation} />
+          {/* Footer */}
+          <View style={styles.footer}>
+            <TouchableOpacity 
+              onPress={handleReport}
+              style={styles.footerButton}
+            >
+              <Text style={styles.footerIcon}>🛡️</Text>
+              <Text style={styles.footerText}>Report Safety Concern</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              onPress={() => navigation.navigate("SafetyGuidelines")}
+              style={styles.footerButton}
+            >
+              <Text style={styles.footerIcon}>📋</Text>
+              <Text style={styles.footerTextSecondary}>Safety Guidelines</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <EnhancedImageViewing
-          images={profile.images.map((img) => ({
-            uri: img.url || img.uri,
-          }))}
-          imageIndex={carouselIndex}
-          visible={isCarouselVisible}
-          onRequestClose={() => setCarouselVisible(false)}
-        />
-
-        <TouchableOpacity onPress={handleReport}>
-          <Text style={styles.handleReport}>Report safety concern</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("SafetyGuidelines")}
-        >
-          <Text style={styles.bottomLeft}>Safety Guidelines</Text>
-        </TouchableOpacity>
       </ScrollView>
-    </Screen>
-  );
-}
 
-function SimpleSection({ title, items }) {
-  const valid = items.filter((i) => i.value);
-  if (valid.length === 0) return null;
-
-  return (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {valid.map((item, i) => (
-        <View key={i} style={styles.row}>
-          <Text style={styles.label}>{item.label}</Text>
-          <Text style={styles.value}>{item.value}</Text>
-        </View>
-      ))}
+      <EnhancedImageViewing
+        images={profile.images.map((img) => ({
+          uri: img.url || img.uri,
+        }))}
+        imageIndex={carouselIndex}
+        visible={isCarouselVisible}
+        onRequestClose={() => setCarouselVisible(false)}
+      />
     </View>
   );
 }
 
+// Glass Card Component
+function GlassCard({ icon, title, badge, children }) {
+  return (
+    <View style={styles.glassCard}>
+      <LinearGradient
+        colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+        style={styles.glassGradient}
+      >
+        <View style={styles.cardHeader}>
+          <View style={styles.cardTitleRow}>
+            <Text style={styles.cardIcon}>{icon}</Text>
+            <Text style={styles.cardTitle}>{title}</Text>
+          </View>
+          {badge && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{badge}</Text>
+            </View>
+          )}
+        </View>
+        <View style={styles.cardContent}>
+          {children}
+        </View>
+      </LinearGradient>
+    </View>
+  );
+}
+
+// Info Section Component
+function InfoSection({ icon, title, items }) {
+  const valid = items.filter((i) => i.value);
+  if (valid.length === 0) return null;
+
+  return (
+    <GlassCard icon={icon} title={title}>
+      {valid.map((item, i) => (
+        <View 
+          key={i} 
+          style={[
+            styles.infoRow,
+            i === valid.length - 1 && styles.infoRowLast
+          ]}
+        >
+          <Text style={styles.infoKey}>{item.key}</Text>
+          <Text style={styles.infoValue}>{item.value}</Text>
+        </View>
+      ))}
+    </GlassCard>
+  );
+}
+
 const styles = StyleSheet.create({
-  handleReport: {
-    color: "#ff4d4d",
-    fontSize: 16,
-    textAlign: "left",
-    fontSize: 15,
-  },
-  bottomLeft: {
-    color: "#ccc",
-    textAlign: "left",
-    fontSize: 15,
-    fontWeight: "500",
-    paddingVertical: 20,
-  },
-  topRight: {
-    width: "100%",
-    alignItems: "flex-end",
-    marginBottom: 10,
-  },
-
-  logoutBtn: {
-    backgroundColor: "#ef4444",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-
-  logoutText: {
-    color: "white",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-
-  container: { padding: 20, backgroundColor: "#111" },
-  center: {
+  container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#111",
+    backgroundColor: '#1a1a2e',
   },
-  loading: { color: "#ccc", marginTop: 10 },
-  error: { color: "red", fontSize: 16 },
-  header: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "#ff69b4",
+  backgroundGradient: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: height,
   },
-  headerText: { marginLeft: 15 },
-  name: { fontSize: 24, fontWeight: "bold", color: "#fff" },
-  status: { fontStyle: "italic", color: "#ff69b4" },
-  sub: { color: "#ccc" },
-  location: { color: "#888", fontSize: 12 },
-  section: {
-    backgroundColor: "#222",
-    padding: 15,
-    borderRadius: 8,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  errorText: {
+    color: '#e94560',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+
+  // Header Card
+  headerCard: {
+    margin: 20,
+    marginTop: 60,
+    borderRadius: 24,
+    overflow: 'hidden',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+  },
+  headerGradient: {
+    padding: 24,
+  },
+  verifyBannerWrapper: {
+    marginBottom: 16,
+  },
+  profileHeader: {
+    alignItems: 'center',
+  },
+  avatarWrapper: {
+    position: 'relative',
     marginBottom: 20,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#ff69b4",
-    marginBottom: 8,
+  avatarGlow: {
+    position: 'absolute',
+    top: -8,
+    left: -8,
+    right: -8,
+    bottom: -8,
+    borderRadius: 80,
+    backgroundColor: '#e94560',
+    opacity: 0.3,
+    shadowColor: '#e94560',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 20,
   },
-  sectionText: { color: "#ddd", lineHeight: 20 },
-  galleryImage: { width: 120, height: 120, borderRadius: 8, marginRight: 10 },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 6,
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    borderColor: 'rgba(255,255,255,0.3)',
   },
-  label: { color: "#aaa", width: 140 },
-  value: { color: "#fff", flex: 1 },
-  tagsContainer: { flexDirection: "row", flexWrap: "wrap", marginTop: 8 },
-  tag: {
-    backgroundColor: "#be185d",
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+  cameraIconContainer: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
     borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
-
-    // s⭐ Center the text inside the chip
-    justifyContent: "center",
-    alignItems: "center",
-
-    // Makes the chip auto-size to content
-    alignSelf: "flex-start",
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#fff',
   },
-  tagText: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 13,
-    textAlign: "center",
+  cameraIconGradient: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraIcon: {
+    fontSize: 20,
+  },
+  profileInfo: {
+    alignItems: 'center',
+  },
+  profileName: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 12,
+  },
+  metaChip: {
+    backgroundColor: 'rgba(233, 69, 96, 0.2)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(233, 69, 96, 0.3)',
+  },
+  metaText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  locationIcon: {
+    fontSize: 16,
+  },
+  locationText: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 15,
+    fontWeight: '500',
   },
 
-  tagChip: {
-    backgroundColor: "#ff69b4",
+  // Content
+  contentContainer: {
+    paddingHorizontal: 20,
+  },
+  glassCard: {
+    marginBottom: 16,
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  glassGradient: {
+    padding: 20,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  cardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardIcon: {
+    fontSize: 24,
+    marginRight: 10,
+  },
+  cardTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  badge: {
+    backgroundColor: '#e94560',
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    marginRight: 8,
-    marginBottom: 8,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  cardContent: {
+    // Content wrapper
+  },
+  bioText: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: 'rgba(255,255,255,0.9)',
+  },
+
+  // Gallery
+  gallery: {
+    paddingRight: 20,
+  },
+  galleryItem: {
+    marginRight: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  galleryImage: {
+    width: 140,
+    height: 180,
+    borderRadius: 16,
+  },
+  galleryOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 60,
+  },
+
+  // Info Rows
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.05)',
+  },
+  infoRowLast: {
+    borderBottomWidth: 0,
+  },
+  infoKey: {
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.6)',
+    fontWeight: '500',
+  },
+  infoValue: {
+    fontSize: 15,
+    color: '#fff',
+    fontWeight: '600',
+    textAlign: 'right',
+    flex: 1,
+    marginLeft: 16,
+  },
+
+  // Interests
+  interestsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  interestChip: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(233, 69, 96, 0.3)',
+  },
+  interestGradient: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  interestText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+
+  // Actions
+  actionsContainer: {
+    marginTop: 24,
+    marginBottom: 24,
+    gap: 12,
+  },
+  logoutButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: '#e94560',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+  },
+  buttonGradient: {
+    padding: 18,
+    alignItems: 'center',
+  },
+  logoutText: {
+    color: '#fff',
+    fontSize: 17,
+    fontWeight: '700',
+  },
+
+  // Footer
+  footer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    gap: 16,
+  },
+  footerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  footerIcon: {
+    fontSize: 18,
+  },
+  footerText: {
+    color: '#e94560',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  footerTextSecondary: {
+    color: 'rgba(255,255,255,0.5)',
+    fontSize: 15,
+    fontWeight: '500',
   },
 });

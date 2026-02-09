@@ -1,15 +1,15 @@
-// EditHabitsScreen.js
 import React, { useState } from "react";
-import { View } from "react-native";
+import GlassBackground from "../../components/GlassBackground";
 import Step4Location from "./Step4Location";
-import Screen from "../../components/Screen";
 
 export default function EditHabitsScreen({ navigation }) {
   const [form, setForm] = useState({
     location: null,
     searchScope: "worldwide",
     willingToRelocate: false,
-    tags: []
+    tags: [],
+    preferredAgeMin: 18,
+    preferredAgeMax: 90,
   });
 
   const setField = (field, value) => {
@@ -17,15 +17,13 @@ export default function EditHabitsScreen({ navigation }) {
   };
 
   return (
-    <Screen style={{ backgroundColor: "#111827" }}>
-      <View style={{ flex: 1 }}>
-        <Step4Location
-          form={form}
-          setForm={setForm}
-          setField={setField}
-          navigation={navigation}
-        />
-      </View>
-    </Screen>
+    <GlassBackground>
+      <Step4Location
+        form={form}
+        setForm={setForm}
+        setField={setField}
+        navigation={navigation}
+      />
+    </GlassBackground>
   );
 }

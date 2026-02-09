@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, ActivityIndicator } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import GlassBackground from "../../components/GlassBackground";
 import Step0Basic from "./Step0Basic";
-import Screen from "../../components/Screen";
+import theme from "../../theme";
 
 export default function EditBasicScreen({ navigation }) {
   const [form, setForm] = useState({
@@ -10,6 +11,7 @@ export default function EditBasicScreen({ navigation }) {
     birthdate: "",
     gender: "",
     occupation: "",
+    bio: "",
   });
   const [loading, setLoading] = useState(true);
 
@@ -40,24 +42,22 @@ export default function EditBasicScreen({ navigation }) {
 
   if (loading) {
     return (
-      <ActivityIndicator
-        size="large"
-        color="#ff69b4"
-        style={{ marginTop: 50 }}
-      />
+      <GlassBackground>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+        </View>
+      </GlassBackground>
     );
   }
 
   return (
-    <Screen style={{ backgroundColor: "#111827" }}>
-      <View style={{ flex: 1 }}>
-        <Step0Basic
-          form={form}
-          setForm={setForm}
-          setField={setField}
-          navigation={navigation}
-        />
-      </View>
-    </Screen>
+    <GlassBackground>
+      <Step0Basic
+        form={form}
+        setForm={setForm}
+        setField={setField}
+        navigation={navigation}
+      />
+    </GlassBackground>
   );
 }

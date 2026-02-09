@@ -6,23 +6,24 @@ import {
   Dimensions,
   ScrollView,
   ActivityIndicator,
+  StatusBar,
 } from "react-native";
 import Swiper from "react-native-deck-swiper";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import * as SecureStore from "expo-secure-store";
-
+import { useFocusEffect } from "@react-navigation/native";
+import GlassBackground from "../components/GlassBackground";
+import GlassCard from "../components/GlassCard";
 import UserCard from "../components/UserCard";
 import ProfileCompletion from "../components/ProfileCompletion";
-import Screen from "../components/Screen";
-import VerifyBanner from "../components/VerifyBanner";
-import { useFocusEffect } from "@react-navigation/native";
 import MatchCongrats from "../components/MatchCongrats";
+import theme from "../theme";
 
-const SCREEN_HEIGHT = Dimensions.get("window").height;
+const { height } = Dimensions.get("window");
 
-export default function DashboardScreen({ navigation }) {
+export default function DiscoverScreen({ navigation }) {
   const [stats, setStats] = useState({
     profileViews: 0,
     newLikes: 0,
@@ -39,21 +40,14 @@ export default function DashboardScreen({ navigation }) {
   const fetchCards = async () => {
     try {
       const token = await SecureStore.getItemAsync("authToken");
-
       const res = await fetch(
         `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       const data = await res.json();
-
-      if (Array.isArray(data)) {
-        setCards(data);
-      } else {
-        setCards([]);
-      }
+      setCards(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Error fetching cards:", err);
       setCards([]);
@@ -68,16 +62,13 @@ export default function DashboardScreen({ navigation }) {
     }, [])
   );
 
-  // Fetch current user
   useEffect(() => {
     async function fetchUser() {
       try {
         const token = await SecureStore.getItemAsync("authToken");
         const res = await fetch(
           `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/me`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         if (!res.ok) throw new Error("Failed to fetch user");
         const data = await res.json();
@@ -89,17 +80,13 @@ export default function DashboardScreen({ navigation }) {
     fetchUser();
   }, []);
 
-  // Fetch stats
   useEffect(() => {
     async function fetchStats() {
       try {
         const token = await SecureStore.getItemAsync("authToken");
-
         const res = await fetch(
           `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/stats`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         if (res.ok) {
           const data = await res.json();
@@ -130,7 +117,6 @@ export default function DashboardScreen({ navigation }) {
       });
 
       const data = await res.json();
-
       if (data.match === true) {
         setShowCongrats(true);
       }
@@ -143,74 +129,85 @@ export default function DashboardScreen({ navigation }) {
     const card = cards[index];
     if (!card) return;
 
-    setSwipeLabel(direction === "right" ? "Liked" : "Disliked");
+    setSwipeLabel(direction === "right" ? "Liked ❤️" : "Passed");
     setTimeout(() => setSwipeLabel(null), 800);
 
     handleSwipeApi(direction, card);
-
-    // ⭐ Remove by ID — never by index
     setCards((prev) => prev.filter((c) => c._id !== card._id));
   };
 
   if (loading) {
     return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#22c55e" />
-      </View>
+      <GlassBackground>
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>Finding matches...</Text>
+        </View>
+      </GlassBackground>
     );
   }
 
   return (
-    <Screen style={{ backgroundColor: "#111827" }}>
-      <View style={styles.container}>
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Welcome back 👋</Text>
-            <Text style={styles.subtitle}>
-              Here’s what’s happening on your profile
-            </Text>
-          </View>
+    <GlassBackground>
+      <StatusBar barStyle="light-content" />
+      
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Discover 🔥</Text>
+          <Text style={styles.subtitle}>
+            Find your perfect match
+          </Text>
+        </View>
 
-          {/* Stats Grid */}
-          <View style={styles.statsGrid}>
-            <StatCard
-              icon={<Ionicons name="flame-sharp" size={28} color="white" />}
-              label="Profile Views"
-              value={stats.profileViews}
-              colors={["#ec4899", "#8b5cf6"]}
-            />
-            <StatCard
-              icon={<Feather name="heart" size={28} color="white" />}
-              label="New Likes"
-              value={stats.newLikes}
-              colors={["#ef4444", "#f97316"]}
-            />
-            <StatCard
-              icon={<Feather name="users" size={28} color="white" />}
-              label="New Matches"
-              value={stats.newMatches}
-              colors={["#6366f1", "#3b82f6"]}
-            />
-            <StatCard
-              icon={<Feather name="message-circle" size={28} color="white" />}
-              label="New Messages"
-              value={stats.newMessages}
-              colors={["#10b981", "#22c55e"]}
-            />
-          </View>
-          <View style={styles.swipeSection}>
-            {swipeLabel && (
-              <View style={styles.swipeFeedback}>
+        {/* Stats Grid */}
+        <View style={styles.statsGrid}>
+          <StatCard
+            icon={<Ionicons name="flame-sharp" size={24} color="white" />}
+            label="Views"
+            value={stats.profileViews}
+            colors={['rgba(236, 72, 153, 0.3)', 'rgba(139, 92, 246, 0.3)']}
+          />
+          <StatCard
+            icon={<Feather name="heart" size={24} color="white" />}
+            label="Likes"
+            value={stats.newLikes}
+            colors={['rgba(239, 68, 68, 0.3)', 'rgba(249, 115, 22, 0.3)']}
+          />
+          <StatCard
+            icon={<Feather name="users" size={24} color="white" />}
+            label="Matches"
+            value={stats.newMatches}
+            colors={['rgba(99, 102, 241, 0.3)', 'rgba(59, 130, 246, 0.3)']}
+          />
+          <StatCard
+            icon={<Feather name="message-circle" size={24} color="white" />}
+            label="Messages"
+            value={stats.newMessages}
+            colors={['rgba(16, 185, 129, 0.3)', 'rgba(34, 197, 94, 0.3)']}
+          />
+        </View>
+
+        {/* Swiper Section */}
+        <View style={styles.swipeSection}>
+          {swipeLabel && (
+            <View style={styles.swipeFeedback}>
+              <LinearGradient
+                colors={['rgba(233, 69, 96, 0.9)', 'rgba(15, 52, 96, 0.9)']}
+                style={styles.swipeFeedbackGradient}
+              >
                 <Text style={styles.swipeFeedbackText}>{swipeLabel}</Text>
-              </View>
-            )}
+              </LinearGradient>
+            </View>
+          )}
 
+          {cards.length > 0 ? (
             <Swiper
-              key={cards.map((c) => c._id).join("-")} // ⭐ forces correct re-render
+              key={cards.map((c) => c._id).join("-")}
               cards={cards}
               renderCard={(card) => (
                 <UserCard user={card} navigation={navigation} />
@@ -227,216 +224,212 @@ export default function DashboardScreen({ navigation }) {
               swipeBackCard={true}
               swipeAnimationDuration={90}
               cardVerticalMargin={0}
-              containerStyle={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              cardStyle={{
-                height: "100%",
-                width: "100%",
-                borderRadius: 20,
-              }}
+              containerStyle={styles.swiperContainer}
+              cardStyle={styles.cardStyle}
             />
-          </View>
+          ) : (
+            <View style={styles.noCardsContainer}>
+              <GlassCard icon="🎯" title="No More Profiles">
+                <Text style={styles.noCardsText}>
+                  You've seen all available profiles!
+                </Text>
+                <Text style={[styles.noCardsText, { marginTop: 8 }]}>
+                  Check back later for new matches.
+                </Text>
+              </GlassCard>
+            </View>
+          )}
+        </View>
 
-          {/* Profile Completion */}
-          <ProfileCompletion user={user} />
+        {/* Profile Completion */}
+        <ProfileCompletion user={user} />
 
-          {/* Suggestions */}
-          <View style={styles.suggestions}>
-            <Text style={styles.suggestionsTitle}>Suggestions</Text>
-            <Text style={styles.suggestion}>
-              <Text style={styles.bullet}>• </Text>
-              Add more photos to get 3× more matches
-            </Text>
-            <Text style={styles.suggestion}>
-              <Text style={styles.bullet}>• </Text>
-              Write a short bio to improve your profile
-            </Text>
-            <Text style={styles.suggestion}>
-              <Text style={styles.bullet}>• </Text>
-              Enable location for better matches
-            </Text>
+        {/* Tips Card */}
+        <GlassCard icon="💡" title="Pro Tips">
+          <View style={styles.tipsContainer}>
+            <TipItem text="Add more photos to get 3× more matches" />
+            <TipItem text="Write a compelling bio to stand out" />
+            <TipItem text="Enable location for better local matches" />
+            <TipItem text="Be authentic and genuine in conversations" />
           </View>
-        </ScrollView>
-        {showCongrats && (
-          <MatchCongrats onClose={() => setShowCongrats(false)} />
-        )}
-      </View>
-    </Screen>
+        </GlassCard>
+      </ScrollView>
+
+      {showCongrats && (
+        <MatchCongrats onClose={() => setShowCongrats(false)} />
+      )}
+    </GlassBackground>
   );
 }
 
+// Stat Card Component
 function StatCard({ icon, label, value, colors }) {
   return (
-    <LinearGradient colors={colors} style={styles.statCard}>
-      <View style={styles.statIcon}>{icon}</View>
-      <Text style={styles.statValue}>{value}</Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </LinearGradient>
+    <View style={styles.statCard}>
+      <LinearGradient colors={colors} style={styles.statGradient}>
+        <View style={styles.statIconContainer}>{icon}</View>
+        <Text style={styles.statValue}>{value}</Text>
+        <Text style={styles.statLabel}>{label}</Text>
+      </LinearGradient>
+    </View>
+  );
+}
+
+// Tip Item Component
+function TipItem({ text }) {
+  return (
+    <View style={styles.tipItem}>
+      <View style={styles.tipBullet}>
+        <Text style={styles.tipBulletText}>✓</Text>
+      </View>
+      <Text style={styles.tipText}>{text}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  swipeFeedback: {
-    position: "absolute",
-    top: 180,
-    left: 0,
-    right: 0,
-    zIndex: 999,
-    alignItems: "center",
-  },
-
-  swipeFeedbackText: {
-    fontSize: 32,
-    fontWeight: "800",
-    color: "white",
-    backgroundColor: "rgba(0,0,0,0.6)",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    overflow: "hidden",
-  },
-
-  swiperInner: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  cardStyle: {
-    width: "100%",
-    alignSelf: "center",
-  },
-
-  container: {
-    flex: 1,
-    backgroundColor: "#111827",
-  },
-  loader: {
-    flex: 1,
-    backgroundColor: "#111827",
-    justifyContent: "center",
-    alignItems: "center",
-  },
   scroll: {
     flex: 1,
   },
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 60,
     paddingBottom: 40,
   },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: theme.colors.textSecondary,
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: '500',
+  },
   header: {
-    marginBottom: 20,
-    alignItems: "center",
+    marginBottom: 24,
+    alignItems: 'center',
   },
   title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "white",
+    fontSize: 32,
+    fontWeight: '800',
+    color: theme.colors.text,
+    marginBottom: 4,
   },
   subtitle: {
-    color: "#9ca3af",
-    marginTop: 4,
+    color: theme.colors.textMuted,
+    fontSize: 16,
   },
+  
+  // Stats Grid
   statsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 30,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 24,
   },
   statCard: {
-    width: "48%",
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
+    flex: 1,
+    minWidth: '47%',
+    borderRadius: theme.borderRadius.lg,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
   },
-  statIcon: {
+  statGradient: {
+    padding: 16,
+    alignItems: 'center',
+  },
+  statIconContainer: {
     marginBottom: 8,
   },
   statValue: {
     fontSize: 28,
-    fontWeight: "800",
-    color: "white",
+    fontWeight: '800',
+    color: theme.colors.text,
+    marginBottom: 4,
   },
   statLabel: {
-    color: "white",
-    opacity: 0.8,
-    marginTop: 4,
-  },
-  swipeSection: {
-    height: 460,
-    width: "100%",
-    marginBottom: 30,
-    alignSelf: "center",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
+    color: theme.colors.textSecondary,
+    fontSize: 12,
+    opacity: 0.9,
   },
 
-  likeLabel: {
-    backgroundColor: "transparent",
-    color: "#22c55e",
-    fontSize: 32,
-    fontWeight: "800",
-    borderWidth: 3,
-    borderColor: "#22c55e",
-    padding: 10,
-    borderRadius: 8,
+  // Swiper Section
+  swipeSection: {
+    height: 480,
+    width: '100%',
+    marginBottom: 24,
+    position: 'relative',
   },
-  likeWrapper: {
-    position: "absolute",
-    top: 50,
-    right: 20,
+  swipeFeedback: {
+    position: 'absolute',
+    top: 40,
+    left: 0,
+    right: 0,
+    zIndex: 999,
+    alignItems: 'center',
   },
-  nopeLabel: {
-    backgroundColor: "transparent",
-    color: "#ef4444",
-    fontSize: 32,
-    fontWeight: "800",
-    borderWidth: 3,
-    borderColor: "#ef4444",
-    padding: 10,
-    borderRadius: 8,
-  },
-  nopeWrapper: {
-    position: "absolute",
-    top: 50,
-    left: 20,
-  },
-  noCards: {
-    flex: 1,
+  swipeFeedbackGradient: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: "#374151",
-    alignItems: "center",
-    justifyContent: "center",
+  },
+  swipeFeedbackText: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: theme.colors.text,
+  },
+  swiperContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardStyle: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+  },
+  noCardsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   noCardsText: {
-    color: "#9ca3af",
-    fontSize: 16,
-    textAlign: "center",
-    paddingHorizontal: 16,
+    color: theme.colors.textSecondary,
+    fontSize: 15,
+    textAlign: 'center',
+    lineHeight: 22,
   },
-  suggestions: {
-    backgroundColor: "#1f2937",
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 30,
+
+  // Tips
+  tipsContainer: {
+    gap: 12,
   },
-  suggestionsTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "white",
-    marginBottom: 10,
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
   },
-  suggestion: {
-    color: "#d1d5db",
-    marginBottom: 6,
+  tipBullet: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(233, 69, 96, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    marginTop: 2,
   },
-  bullet: {
-    color: "#ec4899",
+  tipBulletText: {
+    color: theme.colors.primary,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  tipText: {
+    flex: 1,
+    color: theme.colors.textSecondary,
+    fontSize: 15,
+    lineHeight: 22,
   },
 });

@@ -7,13 +7,14 @@ import {
   Keyboard,
   Platform,
   TouchableOpacity,
+  StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { LinearGradient } from "expo-linear-gradient";
+import GlassBackground from "../components/GlassBackground";
 import ChatHeader from "../components/chat/ChatHeader";
 import ChatMessageList from "../components/chat/ChatMessageList";
 import ChatInputBar from "../components/chat/ChatInputBar";
-
 import ImagePreviewBar from "../components/ImagePreviewBar";
 import FullScreenImageModal from "../components/FullScreenImageModal";
 import ReportUserModal from "../components/ReportUserModal";
@@ -22,6 +23,7 @@ import { useChat } from "../hooks/useChat";
 import { useChatInput } from "../hooks/useChatInput";
 import { useReportUser } from "../hooks/useReportUser";
 import { useImageUpload } from "../hooks/useImageUpload";
+import theme from "../theme";
 
 // Wrapper component for safety checks BEFORE hooks
 export default function ChatScreen({ route, navigation }) {
@@ -29,15 +31,34 @@ export default function ChatScreen({ route, navigation }) {
   if (!route || !route.params) {
     console.error("❌ FATAL: Route or params undefined");
     return (
-      <View style={styles.loader}>
-        <Text style={styles.errorText}>Navigation Error</Text>
-        <TouchableOpacity
-          style={styles.errorButton}
-          onPress={() => navigation?.goBack()}
-        >
-          <Text style={{ color: "white" }}>Go Back</Text>
-        </TouchableOpacity>
-      </View>
+      <GlassBackground>
+        <View style={styles.errorContainer}>
+          <View style={styles.errorCard}>
+            <LinearGradient
+              colors={theme.gradients.glass}
+              style={styles.errorGradient}
+            >
+              <Text style={styles.errorIcon}>⚠️</Text>
+              <Text style={styles.errorTitle}>Navigation Error</Text>
+              <Text style={styles.errorText}>
+                Something went wrong. Please try again.
+              </Text>
+              <TouchableOpacity
+                style={styles.errorButton}
+                onPress={() => navigation?.goBack()}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={theme.gradients.primary}
+                  style={styles.errorButtonGradient}
+                >
+                  <Text style={styles.errorButtonText}>Go Back</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+        </View>
+      </GlassBackground>
     );
   }
 
@@ -46,15 +67,34 @@ export default function ChatScreen({ route, navigation }) {
   if (!userId || !user) {
     console.error("❌ Missing userId or user");
     return (
-      <View style={styles.loader}>
-        <Text style={styles.errorText}>Missing User Data</Text>
-        <TouchableOpacity
-          style={styles.errorButton}
-          onPress={() => navigation?.goBack()}
-        >
-          <Text style={{ color: "white" }}>Go Back</Text>
-        </TouchableOpacity>
-      </View>
+      <GlassBackground>
+        <View style={styles.errorContainer}>
+          <View style={styles.errorCard}>
+            <LinearGradient
+              colors={theme.gradients.glass}
+              style={styles.errorGradient}
+            >
+              <Text style={styles.errorIcon}>👤</Text>
+              <Text style={styles.errorTitle}>Missing User Data</Text>
+              <Text style={styles.errorText}>
+                Unable to load user information.
+              </Text>
+              <TouchableOpacity
+                style={styles.errorButton}
+                onPress={() => navigation?.goBack()}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={theme.gradients.primary}
+                  style={styles.errorButtonGradient}
+                >
+                  <Text style={styles.errorButtonText}>Go Back</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
+        </View>
+      </GlassBackground>
     );
   }
 
@@ -110,97 +150,140 @@ function ChatContent({ userId, user, navigation }) {
 
   if (!currentUserId || userLoading || messagesLoading) {
     return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#22c55e" />
-        <Text style={styles.loadingText}>Loading chat...</Text>
-      </View>
+      <GlassBackground>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>Loading chat...</Text>
+        </View>
+      </GlassBackground>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <ChatHeader
-        user={user}
-        onBack={() => navigation?.goBack()}
-        onClose={() => navigation?.navigate("MatchesHome")}
-        onProfilePress={() =>
-          navigation?.navigate("UserProfile", { userId: user._id })
-        }
-        onReportPress={() => setReportVisible(true)}
-      />
-
-      <ImagePreviewBar images={selectedImages} remove={removeImage} />
-
-      <View style={{ flex: 1 }}>
-        <ChatMessageList
-          messages={messages}
-          currentUserId={currentUserId}
-          onImagePress={setFullscreenImage}
-          onDismissEmojiPicker={() => setShowEmojiPicker(false)}
+    <GlassBackground>
+      <StatusBar barStyle="light-content" />
+      
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <ChatHeader
+          user={user}
+          onBack={() => navigation?.goBack()}
+          onClose={() => navigation?.navigate("MatchesHome")}
+          onProfilePress={() =>
+            navigation?.navigate("UserProfile", { userId: user._id })
+          }
+          onReportPress={() => setReportVisible(true)}
         />
-      </View>
 
-      <View style={{ marginBottom: keyboardHeight }}>
-        <ChatInputBar
-          text={text}
-          setText={setText}
-          showEmojiPicker={showEmojiPicker}
-          setShowEmojiPicker={setShowEmojiPicker}
-          uploading={uploading}
-          onSend={handleSend}
-          onPickImages={pickImages}
+        <ImagePreviewBar images={selectedImages} remove={removeImage} />
+
+        <View style={{ flex: 1 }}>
+          <ChatMessageList
+            messages={messages}
+            currentUserId={currentUserId}
+            onImagePress={setFullscreenImage}
+            onDismissEmojiPicker={() => setShowEmojiPicker(false)}
+          />
+        </View>
+
+        <View style={{ marginBottom: keyboardHeight }}>
+          <ChatInputBar
+            text={text}
+            setText={setText}
+            showEmojiPicker={showEmojiPicker}
+            setShowEmojiPicker={setShowEmojiPicker}
+            uploading={uploading}
+            onSend={handleSend}
+            onPickImages={pickImages}
+          />
+        </View>
+
+        <FullScreenImageModal
+          visible={!!fullscreenImage}
+          imageUrl={fullscreenImage}
+          onClose={() => setFullscreenImage(null)}
         />
-      </View>
 
-      <FullScreenImageModal
-        visible={!!fullscreenImage}
-        imageUrl={fullscreenImage}
-        onClose={() => setFullscreenImage(null)}
-      />
-
-      <ReportUserModal
-        visible={reportVisible}
-        onClose={() => setReportVisible(false)}
-        userId={userId}
-        onSubmit={(payload) => {
-          setReportVisible(false);
-          submitReport(payload);
-        }}
-      />
-    </SafeAreaView>
+        <ReportUserModal
+          visible={reportVisible}
+          onClose={() => setReportVisible(false)}
+          userId={userId}
+          onSubmit={(payload) => {
+            setReportVisible(false);
+            submitReport(payload);
+          }}
+        />
+      </SafeAreaView>
+    </GlassBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#111827",
   },
-  loader: {
+
+  // Loading State
+  loadingContainer: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#111827",
-    padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   loadingText: {
-    color: "#9ca3af",
-    marginTop: 10,
-    fontSize: 14,
+    color: theme.colors.textSecondary,
+    marginTop: 16,
+    fontSize: 16,
+    fontWeight: '500',
+  },
+
+  // Error State
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  errorCard: {
+    width: '100%',
+    maxWidth: 350,
+    borderRadius: theme.borderRadius.xl,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: theme.colors.glassBorder,
+  },
+  errorGradient: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  errorIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+  },
+  errorTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: theme.colors.text,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   errorText: {
-    color: "white",
-    fontSize: 18,
-    fontWeight: "600",
-    marginBottom: 16,
-    textAlign: "center",
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 24,
+    lineHeight: 22,
   },
   errorButton: {
-    marginTop: 20,
-    padding: 12,
-    backgroundColor: "#22c55e",
-    borderRadius: 8,
-    minWidth: 120,
-    alignItems: "center",
+    width: '100%',
+    borderRadius: theme.borderRadius.lg,
+    overflow: 'hidden',
+  },
+  errorButtonGradient: {
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  errorButtonText: {
+    color: theme.colors.text,
+    fontSize: 17,
+    fontWeight: '700',
   },
 });
