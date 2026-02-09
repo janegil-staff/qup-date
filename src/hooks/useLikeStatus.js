@@ -34,7 +34,7 @@ export function useLikeStatus(profileId) {
         : [...prev, { _id: profileId }]
     );
 
-    await fetch(`http://localhost:3000${endpoint}`, {
+    await fetch(`http://qup.dating/${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

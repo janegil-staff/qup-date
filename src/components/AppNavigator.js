@@ -27,6 +27,7 @@ import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
 import LikesScreen from "../screens/LikesScreen";
 import TermsSafetyScreen from "../screens/TermsSafetyScreen";
 import SafetyGuidelinesScreen from "../screens/SafetyGuidelinesScreen";
+import ImageUploadTest from "./ImageUploadTest";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,9 +38,11 @@ function LikesStackNavigator() {
     <LikesStack.Navigator screenOptions={{ headerShown: false }}>
       <LikesStack.Screen name="LikesMain" component={LikesScreen} />
       <LikesStack.Screen name="UserProfile" component={UserProfileScreen} />
+      <LikesStack.Screen name="ChatScreen" component={ChatScreen} />
     </LikesStack.Navigator>
   );
 }
+
 function EditStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -105,7 +108,6 @@ function MainTabs() {
         tabBarStyle: { backgroundColor: "#111827" },
         tabBarActiveTintColor: "white",
         tabBarInactiveTintColor: "gray",
-        headerShown: false,
 
         tabBarIcon: ({ color, size }) => {
           switch (route.name) {
@@ -155,11 +157,7 @@ export default function AppNavigator() {
           />
 
           <Stack.Screen name="MainTabs" component={MainTabs} />
-
-          <Stack.Screen name="UserProfile" component={UserProfileScreen} />
-
-          <Stack.Screen name="ChatScreen" component={ChatScreen} />
-          <Stack.Screen name="MatchesHome" component={MatchesScreen} />
+        <Stack.Screen name="ImageUploadTest" component={ImageUploadTest} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

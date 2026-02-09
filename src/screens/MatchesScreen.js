@@ -14,7 +14,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import Screen from "../components/Screen";
 import UnreadBadge from "../components/UnreadBadge";
 
-export default function MatchesScreen({ navigation }) {
+export default function MatchesScreen({ route, navigation }) {
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reportedUsers, setReportedUsers] = useState([]);

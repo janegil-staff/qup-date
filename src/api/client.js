@@ -1,6 +1,6 @@
 import { refreshAccessToken } from "./auth";
 
-const API_URL = "https://loocalhost:3000/api";
+const API_URL = "https://qup.daing/api";
 
 export async function apiRequest(
   endpoint,
