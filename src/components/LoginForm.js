@@ -36,7 +36,7 @@ export default function LoginForm({ navigation }) {
         await SecureStore.setItemAsync("authToken", data.token);
         await SecureStore.setItemAsync("userId", data.user._id);
         await SecureStore.setItemAsync("userEmail", data.user.email);
-        navigation.navigate("MainTabs", { screen: "Edit" });
+        navigation.navigate("MainTabs", { screen: "Dashboard" });
       } else {
         Alert.alert("Login Failed", data.error || "Invalid credentials");
       }
