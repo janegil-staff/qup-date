@@ -2,6 +2,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Platform } from "react-native";
+import useNavigationBarColor from "../hooks/useNavigationBarColor";
 
 // Screens
 import LandingScreen from "../screens/LandingScreen";
@@ -82,6 +85,14 @@ function ProfileStack() {
       <Stack.Screen name="UserProfile" component={UserProfileScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
       <Stack.Screen name="EditImagesScreen" component={EditImagesScreen} />
+      <Stack.Screen name="EditBasic" component={EditBasicScreen} />
+      <Stack.Screen name="EditAppearance" component={EditAppearanceScreen} />
+      <Stack.Screen name="EditLifestyle" component={EditLifestyleScreen} />
+      <Stack.Screen name="EditDetails" component={EditDetailsScreen} />
+      <Stack.Screen name="EditHabits" component={EditHabitsScreen} />
+      <Stack.Screen name="EditImages" component={EditImagesScreen} />
+      <Stack.Screen name="Dashboard" component={DashboardScreen} />
+      <Stack.Screen name="Likes" component={LikesScreen} />
       <Stack.Screen
         name="SafetyGuidelines"
         component={SafetyGuidelinesScreen}
@@ -105,11 +116,44 @@ function MainTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarStyle: { backgroundColor: "#111827" },
-        tabBarActiveTintColor: "white",
-        tabBarInactiveTintColor: "gray",
+        
+        // Tab bar styling
+        tabBarStyle: {
+          position: 'absolute',
+          borderTopWidth: 0,
+          elevation: 0,
+          height: Platform.OS === 'ios' ? 88 : 70,
+          backgroundColor: 'transparent',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+        },
+        
+        // Tab bar background with gradient
+        tabBarBackground: () => (
+          <LinearGradient
+            colors={[
+              'rgba(26, 26, 46, 0.95)',
+              'rgba(22, 33, 62, 0.90)',
+            ]}
+            style={{ flex: 1 }}
+          />
+        ),
+        
+        // Label styling
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          marginBottom: Platform.OS === 'ios' ? 0 : 8,
+          letterSpacing: 0.5,
+        },
+        
+        // Colors
+        tabBarActiveTintColor: '#e94560',
+        tabBarInactiveTintColor: 'rgba(255,255,255,0.5)',
 
-        tabBarIcon: ({ color, size }) => {
+      tabBarIcon: ({ color, size }) => {
           switch (route.name) {
             case "Dashboard":
               return <FontAwesome name="home" size={size} color={color} />;
@@ -140,6 +184,9 @@ function MainTabs() {
 }
 
 export default function AppNavigator() {
+  // Set Android navigation bar color to match theme
+  useNavigationBarColor();
+  
   return (
     <SafeAreaProvider>
       <NavigationContainer>
@@ -157,7 +204,7 @@ export default function AppNavigator() {
           />
 
           <Stack.Screen name="MainTabs" component={MainTabs} />
-
+          
           {/* Removed ChatScreen from here - it's in each nested stack */}
           {/* Removed MatchesHome from here - it's in MatchesStack */}
         </Stack.Navigator>

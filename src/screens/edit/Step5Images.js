@@ -185,7 +185,7 @@ export default function Step5Images({ form, setForm, setField, navigation }) {
         [
           {
             text: "Let's Go!",
-            onPress: () => navigation.navigate("Dashboard"),
+            onPress: () => navigation.navigate("ProfileHome"),
           },
         ]
       );
