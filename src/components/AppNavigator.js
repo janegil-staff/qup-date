@@ -31,16 +31,13 @@ import EditHabitsScreen from "../screens/edit/EditHabitsScreen";
 import EditImagesScreen from "../screens/edit/EditImagesScreen";
 
 // Shared Screens
-import ChatScreen from "../screens/ChatScreen";
+import ChatScreen from "../screens/ChatScreen-Android";
 import UserProfileScreen from "../screens/UserProfileScreen";
 import SafetyGuidelinesScreen from "../screens/SafetyGuidelinesScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// ============================================================================
-// DASHBOARD TAB STACK
-// ============================================================================
 function DashboardStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -51,9 +48,7 @@ function DashboardStack() {
   );
 }
 
-// ============================================================================
-// MATCHES TAB STACK
-// ============================================================================
+     
 function MatchesStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -64,9 +59,6 @@ function MatchesStack() {
   );
 }
 
-// ============================================================================
-// DISCOVER TAB STACK
-// ============================================================================
 function DiscoverStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -77,9 +69,7 @@ function DiscoverStack() {
   );
 }
 
-// ============================================================================
-// LIKES TAB STACK
-// ============================================================================
+
 function LikesStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -90,9 +80,6 @@ function LikesStack() {
   );
 }
 
-// ============================================================================
-// EDIT TAB STACK - ALL PROFILE EDIT SCREENS
-// ============================================================================
 function EditStack() {
   return (
     <Stack.Navigator
@@ -109,9 +96,7 @@ function EditStack() {
   );
 }
 
-// ============================================================================
-// PROFILE TAB STACK
-// ============================================================================
+
 function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -128,9 +113,6 @@ function ProfileStack() {
   );
 }
 
-// ============================================================================
-// MAIN TABS NAVIGATOR
-// ============================================================================
 function MainTabs() {
   return (
     <Tab.Navigator
@@ -213,9 +195,7 @@ function MainTabs() {
   );
 }
 
-// ============================================================================
-// ROOT NAVIGATOR
-// ============================================================================
+
 export default function AppNavigator() {
   // Set Android navigation bar color to match theme
   useNavigationBarColor();

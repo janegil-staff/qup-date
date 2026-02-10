@@ -21,7 +21,6 @@ import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
 import DeleteProfileButton from "../components/DeleteProfileButton";
 import getAge from "../utils/getAge";
-import SafeBottomView from "../components/SafeBottomView";
 
 const { width, height } = Dimensions.get('window');
 
@@ -202,7 +201,11 @@ export default function ProfileScreen({ navigation }) {
           
           {/* About Me Glass Card */}
           {profile.bio && (
-            <GlassCard icon="💭" title="About Me">
+            <GlassCard 
+              icon="💭" 
+              title="About Me"
+              onEdit={() => navigation.navigate("Edit", { screen: "EditBasic" })}
+            >
               <Text style={styles.bioText}>{profile.bio}</Text>
             </GlassCard>
           )}
@@ -247,6 +250,7 @@ export default function ProfileScreen({ navigation }) {
           <InfoSection
             icon="✨"
             title="Appearance"
+            onEdit={() => navigation.navigate("Edit", { screen: "EditAppearance" })}
             items={[
               { key: "Style", value: capitalize(profile.appearance) },
               { key: "Build", value: capitalize(profile.bodyType) },
@@ -257,6 +261,7 @@ export default function ProfileScreen({ navigation }) {
           <InfoSection
             icon="🌱"
             title="Lifestyle"
+            onEdit={() => navigation.navigate("Edit", { screen: "EditLifestyle" })}
             items={[
               { key: "Smoking", value: capitalize(profile.smoking) },
               { key: "Drinking", value: capitalize(profile.drinking) },
@@ -269,6 +274,7 @@ export default function ProfileScreen({ navigation }) {
           <InfoSection
             icon="🎓"
             title="Background"
+            onEdit={() => navigation.navigate("Edit", { screen: "EditDetails" })}
             items={[
               { key: "Faith", value: capitalize(profile.religion) },
               { key: "Career", value: capitalize(profile.occupation) },
@@ -288,7 +294,11 @@ export default function ProfileScreen({ navigation }) {
 
           {/* Interests */}
           {profile.tags?.length > 0 && (
-            <GlassCard icon="💫" title="Interests">
+            <GlassCard 
+              icon="💫" 
+              title="Interests"
+              onEdit={() => navigation.navigate("Edit", { screen: "EditHabits" })}
+            >
               <View style={styles.interestsGrid}>
                 {profile.tags.map((tag, i) => (
                   <View key={i} style={styles.interestChip}>
@@ -353,13 +363,12 @@ export default function ProfileScreen({ navigation }) {
         visible={isCarouselVisible}
         onRequestClose={() => setCarouselVisible(false)}
       />
-       <SafeBottomView />
     </View>
   );
 }
 
 // Glass Card Component
-function GlassCard({ icon, title, badge, children }) {
+function GlassCard({ icon, title, badge, children, onEdit }) {
   return (
     <View style={styles.glassCard}>
       <LinearGradient
@@ -371,11 +380,28 @@ function GlassCard({ icon, title, badge, children }) {
             <Text style={styles.cardIcon}>{icon}</Text>
             <Text style={styles.cardTitle}>{title}</Text>
           </View>
-          {badge && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{badge}</Text>
-            </View>
-          )}
+          <View style={styles.cardHeaderRight}>
+            {badge && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{badge}</Text>
+              </View>
+            )}
+            {onEdit && (
+              <TouchableOpacity 
+                style={styles.editButton}
+                onPress={onEdit}
+                activeOpacity={0.7}
+              >
+                <LinearGradient
+                  colors={['rgba(233, 69, 96, 0.3)', 'rgba(255, 107, 157, 0.3)']}
+                  style={styles.editButtonGradient}
+                >
+                  <Text style={styles.editIcon}>✏️</Text>
+                  <Text style={styles.editText}>Edit</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
         <View style={styles.cardContent}>
           {children}
@@ -386,12 +412,12 @@ function GlassCard({ icon, title, badge, children }) {
 }
 
 // Info Section Component
-function InfoSection({ icon, title, items }) {
+function InfoSection({ icon, title, items, onEdit }) {
   const valid = items.filter((i) => i.value);
   if (valid.length === 0) return null;
 
   return (
-    <GlassCard icon={icon} title={title}>
+    <GlassCard icon={icon} title={title} onEdit={onEdit}>
       {valid.map((item, i) => (
         <View 
           key={i} 
@@ -568,6 +594,12 @@ const styles = StyleSheet.create({
   cardTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+  },
+  cardHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   cardIcon: {
     fontSize: 24,
@@ -643,6 +675,29 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     flex: 1,
     marginLeft: 16,
+  },
+
+  // Edit Button
+  editButton: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(233, 69, 96, 0.4)',
+  },
+  editButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    gap: 4,
+  },
+  editIcon: {
+    fontSize: 12,
+  },
+  editText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
   },
 
   // Interests
