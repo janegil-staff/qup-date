@@ -142,35 +142,35 @@ function ChatContent({ userId, user, navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       const parent = navigation.getParent();
-      
+
       if (parent) {
         parent.setOptions({
-          tabBarStyle: { display: 'none' }
+          tabBarStyle: { display: "none" },
         });
       }
-      
+
       // Show tab bar again when leaving
       return () => {
         if (parent) {
           parent.setOptions({
             tabBarStyle: {
-              display: 'flex',
-              position: 'absolute',
+              display: "flex",
+              position: "absolute",
               borderTopWidth: 0,
               elevation: 0,
               height: 85,
-              backgroundColor: 'transparent',
-              shadowColor: '#000',
+              backgroundColor: "transparent",
+              shadowColor: "#000",
               shadowOffset: { width: 0, height: -4 },
               shadowOpacity: 0.3,
               shadowRadius: 8,
               paddingBottom: 20, // Android spacing
               paddingTop: 8,
-            }
+            },
           });
         }
       };
-    }, [navigation])
+    }, [navigation]),
   );
 
   if (!currentUserId || userLoading || messagesLoading) {
@@ -187,8 +187,8 @@ function ChatContent({ userId, user, navigation }) {
   return (
     <GlassBackground>
       <StatusBar barStyle="light-content" />
-      
-      <SafeAreaView style={styles.container} edges={["top"]}>
+
+      <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
         <View style={styles.chatContainer}>
           <ChatHeader
             user={user}
@@ -266,34 +266,34 @@ const styles = StyleSheet.create({
   // Loading State
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
     color: theme.colors.textSecondary,
     marginTop: 16,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 
   // Error State
   errorContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   errorCard: {
-    width: '100%',
+    width: "100%",
     maxWidth: 350,
     borderRadius: theme.borderRadius.xl,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: theme.colors.glassBorder,
   },
   errorGradient: {
     padding: 32,
-    alignItems: 'center',
+    alignItems: "center",
   },
   errorIcon: {
     fontSize: 64,
@@ -301,30 +301,30 @@ const styles = StyleSheet.create({
   },
   errorTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: theme.colors.text,
     marginBottom: 8,
-    textAlign: 'center',
+    textAlign: "center",
   },
   errorText: {
     fontSize: 16,
     color: theme.colors.textSecondary,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
     lineHeight: 22,
   },
   errorButton: {
-    width: '100%',
+    width: "100%",
     borderRadius: theme.borderRadius.lg,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   errorButtonGradient: {
     paddingVertical: 14,
-    alignItems: 'center',
+    alignItems: "center",
   },
   errorButtonText: {
     color: theme.colors.text,
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 });
