@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   StyleSheet,
   StatusBar,
+  Platform,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
@@ -16,6 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import GlassBackground from "../components/GlassBackground";
 import VerifiedBadge from "../components/VerifiedBadge";
 import UnreadBadge from "../components/UnreadBadge";
+import SafeBottomView from "../components/SafeBottomView";
 import theme from "../theme";
 
 export default function MatchesScreen({ route, navigation }) {
@@ -171,6 +173,8 @@ export default function MatchesScreen({ route, navigation }) {
     </View>
   );
 
+  const renderFooter = () => <SafeBottomView />;
+
   if (loading) {
     return (
       <GlassBackground>
@@ -235,6 +239,7 @@ export default function MatchesScreen({ route, navigation }) {
             numColumns={2}
             columnWrapperStyle={styles.columnWrapper}
             contentContainerStyle={styles.listContent}
+            ListFooterComponent={renderFooter}
             showsVerticalScrollIndicator={false}
           />
         )}
@@ -281,7 +286,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   listContent: {
-    paddingBottom: 100,
+    paddingBottom: 16, // Small padding, SafeBottomView handles the rest
   },
 
   // Card

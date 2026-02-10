@@ -29,6 +29,7 @@ import EditLifestyleScreen from "../screens/edit/EditLifestyleScreen";
 import EditDetailsScreen from "../screens/edit/EditDetailsScreen";
 import EditHabitsScreen from "../screens/edit/EditHabitsScreen";
 import EditImagesScreen from "../screens/edit/EditImagesScreen";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Shared Screens
 import ChatScreen from "../screens/ChatScreen-Android";
@@ -48,7 +49,6 @@ function DashboardStack() {
   );
 }
 
-     
 function MatchesStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -68,7 +68,6 @@ function DiscoverStack() {
     </Stack.Navigator>
   );
 }
-
 
 function LikesStack() {
   return (
@@ -92,16 +91,16 @@ function EditStack() {
       <Stack.Screen name="EditDetails" component={EditDetailsScreen} />
       <Stack.Screen name="EditHabits" component={EditHabitsScreen} />
       <Stack.Screen name="EditImages" component={EditImagesScreen} />
+      <Stack.Screen name="ProfileHome" component={ProfileScreen} />
     </Stack.Navigator>
   );
 }
 
-
 function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="EditImages" component={EditImagesScreen} />
       <Stack.Screen name="ProfileHome" component={ProfileScreen} />
+      <Stack.Screen name="EditImages" component={EditImagesScreen} />
       <Stack.Screen name="UserProfile" component={UserProfileScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
 
@@ -114,6 +113,12 @@ function ProfileStack() {
 }
 
 function MainTabs() {
+  const insets = useSafeAreaInsets();
+
+  // Calculate dynamic tab bar height based on device safe area
+  const tabBarHeight =
+    Platform.OS === "ios" ? 88 : 50 + Math.max(insets.bottom, 20); // Base 85px + system bar height (min 20px)
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -124,14 +129,16 @@ function MainTabs() {
           position: "absolute",
           borderTopWidth: 0,
           elevation: 0,
-          height: Platform.OS === "ios" ? 88 : 85, // Increased height for Android
+          height: tabBarHeight, // Dynamic height
           backgroundColor: "transparent",
           shadowColor: "#000",
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
-          paddingBottom: Platform.OS === "android" ? 20 : 0, // More spacing from system bar
-          paddingTop: Platform.OS === "android" ? 8 : 0, // Additional top padding
+          // Use actual inset with minimum fallback
+          paddingBottom:
+            Platform.OS === "android" ? Math.max(insets.bottom, 20) : 0,
+          paddingTop: Platform.OS === "android" ? 8 : 0,
         },
 
         // Glassmorphic Background
@@ -195,7 +202,6 @@ function MainTabs() {
   );
 }
 
-
 export default function AppNavigator() {
   // Set Android navigation bar color to match theme
   useNavigationBarColor();
@@ -217,6 +223,8 @@ export default function AppNavigator() {
             component={ForgotPasswordScreen}
           />
 
+          <Stack.Screen name="ProfileHome" component={ProfileScreen} />
+          <Stack.Screen name="EditImages" component={EditImagesScreen} />
           {/* Main App */}
           <Stack.Screen name="MainTabs" component={MainTabs} />
         </Stack.Navigator>
