@@ -33,7 +33,7 @@ const slides = [
     id: '2',
     icon: 'shield-checkmark-outline',
     title: 'Verified Profiles',
-    description: 'Every member is verified with LinkedIn. Real professionals, real connections.',
+    description: 'Every member can verify with LinkedIn. Real professionals, real connections.',
   },
   {
     id: '3',

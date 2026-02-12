@@ -189,9 +189,21 @@ export default function LandingScreen({ navigation }) {
         >
           <Text style={styles.statsTitle}>Growing Every Day</Text>
           <View style={styles.statsRow}>
-<StatItem number={`${stats.totalUsers}`} label="Professionals" icon="people" />
-<StatItem number={`${stats.verifiedPercent}%`} label="LinkedIn Verified" icon="logo-linkedin" />
-<StatItem number={`${stats.linkedinVerified}`} label="Verified Profiles" icon="shield-checkmark" />
+            <StatItem
+              number={`${stats.totalUsers}`}
+              label="Professionals"
+              icon="people"
+            />
+            <StatItem
+              number={`${stats.verifiedPercent}%`}
+              label="LinkedIn Verified"
+              icon="logo-linkedin"
+            />
+            <StatItem
+              number={`${stats.linkedinVerified}`}
+              label="Verified Profiles"
+              icon="shield-checkmark"
+            />
           </View>
         </LinearGradient>
       </View>
@@ -235,7 +247,7 @@ export default function LandingScreen({ navigation }) {
             Ready to Meet Someone{"\n"}Who Gets It?
           </Text>
           <Text style={styles.finalCTASubtitle}>
-            Join thousands of verified professionals on QUP
+            Be among the first tousand of verified professionals on QUP
           </Text>
           <TouchableOpacity
             style={styles.finalCTAButton}
