@@ -37,6 +37,8 @@ import UserProfileScreen from "../screens/UserProfileScreen";
 import SafetyGuidelinesScreen from "../screens/SafetyGuidelinesScreen";
 import ProfessionalOnboarding from "../screens/ProfessionalOnboarding";
 import LinkedInVerifyScreen from "../screens/LinkedInVerifyScreen";
+import EditCareerScreen from "../screens/edit/EditCareerScreen";
+import EditPreferencesScreen from "../screens/edit/EditPreferencesScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -88,10 +90,12 @@ function EditStack() {
       initialRouteName="EditBasic"
     >
       <Stack.Screen name="EditBasic" component={EditBasicScreen} />
+      <Stack.Screen name="EditCareer" component={EditCareerScreen} />
       <Stack.Screen name="EditAppearance" component={EditAppearanceScreen} />
       <Stack.Screen name="EditLifestyle" component={EditLifestyleScreen} />
       <Stack.Screen name="EditDetails" component={EditDetailsScreen} />
       <Stack.Screen name="EditHabits" component={EditHabitsScreen} />
+      <Stack.Screen name="EditPreferences" component={EditPreferencesScreen} />
       <Stack.Screen name="EditImages" component={EditImagesScreen} />
       <Stack.Screen name="ProfileHome" component={ProfileScreen} />
     </Stack.Navigator>

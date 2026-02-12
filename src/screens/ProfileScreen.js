@@ -297,7 +297,7 @@ export default function ProfileScreen({ navigation }) {
             icon="🎓"
             title="Background"
             onEdit={() =>
-              navigation.navigate("Edit", { screen: "EditDetails" })
+              navigation.navigate("Edit", { screen: "EditCareer" })
             }
             items={[
               { key: "Faith", value: capitalize(profile.religion) },

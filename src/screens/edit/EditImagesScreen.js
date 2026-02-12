@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import GlassBackground from "../../components/GlassBackground";
-import Step5Images from "./Step5Images";
+import Step7Images from "./Step7Images";
 import SafeBottomView from "../../components/SafeBottomView";
 
 export default function ({ navigation }) {
@@ -14,7 +14,7 @@ export default function ({ navigation }) {
 
   return (
     <GlassBackground>
-      <Step5Images
+      <Step7Images
         form={form}
         setForm={setForm}
         setField={setField}

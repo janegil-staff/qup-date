@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import GlassBackground from "../../components/GlassBackground";
-import Step2Lifestyle from "./Step2Lifestyle";
+import Step3Lifestyle from "./Step3Lifestyle";
 import SafeBottomView from "../../components/SafeBottomView";
 
 export default function EditLifestyleScreen({ navigation }) {
@@ -17,7 +17,7 @@ export default function EditLifestyleScreen({ navigation }) {
 
   return (
     <GlassBackground>
-      <Step2Lifestyle
+      <Step3Lifestyle
         form={form}
         setForm={setForm}
         setField={setField}

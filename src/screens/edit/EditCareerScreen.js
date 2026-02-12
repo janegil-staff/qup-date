@@ -1,16 +1,14 @@
 import React, { useState } from "react";
+import Step1Career from "./Step1Career";
 import GlassBackground from "../../components/GlassBackground";
-import Step5Location from "./Step5Location";
 import SafeBottomView from "../../components/SafeBottomView";
 
-export default function EditHabitsScreen({ navigation }) {
+export default function EditCareerScreen({ navigation }) {
   const [form, setForm] = useState({
-    location: null,
-    searchScope: "worldwide",
-    willingToRelocate: false,
-    tags: [],
-    preferredAgeMin: 18,
-    preferredAgeMax: 90,
+    occupation: "",
+    company: "",
+    industry: "",
+    education: "",
   });
 
   const setField = (field, value) => {
@@ -19,7 +17,7 @@ export default function EditHabitsScreen({ navigation }) {
 
   return (
     <GlassBackground>
-      <Step5Location
+      <Step1Career
         form={form}
         setForm={setForm}
         setField={setField}

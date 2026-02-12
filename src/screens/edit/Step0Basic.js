@@ -33,7 +33,6 @@ export default function Step0Basic({ form, setForm, setField, navigation }) {
         setField("name", data.user.name || "");
         setField("birthdate", data.user.birthdate || "");
         setField("gender", data.user.gender || "");
-        setField("occupation", data.user.occupation || "");
         setField("bio", data.user.bio || "");
       } catch (err) {
         console.error("Failed to load profile", err);
@@ -56,7 +55,7 @@ export default function Step0Basic({ form, setForm, setField, navigation }) {
         body: JSON.stringify(form),
       });
       // Navigate to next step
-      navigation.navigate("EditAppearance", {
+      navigation.navigate("EditCareer", {
         form,
         setForm,
         setField,
@@ -189,25 +188,6 @@ export default function Step0Basic({ form, setForm, setField, navigation }) {
                   </LinearGradient>
                 </TouchableOpacity>
               ))}
-            </View>
-          </View>
-
-          {/* Occupation Field */}
-          <View style={styles.field}>
-            <Text style={styles.label}>Occupation</Text>
-            <View style={styles.inputContainer}>
-              <LinearGradient
-                colors={['rgba(255,255,255,0.05)', 'rgba(255,255,255,0.02)']}
-                style={styles.inputGradient}
-              >
-                <TextInput
-                  value={form?.occupation ?? ""}
-                  onChangeText={(val) => setField("occupation", val)}
-                  style={styles.input}
-                  placeholder="Your occupation"
-                  placeholderTextColor={theme.colors.textDim}
-                />
-              </LinearGradient>
             </View>
           </View>
 

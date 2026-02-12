@@ -7,26 +7,29 @@ import {
   StyleSheet,
 } from "react-native";
 import Step0Basic from "./Step0Basic";
-import Step1Appearance from "./Step1Appearance";
-import Step2Lifestyle from "./Step2Lifestyle";
-import Step3Habits from "./Step3Habits";
-import Step4Bio from "./Step4Bio";
-import Step5Images from "./Step5Images";
+import Step1Career from "./Step1Career";
+import Step2Appearance from "./Step2Appearance";
+import Step3Lifestyle from "./Step3Lifestyle";
+import Step4Habits from "./Step3Habits";
+import Step5Bio from "./Step4Bio";
+import Step6Images from "./Step7Images";
 import { useToast } from "../components/ToastProvider";
 
 export default function EditProfileNavigator() {
   const { showToast } = useToast();
 
   const [step, setStep] = useState(0);
-  const totalSteps = 6;
+  const totalSteps = 7;
   const [loading, setLoading] = useState(true);
 
-  // Safe default form object
   const [form, setForm] = useState({
     name: "",
     birthdate: "",
     gender: "",
     occupation: "",
+    company: "",
+    industry: "",
+    education: "",
     appearance: "",
     lifestyle: "",
     habits: "",
@@ -34,7 +37,6 @@ export default function EditProfileNavigator() {
     images: [],
   });
 
-  // Fetch profile data
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -93,13 +95,24 @@ export default function EditProfileNavigator() {
     );
   }
 
+  const stepLabels = [
+    "Basic Info",
+    "Career",
+    "Appearance",
+    "Lifestyle",
+    "Habits",
+    "Bio",
+    "Photos",
+  ];
+
   const steps = [
     <Step0Basic form={form} setField={setField} />,
-    <Step1Appearance form={form} setField={setField} />,
-    <Step2Lifestyle form={form} setField={setField} />,
-    <Step3Habits form={form} setField={setField} />,
-    <Step4Bio form={form} setField={setField} />,
-    <Step5Images form={form} setField={setField} />,
+    <Step1Career form={form} setField={setField} />,
+    <Step2Appearance form={form} setField={setField} />,
+    <Step3Lifestyle form={form} setField={setField} />,
+    <Step4Habits form={form} setField={setField} />,
+    <Step5Bio form={form} setField={setField} />,
+    <Step6Images form={form} setField={setField} />,
   ];
 
   return (
@@ -114,7 +127,7 @@ export default function EditProfileNavigator() {
         />
       </View>
       <Text style={styles.progressText}>
-        Step {step + 1} of {totalSteps}
+        {stepLabels[step]} — Step {step + 1} of {totalSteps}
       </Text>
 
       {/* Step content */}

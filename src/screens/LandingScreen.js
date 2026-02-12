@@ -8,8 +8,21 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
+import { useState, useEffect } from "react";
 
 export default function LandingScreen({ navigation }) {
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    linkedinVerified: 0,
+    verifiedPercent: 0,
+  });
+
+  useEffect(() => {
+    fetch("https://qup.dating/api/mobile/public-stats")
+      .then((res) => res.json())
+      .then((data) => setStats(data))
+      .catch(() => {});
+  }, []);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* HERO SECTION */}
@@ -29,7 +42,9 @@ export default function LandingScreen({ navigation }) {
           </View>
 
           <Text style={styles.title}>QUP</Text>
-          <Text style={styles.tagline}>Swipe with confidence.{"\n"}Date with ambition.</Text>
+          <Text style={styles.tagline}>
+            Swipe with confidence.{"\n"}Date with ambition.
+          </Text>
 
           {/* Trust Badges */}
           <View style={styles.trustRow}>
@@ -109,14 +124,28 @@ export default function LandingScreen({ navigation }) {
           <FontAwesome name="linkedin-square" size={48} color="#fff" />
           <Text style={styles.linkedinTitle}>LinkedIn Verified Profiles</Text>
           <Text style={styles.linkedinDescription}>
-            Every user can verify their identity through LinkedIn. No catfishing, no fake profiles — just real professionals looking for real connections.
+            Every user can verify their identity through LinkedIn. No
+            catfishing, no fake profiles — just real professionals looking for
+            real connections.
           </Text>
 
           <View style={styles.linkedinFeatures}>
-            <LinkedInFeature icon="checkmark-circle" text="Confirms real identity" />
-            <LinkedInFeature icon="checkmark-circle" text="Proves professional background" />
-            <LinkedInFeature icon="checkmark-circle" text="Verified badge on your profile" />
-            <LinkedInFeature icon="checkmark-circle" text="Builds trust with matches" />
+            <LinkedInFeature
+              icon="checkmark-circle"
+              text="Confirms real identity"
+            />
+            <LinkedInFeature
+              icon="checkmark-circle"
+              text="Proves professional background"
+            />
+            <LinkedInFeature
+              icon="checkmark-circle"
+              text="Verified badge on your profile"
+            />
+            <LinkedInFeature
+              icon="checkmark-circle"
+              text="Builds trust with matches"
+            />
           </View>
         </LinearGradient>
       </View>
@@ -160,9 +189,9 @@ export default function LandingScreen({ navigation }) {
         >
           <Text style={styles.statsTitle}>Growing Every Day</Text>
           <View style={styles.statsRow}>
-            <StatItem number="2,500+" label="Professionals" icon="people" />
-            <StatItem number="78%" label="Verified" icon="shield-checkmark" />
-            <StatItem number="1,200+" label="Matches Made" icon="heart" />
+<StatItem number={`${stats.totalUsers}`} label="Professionals" icon="people" />
+<StatItem number={`${stats.verifiedPercent}%`} label="LinkedIn Verified" icon="logo-linkedin" />
+<StatItem number={`${stats.linkedinVerified}`} label="Verified Profiles" icon="shield-checkmark" />
           </View>
         </LinearGradient>
       </View>
@@ -223,7 +252,9 @@ export default function LandingScreen({ navigation }) {
             </LinearGradient>
           </TouchableOpacity>
 
-          <Text style={styles.finalCTANote}>Free to join. No credit card required.</Text>
+          <Text style={styles.finalCTANote}>
+            Free to join. No credit card required.
+          </Text>
         </LinearGradient>
       </View>
 
@@ -291,7 +322,12 @@ function FeatureCard({ icon, title, description }) {
 function StatItem({ number, label, icon }) {
   return (
     <View style={styles.statItem}>
-      <Ionicons name={icon} size={24} color="#e94560" style={{ marginBottom: 8 }} />
+      <Ionicons
+        name={icon}
+        size={24}
+        color="#e94560"
+        style={{ marginBottom: 8 }}
+      />
       <Text style={styles.statNumber}>{number}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>

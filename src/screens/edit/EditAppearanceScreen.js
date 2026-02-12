@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View } from "react-native";
 import GlassBackground from "../../components/GlassBackground";
-import Step1Appearance from "./Step1Appearance";
+import Step2Appearance from "./Step2Appearance";
 import SafeBottomView from "../../components/SafeBottomView";
 
 export default function EditAppearanceScreen({ navigation }) {
@@ -17,7 +17,7 @@ export default function EditAppearanceScreen({ navigation }) {
 
   return (
     <GlassBackground>
-      <Step1Appearance
+      <Step2Appearance
         form={form}
         setForm={setForm}
         setField={setField}
