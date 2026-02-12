@@ -35,6 +35,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ChatScreen from "../screens/ChatScreen-Android";
 import UserProfileScreen from "../screens/UserProfileScreen";
 import SafetyGuidelinesScreen from "../screens/SafetyGuidelinesScreen";
+import ProfessionalOnboarding from "../screens/ProfessionalOnboarding";
+import LinkedInVerifyScreen from "../screens/LinkedInVerifyScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -215,6 +217,10 @@ export default function AppNavigator() {
         >
           {/* Auth Flow */}
           <Stack.Screen name="TermsSafety" component={TermsSafetyScreen} />
+          <Stack.Screen
+            name="ProfessionalOnboarding"
+            component={ProfessionalOnboarding}
+          />
           <Stack.Screen name="LandingScreen" component={LandingScreen} />
           <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
           <Stack.Screen name="LoginForm" component={LoginForm} />
@@ -222,7 +228,10 @@ export default function AppNavigator() {
             name="ForgotPasswordScreen"
             component={ForgotPasswordScreen}
           />
-
+          <Stack.Screen
+            name="LinkedInVerify"
+            component={LinkedInVerifyScreen}
+          />
           <Stack.Screen name="ProfileHome" component={ProfileScreen} />
           <Stack.Screen name="EditImages" component={EditImagesScreen} />
           {/* Main App */}

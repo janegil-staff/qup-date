@@ -2,7 +2,8 @@
   "expo": {
     "name": "QupDatingMobile",
     "slug": "QupDatingMobile",
-    "version": "4.1.89",
+    "version": "4.2.2",
+    "scheme": "qupdating",
     "orientation": "default",
     "icon": "./assets/qup-logo.png",
     "userInterfaceStyle": "light",
@@ -22,7 +23,7 @@
     },
     "android": {
       "softwareKeyboardLayoutMode": "pan",
-      "versionCode": 95,
+      "versionCode": 99,
       "package": "dating.qup",
       "permissions": [
         "ACCESS_FINE_LOCATION",
@@ -39,7 +40,8 @@
     },
     "plugins": [
       "expo-secure-store",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

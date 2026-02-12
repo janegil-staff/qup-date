@@ -1,6 +1,12 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import * as SecureStore from "expo-secure-store";
 
 export default function LikesCard({
@@ -38,7 +44,7 @@ export default function LikesCard({
       const token = await SecureStore.getItemAsync("authToken");
 
       const res = await fetch(
-        "https:qup.dating/api/mobile/dislike/remove",
+        "https://qup.dating/api/mobile/dislike/remove",
         {
           method: "POST",
           headers: {
@@ -76,7 +82,23 @@ export default function LikesCard({
       <TouchableOpacity
         onPress={() => navigation.navigate("UserProfile", { userId: user._id })}
       >
-        <Image source={{ uri: (user.profileImage ? user.profileImage : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png") }} style={styles.image} />
+        <View style={{ position: "relative" }}>
+          <Image
+            source={{
+              uri: user.profileImage
+                ? user.profileImage
+                : "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
+            }}
+            style={styles.image}
+          />
+          {/* LinkedIn Badge on image */}
+          {user.linkedin?.isVerified && (
+            <View style={styles.linkedinBadge}>
+              <FontAwesome name="linkedin-square" size={12} color="#fff" />
+              <Text style={styles.linkedinText}>Verified</Text>
+            </View>
+          )}
+        </View>
         <Text style={styles.name}>{user.name}</Text>
         {user.bio ? <Text style={styles.bio}>{user.bio}</Text> : null}
       </TouchableOpacity>
@@ -114,6 +136,23 @@ const styles = StyleSheet.create({
     height: 180,
     borderRadius: 10,
     marginBottom: 10,
+  },
+  linkedinBadge: {
+    position: "absolute",
+    bottom: 18,
+    left: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(10, 102, 194, 0.9)",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    gap: 4,
+  },
+  linkedinText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "700",
   },
   name: {
     color: "#fff",

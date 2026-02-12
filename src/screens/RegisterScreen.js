@@ -10,12 +10,38 @@ import {
   Image,
   Platform,
   Alert,
+  Modal,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import * as ImagePicker from "expo-image-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
 
 import Screen from "../components/Screen";
+
+const INDUSTRIES = [
+  'Technology',
+  'Finance',
+  'Healthcare',
+  'Education',
+  'Marketing',
+  'Sales',
+  'Engineering',
+  'Law',
+  'Consulting',
+  'Real Estate',
+  'Media',
+  'Other',
+];
+
+const EDUCATION_LEVELS = [
+  'High School',
+  'Bachelor\'s Degree',
+  'Master\'s Degree',
+  'MBA',
+  'PhD',
+  'Professional Degree (MD, JD, etc)',
+];
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState("");
@@ -27,10 +53,19 @@ export default function RegisterScreen({ navigation }) {
   );
   const [birthMonth, setBirthMonth] = useState(
     String(currentDate.getMonth() + 1),
-  ); // months are 0-based
+  );
   const [birthDay, setBirthDay] = useState(String(currentDate.getDate()));
   const [birthdate, setBirthdate] = useState(new Date());
   const [gender, setGender] = useState("");
+  
+  // ⭐ NEW PROFESSIONAL FIELDS
+  const [jobTitle, setJobTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [educationLevel, setEducationLevel] = useState("");
+  const [showIndustryPicker, setShowIndustryPicker] = useState(false);
+  const [showEducationPicker, setShowEducationPicker] = useState(false);
+  
   const [images, setImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -45,6 +80,10 @@ export default function RegisterScreen({ navigation }) {
     emailRegex.test(email) &&
     password.trim() &&
     gender.trim() &&
+    jobTitle.trim() &&
+    company.trim() &&
+    industry.trim() &&
+    educationLevel.trim() &&
     birthdate;
 
   const validateForm = () => {
@@ -55,10 +94,16 @@ export default function RegisterScreen({ navigation }) {
     if (!password) errors.password = "Password is required";
     if (!gender) errors.gender = "Please select a gender";
     if (!birthdate) errors.birthdate = "Complete birthdate is required";
+    
+    // ⭐ PROFESSIONAL VALIDATIONS
+    if (!jobTitle) errors.jobTitle = "Job title is required";
+    if (!company) errors.company = "Company is required";
+    if (!industry) errors.industry = "Industry is required";
+    if (!educationLevel) errors.educationLevel = "Education level is required";
+    
     return errors;
   };
 
-  // ✅ Pick image from gallery
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -69,18 +114,15 @@ export default function RegisterScreen({ navigation }) {
     }
   };
 
-  // ✅ Remove image
   const removeImage = (index) => {
     setImages(images.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async () => {
-    // Clear old token so iPhone doesn't reuse previous session
-    //  await SecureStore.deleteItemAsync("authToken");
-
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
+      Alert.alert('Missing Information', 'Please fill in all required professional fields');
       return;
     }
     if (!agreed) {
@@ -93,7 +135,6 @@ export default function RegisterScreen({ navigation }) {
     try {
       let uploadedImages = [];
 
-      // 🔹 Only upload images if user selected any
       if (images.length > 0) {
         const formData = new FormData();
         images.forEach((img, i) => {
@@ -123,7 +164,7 @@ export default function RegisterScreen({ navigation }) {
         uploadedImages = uploadData.images || [];
       }
 
-      // 🔹 Register user (always send array)
+      // ⭐ REGISTER WITH PROFESSIONAL FIELDS
       const res = await fetch("https://qup.dating/api/mobile/register", {
         method: "POST",
         headers: {
@@ -135,6 +176,10 @@ export default function RegisterScreen({ navigation }) {
           password,
           birthdate: birthdate.toISOString(),
           gender,
+          jobTitle,        // ⭐ NEW
+          company,         // ⭐ NEW
+          industry,        // ⭐ NEW
+          educationLevel,  // ⭐ NEW
           images: uploadedImages || [],
         }),
       });
@@ -156,10 +201,7 @@ export default function RegisterScreen({ navigation }) {
         return;
       }
 
-      // 🔹 Backend does NOT return token → do NOT auto-login
       alert("Register success, you can log in to your profile.");
-
-      // Force user to login manually (prevents wrong user session)
       navigation.navigate("LoginForm");
     } catch (err) {
       console.error("Registration failed:", err);
@@ -169,12 +211,11 @@ export default function RegisterScreen({ navigation }) {
     }
   };
 
-  const hasErrors = Object.keys(errors).length > 0;
-
   return (
     <Screen style={{ backgroundColor: "#111827" }}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.heading}>Create Profile</Text>
+        <Text style={styles.heading}>Create Professional Profile</Text>
+        <Text style={styles.subtitle}>Join Norway's premier dating platform for professionals</Text>
 
         {/* Name */}
         <TextInput
@@ -184,7 +225,8 @@ export default function RegisterScreen({ navigation }) {
           value={name}
           onChangeText={setName}
         />
-        {errors.email && <Text style={styles.errorText}>{errors.name}</Text>}
+        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+
         {/* Email */}
         <TextInput
           style={styles.input}
@@ -195,6 +237,7 @@ export default function RegisterScreen({ navigation }) {
           keyboardType="email-address"
         />
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+
         {/* Password */}
         <TextInput
           style={styles.input}
@@ -204,11 +247,10 @@ export default function RegisterScreen({ navigation }) {
           onChangeText={setPassword}
           secureTextEntry
         />
-        {errors.email && (
-          <Text style={styles.errorText}>{errors.password}</Text>
-        )}
-        <Text style={styles.birthdate}>Birthdate</Text>
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
 
+        {/* Birthdate */}
+        <Text style={styles.birthdate}>Birthdate</Text>
         <TouchableOpacity
           style={styles.dateButton}
           onPress={() => setShowDatePicker(true)}
@@ -247,12 +289,79 @@ export default function RegisterScreen({ navigation }) {
         </View>
         {errors.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
 
+        {/* ⭐ PROFESSIONAL SECTION */}
+        <View style={styles.professionalSection}>
+          <View style={styles.sectionHeader}>
+            <Ionicons name="briefcase" size={24} color="#ff69b4" />
+            <Text style={styles.sectionTitle}>Professional Information</Text>
+          </View>
+
+          {/* Job Title */}
+          <View style={styles.inputWithIcon}>
+            <Ionicons name="briefcase-outline" size={20} color="#6b7280" style={styles.inputIcon} />
+            <TextInput
+              style={[styles.input, styles.inputWithPadding]}
+              placeholder="Job Title (e.g. Senior Software Engineer)"
+              placeholderTextColor="#6b7280"
+              value={jobTitle}
+              onChangeText={setJobTitle}
+            />
+          </View>
+          {errors.jobTitle && <Text style={styles.errorText}>{errors.jobTitle}</Text>}
+
+          {/* Company */}
+          <View style={styles.inputWithIcon}>
+            <Ionicons name="business-outline" size={20} color="#6b7280" style={styles.inputIcon} />
+            <TextInput
+              style={[styles.input, styles.inputWithPadding]}
+              placeholder="Company (e.g. Google, Microsoft)"
+              placeholderTextColor="#6b7280"
+              value={company}
+              onChangeText={setCompany}
+            />
+          </View>
+          {errors.company && <Text style={styles.errorText}>{errors.company}</Text>}
+
+          {/* Industry Picker */}
+          <TouchableOpacity
+            style={styles.selectButton}
+            onPress={() => setShowIndustryPicker(true)}
+          >
+            <Ionicons name="globe-outline" size={20} color="#6b7280" />
+            <Text style={[styles.selectText, !industry && styles.placeholder]}>
+              {industry || 'Select Industry'}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color="#6b7280" />
+          </TouchableOpacity>
+          {errors.industry && <Text style={styles.errorText}>{errors.industry}</Text>}
+
+          {/* Education Picker */}
+          <TouchableOpacity
+            style={styles.selectButton}
+            onPress={() => setShowEducationPicker(true)}
+          >
+            <Ionicons name="school-outline" size={20} color="#6b7280" />
+            <Text style={[styles.selectText, !educationLevel && styles.placeholder]}>
+              {educationLevel || 'Select Education Level'}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color="#6b7280" />
+          </TouchableOpacity>
+          {errors.educationLevel && <Text style={styles.errorText}>{errors.educationLevel}</Text>}
+
+          {/* Verification Info */}
+          <View style={styles.verificationInfo}>
+            <Ionicons name="shield-checkmark" size={20} color="#ff69b4" />
+            <Text style={styles.verificationText}>
+              We verify all professional information to ensure quality matches
+            </Text>
+          </View>
+        </View>
+
         {/* Image uploader */}
         <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
           <Text style={styles.buttonText}>Pick Image</Text>
         </TouchableOpacity>
 
-        {/* ✅ Preview with remove option */}
         <View style={styles.previewRow}>
           {images.map((img, i) => (
             <View key={i} style={styles.previewWrapper}>
@@ -268,8 +377,7 @@ export default function RegisterScreen({ navigation }) {
         </View>
 
         {/* Terms Agreement */}
-        <View style={{ marginVertical
-          : 20 }}>
+        <View style={{ marginVertical: 20 }}>
           <TouchableOpacity
             style={{ flexDirection: "row", alignItems: "center" }}
             onPress={() => setAgreed(!agreed)}
@@ -300,8 +408,7 @@ export default function RegisterScreen({ navigation }) {
               >
                 Privacy Policy
               </Text>
-              . Qup Dating has zero tolerance for abusive or inappropriate
-              content.
+              . QUP Professional is for serious, career-focused dating only.
             </Text>
           </TouchableOpacity>
 
@@ -311,19 +418,20 @@ export default function RegisterScreen({ navigation }) {
             </Text>
           )}
         </View>
+
         {/* Submit */}
         <TouchableOpacity
           style={[
             styles.submitButton,
             !isFormValid && styles.submitButtonDisabled,
           ]}
-          disabled={isLoading}
+          disabled={isLoading || !isFormValid}
           onPress={handleSubmit}
         >
           {isLoading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Submit</Text>
+            <Text style={styles.buttonText}>Create Professional Profile</Text>
           )}
         </TouchableOpacity>
 
@@ -337,11 +445,209 @@ export default function RegisterScreen({ navigation }) {
           </Text>
         </Text>
       </ScrollView>
+
+      {/* Industry Picker Modal */}
+      <Modal
+        visible={showIndustryPicker}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowIndustryPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Industry</Text>
+              <TouchableOpacity onPress={() => setShowIndustryPicker(false)}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {INDUSTRIES.map((item) => (
+                <TouchableOpacity
+                  key={item}
+                  style={styles.option}
+                  onPress={() => {
+                    setIndustry(item);
+                    setShowIndustryPicker(false);
+                  }}
+                >
+                  <Text style={styles.optionText}>{item}</Text>
+                  {industry === item && (
+                    <Ionicons name="checkmark" size={24} color="#ff69b4" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Education Picker Modal */}
+      <Modal
+        visible={showEducationPicker}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowEducationPicker(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Education Level</Text>
+              <TouchableOpacity onPress={() => setShowEducationPicker(false)}>
+                <Ionicons name="close" size={24} color="#fff" />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {EDUCATION_LEVELS.map((item) => (
+                <TouchableOpacity
+                  key={item}
+                  style={styles.option}
+                  onPress={() => {
+                    setEducationLevel(item);
+                    setShowEducationPicker(false);
+                  }}
+                >
+                  <Text style={styles.optionText}>{item}</Text>
+                  {educationLevel === item && (
+                    <Ionicons name="checkmark" size={24} color="#ff69b4" />
+                  )}
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    backgroundColor: "#111827",
+    padding: 20,
+    paddingBottom: 80,
+  },
+  heading: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#ff69b4",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: "#9ca3af",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  
+  // Professional Section
+  professionalSection: {
+    backgroundColor: 'rgba(31, 41, 55, 0.5)',
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 20,
+    borderWidth: 1,
+    borderColor: '#374151',
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#fff',
+    marginLeft: 8,
+  },
+  inputWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: "#1f2937",
+    borderRadius: 8,
+    marginBottom: 15,
+    paddingHorizontal: 12,
+  },
+  inputIcon: {
+    marginRight: 8,
+  },
+  inputWithPadding: {
+    flex: 1,
+    paddingLeft: 0,
+  },
+  selectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: "#1f2937",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 15,
+  },
+  selectText: {
+    flex: 1,
+    color: 'white',
+    fontSize: 16,
+    marginLeft: 12,
+  },
+  placeholder: {
+    color: '#6b7280',
+  },
+  verificationInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 105, 180, 0.1)',
+    borderRadius: 8,
+    padding: 12,
+    marginTop: 8,
+  },
+  verificationText: {
+    flex: 1,
+    color: '#d1d5db',
+    fontSize: 12,
+    marginLeft: 8,
+    lineHeight: 18,
+  },
+
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#1f2937',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    maxHeight: '70%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  option: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#374151',
+  },
+  optionText: {
+    fontSize: 16,
+    color: '#fff',
+  },
+
+  // Existing styles...
   dateButton: {
     backgroundColor: "#1f2937",
     padding: 14,
@@ -352,9 +658,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
   },
-
   errorText: {
-    color: "#f87171", // red
+    color: "#f87171",
     fontSize: 12,
     marginBottom: 10,
   },
@@ -369,61 +674,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   submitButtonDisabled: {
-    backgroundColor: "#9ca3af", // ✅ greyed out when disabled
+    backgroundColor: "#9ca3af",
   },
-
-  pickerWrapper: {
-    flex: 1,
-    backgroundColor: "#1f2937",
-    borderRadius: 6,
-    marginHorizontal: 4,
-    height: 55, // ⭐ increased height
-  },
-
-  picker: {
-    color: "white", // ✅ Android text color
-    height: 40,
-  },
-
   genderRow: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginBottom: 15,
   },
-
   genderButton: {
-    flex: 1, // ✅ each button takes equal width
+    flex: 1,
     backgroundColor: "#1f2937",
     paddingVertical: 12,
-    marginHorizontal: 5, // spacing between buttons
+    marginHorizontal: 5,
     borderRadius: 8,
-    alignItems: "center", // center text horizontally
+    alignItems: "center",
   },
-
   genderSelected: {
     backgroundColor: "#2563eb",
   },
-
   genderText: {
     color: "white",
     fontWeight: "600",
     textTransform: "capitalize",
     textAlign: "center",
-  },
-
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#111827",
-    padding: 20,
-    paddingBottom: 80, // gives breathing room at bottom
-  },
-
-  heading: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: "#ff69b4",
-    textAlign: "center",
-    marginBottom: 20,
   },
   input: {
     backgroundColor: "#1f2937",
@@ -432,32 +705,29 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 15,
   },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 25, // ⭐ more spacing
-  },
-
-  genderButton: {
-    backgroundColor: "#1f2937",
-    padding: 10,
-    borderRadius: 8,
-    marginHorizontal: 5,
-  },
-  genderSelected: { backgroundColor: "#2563eb" },
-  genderText: { color: "white" },
   uploadButton: {
     backgroundColor: "#374151",
     padding: 12,
     borderRadius: 8,
     marginBottom: 15,
-    marginTop: 10, // ⭐ new
+    marginTop: 10,
     alignItems: "center",
   },
-
-  previewRow: { flexDirection: "row", flexWrap: "wrap", marginBottom: 15 },
-  previewWrapper: { position: "relative", marginRight: 10, marginBottom: 10 },
-  previewImage: { width: 80, height: 80, borderRadius: 8 },
+  previewRow: { 
+    flexDirection: "row", 
+    flexWrap: "wrap", 
+    marginBottom: 15 
+  },
+  previewWrapper: { 
+    position: "relative", 
+    marginRight: 10, 
+    marginBottom: 10 
+  },
+  previewImage: { 
+    width: 80, 
+    height: 80, 
+    borderRadius: 8 
+  },
   removeButton: {
     position: "absolute",
     top: -6,
@@ -467,33 +737,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingVertical: 2,
   },
-  removeText: { color: "white", fontWeight: "bold", fontSize: 12 },
-  submitButton: {
-    backgroundColor: "#ff69b4",
-    padding: 14,
-    borderRadius: 8,
-    alignItems: "center",
+  removeText: { 
+    color: "white", 
+    fontWeight: "bold", 
+    fontSize: 12 
   },
-  buttonText: { color: "white", fontWeight: "600" },
-  footer: { marginTop: 20, textAlign: "center", color: "#ccc" },
+  buttonText: { 
+    color: "white", 
+    fontWeight: "600" 
+  },
+  footer: { 
+    marginTop: 20, 
+    textAlign: "center", 
+    color: "#ccc" 
+  },
 });
-
-const pickerSelectStyles = {
-  inputIOS: {
-    color: "white",
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    backgroundColor: "transparent",
-    fontSize: 16,
-  },
-  inputAndroid: {
-    color: "white",
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    backgroundColor: "transparent",
-    fontSize: 16,
-  },
-  placeholder: {
-    color: "#9ca3af",
-  },
-};

@@ -27,6 +27,7 @@
     "expo-secure-store": "~15.0.8",
     "expo-splash-screen": "~31.0.12",
     "expo-status-bar": "~3.0.9",
+    "expo-web-browser": "~15.0.10",
     "i18n-iso-countries": "^7.14.0",
     "jwt-decode": "^4.0.0",
     "react": "19.1.0",
@@ -52,6 +53,7 @@
   },
   "private": true,
   "devDependencies": {
+    "@react-native-community/cli": "^20.1.1",
     "qup-cleaner": "^1.0.6"
   }
 }

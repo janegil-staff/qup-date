@@ -23,7 +23,7 @@ import theme from "../theme";
 
 const { height } = Dimensions.get("window");
 
-export default function DiscoverScreen({ navigation }) {
+export default function DashboardScreen({ navigation }) {
   const [stats, setStats] = useState({
     profileViews: 0,
     newLikes: 0,

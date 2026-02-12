@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
 import SafeBottomView from "../components/SafeBottomView";
@@ -22,9 +22,10 @@ import MatchCongrats from "../components/MatchCongrats";
 import MessageButton from "../components/MessageButton";
 import ReportUserModal from "../components/ReportUserModal";
 import BlockUserModal from "../components/BlockUserModal";
+import LinkedInVerifiedBadge from "../components/LinkedInVerifiedBadge";
 import getAge from "../utils/getAge";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 function capitalize(str) {
   if (!str) return "";
@@ -84,21 +85,24 @@ export default function UserProfileScreen({ route, navigation }) {
     const currentUserId = await SecureStore.getItemAsync("userId");
 
     try {
-      const response = await fetch("https://qup.dating/api/mobile/report-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          reportedUser: userId,
-          reporter: currentUserId,
-          reason,
-          timestamp: Date.now(),
-        }),
-      });
+      const response = await fetch(
+        "https://qup.dating/api/mobile/report-user",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            reportedUser: userId,
+            reporter: currentUserId,
+            reason,
+            timestamp: Date.now(),
+          }),
+        },
+      );
 
       if (!response.ok) throw new Error("Failed to submit report");
       Alert.alert(
         "Report submitted",
-        "Thank you. We will review this within 24 hours."
+        "Thank you. We will review this within 24 hours.",
       );
     } catch (error) {
       Alert.alert("Error", "Could not submit report. Please try again.");
@@ -162,7 +166,7 @@ export default function UserProfileScreen({ route, navigation }) {
   if (loading) {
     return (
       <LinearGradient
-        colors={['#1a1a2e', '#16213e', '#0f3460']}
+        colors={["#1a1a2e", "#16213e", "#0f3460"]}
         style={styles.loadingContainer}
       >
         <ActivityIndicator size="large" color="#e94560" />
@@ -184,10 +188,10 @@ export default function UserProfileScreen({ route, navigation }) {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* Animated Background */}
       <LinearGradient
-        colors={['#1a1a2e', '#16213e', '#0f3460', '#16213e']}
+        colors={["#1a1a2e", "#16213e", "#0f3460", "#16213e"]}
         style={styles.backgroundGradient}
       />
 
@@ -205,7 +209,7 @@ export default function UserProfileScreen({ route, navigation }) {
           }}
         >
           <LinearGradient
-            colors={['rgba(0,0,0,0.6)', 'rgba(0,0,0,0.4)']}
+            colors={["rgba(0,0,0,0.6)", "rgba(0,0,0,0.4)"]}
             style={styles.iconButton}
           >
             <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -223,28 +227,27 @@ export default function UserProfileScreen({ route, navigation }) {
 
         {/* Like/Unlike Button */}
         {canLike && (
-          <TouchableOpacity
-            style={styles.likeButton}
-            onPress={toggleLike}
-          >
+          <TouchableOpacity style={styles.likeButton} onPress={toggleLike}>
             <LinearGradient
-              colors={isMatched ? ['#ff4444', '#cc0000'] : ['#e94560', '#ff6b9d']}
+              colors={
+                isMatched ? ["#ff4444", "#cc0000"] : ["#e94560", "#ff6b9d"]
+              }
               style={styles.iconButton}
             >
-              <Text style={styles.likeIcon}>{isMatched ? '✕' : '♥'}</Text>
+              <Text style={styles.likeIcon}>{isMatched ? "✕" : "♥"}</Text>
             </LinearGradient>
           </TouchableOpacity>
         )}
       </View>
 
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Header Card */}
         <View style={styles.headerCard}>
           <LinearGradient
-            colors={['rgba(233, 69, 96, 0.1)', 'rgba(15, 52, 96, 0.1)']}
+            colors={["rgba(233, 69, 96, 0.1)", "rgba(15, 52, 96, 0.1)"]}
             style={styles.headerGradient}
           >
             <View style={styles.profileHeader}>
@@ -253,7 +256,8 @@ export default function UserProfileScreen({ route, navigation }) {
                 <View style={styles.avatarGlow} />
                 <Image
                   source={{
-                    uri: profile.profileImage ||
+                    uri:
+                      profile.profileImage ||
                       "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
                   }}
                   style={styles.avatar}
@@ -268,7 +272,14 @@ export default function UserProfileScreen({ route, navigation }) {
               {/* Profile Info */}
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{profile.name}</Text>
-                
+
+                {/* LinkedIn Verified Badge */}
+                {profile.linkedin?.isVerified && (
+                  <View style={{ marginBottom: 10 }}>
+                    <LinkedInVerifiedBadge size="md" />
+                  </View>
+                )}
+
                 <View style={styles.metaRow}>
                   {age && (
                     <View style={styles.metaChip}>
@@ -276,7 +287,9 @@ export default function UserProfileScreen({ route, navigation }) {
                     </View>
                   )}
                   <View style={styles.metaChip}>
-                    <Text style={styles.metaText}>{capitalize(profile.gender)}</Text>
+                    <Text style={styles.metaText}>
+                      {capitalize(profile.gender)}
+                    </Text>
                   </View>
                 </View>
 
@@ -303,7 +316,6 @@ export default function UserProfileScreen({ route, navigation }) {
 
         {/* Content Cards */}
         <View style={styles.contentContainer}>
-          
           {/* About Me */}
           {profile.bio && (
             <GlassCard icon="💭" title="About">
@@ -313,13 +325,9 @@ export default function UserProfileScreen({ route, navigation }) {
 
           {/* Photo Gallery */}
           {Array.isArray(profile.images) && profile.images.length > 0 && (
-            <GlassCard 
-              icon="🎨" 
-              title="Gallery"
-              badge={profile.images.length}
-            >
-              <ScrollView 
-                horizontal 
+            <GlassCard icon="🎨" title="Gallery" badge={profile.images.length}>
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.gallery}
               >
@@ -338,7 +346,7 @@ export default function UserProfileScreen({ route, navigation }) {
                       style={styles.galleryImage}
                     />
                     <LinearGradient
-                      colors={['transparent', 'rgba(0,0,0,0.4)']}
+                      colors={["transparent", "rgba(0,0,0,0.4)"]}
                       style={styles.galleryOverlay}
                     />
                   </TouchableOpacity>
@@ -354,7 +362,10 @@ export default function UserProfileScreen({ route, navigation }) {
             items={[
               { key: "Style", value: capitalize(profile.appearance) },
               { key: "Build", value: capitalize(profile.bodyType) },
-              { key: "Height", value: profile.height ? `${profile.height} cm` : null },
+              {
+                key: "Height",
+                value: profile.height ? `${profile.height} cm` : null,
+              },
             ]}
           />
 
@@ -364,9 +375,18 @@ export default function UserProfileScreen({ route, navigation }) {
             items={[
               { key: "Smoking", value: capitalize(profile.smoking) },
               { key: "Drinking", value: capitalize(profile.drinking) },
-              { key: "Children", value: profile.hasChildren ? "Has children" : "No children" },
-              { key: "Future kids", value: profile.wantsChildren ? "Open to it" : "Not planning" },
-              { key: "Relocation", value: profile.willingToRelocate ? "Flexible" : "Staying local" },
+              {
+                key: "Children",
+                value: profile.hasChildren ? "Has children" : "No children",
+              },
+              {
+                key: "Future kids",
+                value: profile.wantsChildren ? "Open to it" : "Not planning",
+              },
+              {
+                key: "Relocation",
+                value: profile.willingToRelocate ? "Flexible" : "Staying local",
+              },
             ]}
           />
 
@@ -396,7 +416,10 @@ export default function UserProfileScreen({ route, navigation }) {
                 {profile.tags.map((tag, i) => (
                   <View key={i} style={styles.interestChip}>
                     <LinearGradient
-                      colors={['rgba(233, 69, 96, 0.2)', 'rgba(15, 52, 96, 0.2)']}
+                      colors={[
+                        "rgba(233, 69, 96, 0.2)",
+                        "rgba(15, 52, 96, 0.2)",
+                      ]}
                       style={styles.interestGradient}
                     >
                       <Text style={styles.interestText}>{String(tag)}</Text>
@@ -409,12 +432,12 @@ export default function UserProfileScreen({ route, navigation }) {
 
           {/* Action Buttons */}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.actionButton}
               onPress={() => setReportVisible(true)}
             >
               <LinearGradient
-                colors={['rgba(255,107,157,0.2)', 'rgba(255,107,157,0.1)']}
+                colors={["rgba(255,107,157,0.2)", "rgba(255,107,157,0.1)"]}
                 style={styles.actionGradient}
               >
                 <Ionicons name="flag-outline" size={20} color="#ff6b9d" />
@@ -422,12 +445,12 @@ export default function UserProfileScreen({ route, navigation }) {
               </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.actionButton}
               onPress={() => setBlockModalVisible(true)}
             >
               <LinearGradient
-                colors={['rgba(255,68,68,0.2)', 'rgba(255,68,68,0.1)']}
+                colors={["rgba(255,68,68,0.2)", "rgba(255,68,68,0.1)"]}
                 style={styles.actionGradient}
               >
                 <Ionicons name="ban-outline" size={20} color="#ff4444" />
@@ -436,15 +459,13 @@ export default function UserProfileScreen({ route, navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-        
+
         {/* Safe bottom spacing for tab bar */}
         <SafeBottomView />
       </ScrollView>
 
       {/* Modals */}
-      {showCongrats && (
-        <MatchCongrats onClose={() => setShowCongrats(false)} />
-      )}
+      {showCongrats && <MatchCongrats onClose={() => setShowCongrats(false)} />}
 
       <ReportUserModal
         visible={reportVisible}
@@ -479,7 +500,7 @@ function GlassCard({ icon, title, badge, children }) {
   return (
     <View style={styles.glassCard}>
       <LinearGradient
-        colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+        colors={["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]}
         style={styles.glassGradient}
       >
         <View style={styles.cardHeader}>
@@ -493,9 +514,7 @@ function GlassCard({ icon, title, badge, children }) {
             </View>
           )}
         </View>
-        <View style={styles.cardContent}>
-          {children}
-        </View>
+        <View style={styles.cardContent}>{children}</View>
       </LinearGradient>
     </View>
   );
@@ -509,12 +528,9 @@ function InfoSection({ icon, title, items }) {
   return (
     <GlassCard icon={icon} title={title}>
       {valid.map((item, i) => (
-        <View 
-          key={i} 
-          style={[
-            styles.infoRow,
-            i === valid.length - 1 && styles.infoRowLast
-          ]}
+        <View
+          key={i}
+          style={[styles.infoRow, i === valid.length - 1 && styles.infoRowLast]}
         >
           <Text style={styles.infoKey}>{item.key}</Text>
           <Text style={styles.infoValue}>{item.value}</Text>
@@ -527,10 +543,10 @@ function InfoSection({ icon, title, items }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: "#1a1a2e",
   },
   backgroundGradient: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
@@ -538,19 +554,19 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
-    color: '#fff',
+    color: "#fff",
     marginTop: 16,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   errorText: {
-    color: '#e94560',
+    color: "#e94560",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   scrollContent: {
     paddingBottom: 40,
@@ -558,39 +574,39 @@ const styles = StyleSheet.create({
 
   // Floating Actions
   floatingActions: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 20,
     zIndex: 100,
   },
   backButton: {
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   messageButtonWrapper: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center', // Vertically center with other buttons
-    height: 48, // Match the icon button height
+    alignItems: "center",
+    justifyContent: "center",
+    height: 48,
   },
   likeButton: {
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   iconButton: {
     width: 48,
     height: 48,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   likeIcon: {
     fontSize: 24,
-    color: '#fff',
+    color: "#fff",
   },
 
   // Header Card
@@ -598,9 +614,9 @@ const styles = StyleSheet.create({
     margin: 20,
     marginTop: 120,
     borderRadius: 24,
-    overflow: 'hidden',
+    overflow: "hidden",
     elevation: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
@@ -609,22 +625,22 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   profileHeader: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   avatarWrapper: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 20,
   },
   avatarGlow: {
-    position: 'absolute',
+    position: "absolute",
     top: -8,
     left: -8,
     right: -8,
     bottom: -8,
     borderRadius: 80,
-    backgroundColor: '#e94560',
+    backgroundColor: "#e94560",
     opacity: 0.3,
-    shadowColor: '#e94560',
+    shadowColor: "#e94560",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 20,
@@ -634,54 +650,54 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 4,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: "rgba(255,255,255,0.3)",
   },
   matchBadge: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: '#22c55e',
+    backgroundColor: "#22c55e",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: "#fff",
   },
   matchBadgeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 10,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   profileInfo: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   profileName: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 12,
   },
   metaRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
     marginBottom: 12,
   },
   metaChip: {
-    backgroundColor: 'rgba(233, 69, 96, 0.2)',
+    backgroundColor: "rgba(233, 69, 96, 0.2)",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(233, 69, 96, 0.3)',
+    borderColor: "rgba(233, 69, 96, 0.3)",
   },
   metaText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
     marginBottom: 8,
   },
@@ -689,23 +705,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   locationText: {
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   statusBadge: {
-    backgroundColor: 'rgba(233, 69, 96, 0.15)',
+    backgroundColor: "rgba(233, 69, 96, 0.15)",
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(233, 69, 96, 0.3)',
+    borderColor: "rgba(233, 69, 96, 0.3)",
   },
   statusText: {
-    color: '#e94560',
+    color: "#e94560",
     fontSize: 13,
-    fontWeight: '600',
-    fontStyle: 'italic',
+    fontWeight: "600",
+    fontStyle: "italic",
   },
 
   // Content
@@ -715,22 +731,22 @@ const styles = StyleSheet.create({
   glassCard: {
     marginBottom: 16,
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: "rgba(255,255,255,0.1)",
   },
   glassGradient: {
     padding: 20,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   cardTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   cardIcon: {
     fontSize: 24,
@@ -738,19 +754,19 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   badge: {
-    backgroundColor: '#e94560',
+    backgroundColor: "#e94560",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
   },
   badgeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   cardContent: {
     // Content wrapper
@@ -758,7 +774,7 @@ const styles = StyleSheet.create({
   bioText: {
     fontSize: 16,
     lineHeight: 24,
-    color: 'rgba(255,255,255,0.9)',
+    color: "rgba(255,255,255,0.9)",
   },
 
   // Gallery
@@ -768,7 +784,7 @@ const styles = StyleSheet.create({
   galleryItem: {
     marginRight: 12,
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   galleryImage: {
     width: 140,
@@ -776,7 +792,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   galleryOverlay: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -785,49 +801,49 @@ const styles = StyleSheet.create({
 
   // Info Rows
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: "rgba(255,255,255,0.05)",
   },
   infoRowLast: {
     borderBottomWidth: 0,
   },
   infoKey: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.6)',
-    fontWeight: '500',
+    color: "rgba(255,255,255,0.6)",
+    fontWeight: "500",
   },
   infoValue: {
     fontSize: 15,
-    color: '#fff',
-    fontWeight: '600',
-    textAlign: 'right',
+    color: "#fff",
+    fontWeight: "600",
+    textAlign: "right",
     flex: 1,
     marginLeft: 16,
   },
 
   // Interests
   interestsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   interestChip: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'rgba(233, 69, 96, 0.3)',
+    borderColor: "rgba(233, 69, 96, 0.3)",
   },
   interestGradient: {
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
   interestText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   // Actions
@@ -838,25 +854,25 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: "rgba(255,255,255,0.1)",
   },
   actionGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     padding: 16,
     gap: 10,
   },
   actionText: {
-    color: '#ff6b9d',
+    color: "#ff6b9d",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   actionTextDanger: {
-    color: '#ff4444',
+    color: "#ff4444",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

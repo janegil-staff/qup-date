@@ -13,7 +13,7 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import GlassBackground from "../components/GlassBackground";
 import SafeBottomView from "../components/SafeBottomView";
 import MatchCongrats from "../components/MatchCongrats";
@@ -123,6 +123,14 @@ export default function DiscoverScreen({ navigation }) {
           {item.isVerified && (
             <View style={styles.verifiedBadgeContainer}>
               <VerifiedBadge />
+            </View>
+          )}
+
+          {/* LinkedIn Badge */}
+          {item.linkedin?.isVerified && (
+            <View style={styles.linkedinBadgeContainer}>
+              <FontAwesome name="linkedin-square" size={14} color="#fff" />
+              <Text style={styles.linkedinBadgeText}>LinkedIn</Text>
             </View>
           )}
 
@@ -320,6 +328,26 @@ const styles = StyleSheet.create({
     top: 24,
     right: 24,
     zIndex: 10,
+  },
+
+  // LinkedIn Badge
+  linkedinBadgeContainer: {
+    position: "absolute",
+    top: 24,
+    left: 24,
+    zIndex: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(10, 102, 194, 0.9)",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
+    gap: 5,
+  },
+  linkedinBadgeText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "700",
   },
 
   // Image

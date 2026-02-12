@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, Image, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
 export default function ChatHeader(props) {
   const user = props.user;
@@ -26,7 +26,15 @@ export default function ChatHeader(props) {
           }}
           style={styles.avatar}
         />
-        <Text style={styles.userName}>{user.name || "Unknown"}</Text>
+        <View style={styles.nameContainer}>
+          <Text style={styles.userName}>{user.name || "Unknown"}</Text>
+          {user.linkedin?.isVerified && (
+            <View style={styles.linkedinBadge}>
+              <FontAwesome name="linkedin-square" size={10} color="#0A66C2" />
+              <Text style={styles.linkedinText}>Verified</Text>
+            </View>
+          )}
+        </View>
       </TouchableOpacity>
 
       <View style={styles.rightButtons}>
@@ -70,9 +78,23 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginRight: 10,
   },
+  nameContainer: {
+    flexDirection: "column",
+  },
   userName: {
     color: "white",
     fontSize: 16,
+    fontWeight: "600",
+  },
+  linkedinBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    marginTop: 2,
+  },
+  linkedinText: {
+    color: "#93c5fd",
+    fontSize: 10,
     fontWeight: "600",
   },
   rightButtons: {

@@ -14,7 +14,7 @@ export default function TermsSafetyScreen({ navigation }) {
 
   const continueToApp = () => {
     if (agreed) {
-      navigation.navigate("LandingScreen"); // or Login, depending on your flow
+      navigation.navigate("ProfessionalOnboarding"); // or Login, depending on your flow
     }
   };
 

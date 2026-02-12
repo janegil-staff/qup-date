@@ -14,22 +14,24 @@ import {
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
+import { LinearGradient } from "expo-linear-gradient";
+import { BlurView } from "expo-blur";
 import EnhancedImageViewing from "react-native-image-viewing";
 import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
 import DeleteProfileButton from "../components/DeleteProfileButton";
 import getAge from "../utils/getAge";
+import SafeBottomView from "../components/SafeBottomView";
+import LinkedInVerifiedBadge from "../components/LinkedInVerifiedBadge";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 const handleReport = async () => {
   const email = "qup.dating@gmail.com";
   const subject = encodeURIComponent("Safety concern report");
   const body = encodeURIComponent("Please describe the issue:\n\n");
   const url = `mailto:${email}?subject=${subject}&body=${body}`;
-  
+
   const canOpen = await Linking.canOpenURL(url);
   if (canOpen) {
     Linking.openURL(url);
@@ -62,6 +64,7 @@ export default function ProfileScreen({ navigation }) {
       const data = await res.json();
       setIsVerified(data.user.isVerified);
       setProfile(data.user);
+      console.log("LinkedIn:", JSON.stringify(data.user.linkedin));
     } finally {
       setLoading(false);
     }
@@ -76,7 +79,7 @@ export default function ProfileScreen({ navigation }) {
   if (loading) {
     return (
       <LinearGradient
-        colors={['#1a1a2e', '#16213e', '#0f3460']}
+        colors={["#1a1a2e", "#16213e", "#0f3460"]}
         style={styles.loadingContainer}
       >
         <ActivityIndicator size="large" color="#e94560" />
@@ -96,44 +99,40 @@ export default function ProfileScreen({ navigation }) {
   const age = getAge(profile.birthdate);
 
   const handleLogout = async () => {
-    Alert.alert(
-      "Logout",
-      "Are you sure you want to logout?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Logout",
-          style: "destructive",
-          onPress: async () => {
-            await SecureStore.deleteItemAsync("authToken");
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "LoginForm" }],
-            });
-          },
+    Alert.alert("Logout", "Are you sure you want to logout?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await SecureStore.deleteItemAsync("authToken");
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "LoginForm" }],
+          });
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* Animated Background */}
       <LinearGradient
-        colors={['#1a1a2e', '#16213e', '#0f3460', '#16213e']}
+        colors={["#1a1a2e", "#16213e", "#0f3460", "#16213e"]}
         style={styles.backgroundGradient}
       />
 
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Floating Header Card */}
         <View style={styles.headerCard}>
           <LinearGradient
-            colors={['rgba(233, 69, 96, 0.1)', 'rgba(15, 52, 96, 0.1)']}
+            colors={["rgba(233, 69, 96, 0.1)", "rgba(15, 52, 96, 0.1)"]}
             style={styles.headerGradient}
           >
             {!isVerified && (
@@ -144,7 +143,7 @@ export default function ProfileScreen({ navigation }) {
 
             <View style={styles.profileHeader}>
               {/* Avatar with Glow Effect */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.avatarWrapper}
                 onPress={() => navigation.navigate("EditImages")}
                 activeOpacity={0.8}
@@ -152,7 +151,8 @@ export default function ProfileScreen({ navigation }) {
                 <View style={styles.avatarGlow} />
                 <Image
                   source={{
-                    uri: profile.profileImage ||
+                    uri:
+                      profile.profileImage ||
                       "https://res.cloudinary.com/dbcdsonhz/image/upload/v1769110864/dating-app/empty-profile-image_dlwotm.png",
                   }}
                   style={styles.avatar}
@@ -160,7 +160,10 @@ export default function ProfileScreen({ navigation }) {
                 {/* Camera Icon Overlay */}
                 <View style={styles.cameraIconContainer}>
                   <LinearGradient
-                    colors={['rgba(233, 69, 96, 0.9)', 'rgba(255, 107, 157, 0.9)']}
+                    colors={[
+                      "rgba(233, 69, 96, 0.9)",
+                      "rgba(255, 107, 157, 0.9)",
+                    ]}
                     style={styles.cameraIconGradient}
                   >
                     <Text style={styles.cameraIcon}>📷</Text>
@@ -171,7 +174,11 @@ export default function ProfileScreen({ navigation }) {
               {/* Name & Info */}
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{profile.name}</Text>
-                
+                {profile.linkedin?.isVerified && (
+                  <View style={{ marginBottom: 10 }}>
+                    <LinkedInVerifiedBadge size="md" />
+                  </View>
+                )}
                 <View style={styles.metaRow}>
                   {age && (
                     <View style={styles.metaChip}>
@@ -179,7 +186,9 @@ export default function ProfileScreen({ navigation }) {
                     </View>
                   )}
                   <View style={styles.metaChip}>
-                    <Text style={styles.metaText}>{capitalize(profile.gender)}</Text>
+                    <Text style={styles.metaText}>
+                      {capitalize(profile.gender)}
+                    </Text>
                   </View>
                 </View>
 
@@ -198,13 +207,14 @@ export default function ProfileScreen({ navigation }) {
 
         {/* Content Cards */}
         <View style={styles.contentContainer}>
-          
           {/* About Me Glass Card */}
           {profile.bio && (
-            <GlassCard 
-              icon="💭" 
+            <GlassCard
+              icon="💭"
               title="About Me"
-              onEdit={() => navigation.navigate("Edit", { screen: "EditBasic" })}
+              onEdit={() =>
+                navigation.navigate("Edit", { screen: "EditBasic" })
+              }
             >
               <Text style={styles.bioText}>{profile.bio}</Text>
             </GlassCard>
@@ -212,13 +222,9 @@ export default function ProfileScreen({ navigation }) {
 
           {/* Photo Gallery */}
           {Array.isArray(profile.images) && profile.images.length > 0 && (
-            <GlassCard 
-              icon="🎨" 
-              title="Gallery"
-              badge={profile.images.length}
-            >
-              <ScrollView 
-                horizontal 
+            <GlassCard icon="🎨" title="Gallery" badge={profile.images.length}>
+              <ScrollView
+                horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.gallery}
               >
@@ -237,7 +243,7 @@ export default function ProfileScreen({ navigation }) {
                       style={styles.galleryImage}
                     />
                     <LinearGradient
-                      colors={['transparent', 'rgba(0,0,0,0.4)']}
+                      colors={["transparent", "rgba(0,0,0,0.4)"]}
                       style={styles.galleryOverlay}
                     />
                   </TouchableOpacity>
@@ -250,31 +256,49 @@ export default function ProfileScreen({ navigation }) {
           <InfoSection
             icon="✨"
             title="Appearance"
-            onEdit={() => navigation.navigate("Edit", { screen: "EditAppearance" })}
+            onEdit={() =>
+              navigation.navigate("Edit", { screen: "EditAppearance" })
+            }
             items={[
               { key: "Style", value: capitalize(profile.appearance) },
               { key: "Build", value: capitalize(profile.bodyType) },
-              { key: "Height", value: profile.height ? `${profile.height} cm` : null },
+              {
+                key: "Height",
+                value: profile.height ? `${profile.height} cm` : null,
+              },
             ]}
           />
 
           <InfoSection
             icon="🌱"
             title="Lifestyle"
-            onEdit={() => navigation.navigate("Edit", { screen: "EditLifestyle" })}
+            onEdit={() =>
+              navigation.navigate("Edit", { screen: "EditLifestyle" })
+            }
             items={[
               { key: "Smoking", value: capitalize(profile.smoking) },
               { key: "Drinking", value: capitalize(profile.drinking) },
-              { key: "Children", value: profile.hasChildren ? "Has children" : "No children" },
-              { key: "Future kids", value: profile.wantsChildren ? "Open to it" : "Not planning" },
-              { key: "Relocation", value: profile.willingToRelocate ? "Flexible" : "Staying local" },
+              {
+                key: "Children",
+                value: profile.hasChildren ? "Has children" : "No children",
+              },
+              {
+                key: "Future kids",
+                value: profile.wantsChildren ? "Open to it" : "Not planning",
+              },
+              {
+                key: "Relocation",
+                value: profile.willingToRelocate ? "Flexible" : "Staying local",
+              },
             ]}
           />
 
           <InfoSection
             icon="🎓"
             title="Background"
-            onEdit={() => navigation.navigate("Edit", { screen: "EditDetails" })}
+            onEdit={() =>
+              navigation.navigate("Edit", { screen: "EditDetails" })
+            }
             items={[
               { key: "Faith", value: capitalize(profile.religion) },
               { key: "Career", value: capitalize(profile.occupation) },
@@ -294,16 +318,21 @@ export default function ProfileScreen({ navigation }) {
 
           {/* Interests */}
           {profile.tags?.length > 0 && (
-            <GlassCard 
-              icon="💫" 
+            <GlassCard
+              icon="💫"
               title="Interests"
-              onEdit={() => navigation.navigate("Edit", { screen: "EditHabits" })}
+              onEdit={() =>
+                navigation.navigate("Edit", { screen: "EditHabits" })
+              }
             >
               <View style={styles.interestsGrid}>
                 {profile.tags.map((tag, i) => (
                   <View key={i} style={styles.interestChip}>
                     <LinearGradient
-                      colors={['rgba(233, 69, 96, 0.2)', 'rgba(15, 52, 96, 0.2)']}
+                      colors={[
+                        "rgba(233, 69, 96, 0.2)",
+                        "rgba(15, 52, 96, 0.2)",
+                      ]}
                       style={styles.interestGradient}
                     >
                       <Text style={styles.interestText}>{tag}</Text>
@@ -316,13 +345,13 @@ export default function ProfileScreen({ navigation }) {
 
           {/* Action Buttons */}
           <View style={styles.actionsContainer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={styles.logoutButton}
               onPress={handleLogout}
               activeOpacity={0.8}
             >
               <LinearGradient
-                colors={['#e94560', '#d63447']}
+                colors={["#e94560", "#d63447"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.buttonGradient}
@@ -336,15 +365,15 @@ export default function ProfileScreen({ navigation }) {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={handleReport}
               style={styles.footerButton}
             >
               <Text style={styles.footerIcon}>🛡️</Text>
               <Text style={styles.footerText}>Report Safety Concern</Text>
             </TouchableOpacity>
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               onPress={() => navigation.navigate("SafetyGuidelines")}
               style={styles.footerButton}
             >
@@ -363,6 +392,7 @@ export default function ProfileScreen({ navigation }) {
         visible={isCarouselVisible}
         onRequestClose={() => setCarouselVisible(false)}
       />
+      <SafeBottomView />
     </View>
   );
 }
@@ -372,7 +402,7 @@ function GlassCard({ icon, title, badge, children, onEdit }) {
   return (
     <View style={styles.glassCard}>
       <LinearGradient
-        colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
+        colors={["rgba(255,255,255,0.08)", "rgba(255,255,255,0.02)"]}
         style={styles.glassGradient}
       >
         <View style={styles.cardHeader}>
@@ -387,13 +417,16 @@ function GlassCard({ icon, title, badge, children, onEdit }) {
               </View>
             )}
             {onEdit && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.editButton}
                 onPress={onEdit}
                 activeOpacity={0.7}
               >
                 <LinearGradient
-                  colors={['rgba(233, 69, 96, 0.3)', 'rgba(255, 107, 157, 0.3)']}
+                  colors={[
+                    "rgba(233, 69, 96, 0.3)",
+                    "rgba(255, 107, 157, 0.3)",
+                  ]}
                   style={styles.editButtonGradient}
                 >
                   <Text style={styles.editIcon}>✏️</Text>
@@ -403,9 +436,7 @@ function GlassCard({ icon, title, badge, children, onEdit }) {
             )}
           </View>
         </View>
-        <View style={styles.cardContent}>
-          {children}
-        </View>
+        <View style={styles.cardContent}>{children}</View>
       </LinearGradient>
     </View>
   );
@@ -419,12 +450,9 @@ function InfoSection({ icon, title, items, onEdit }) {
   return (
     <GlassCard icon={icon} title={title} onEdit={onEdit}>
       {valid.map((item, i) => (
-        <View 
-          key={i} 
-          style={[
-            styles.infoRow,
-            i === valid.length - 1 && styles.infoRowLast
-          ]}
+        <View
+          key={i}
+          style={[styles.infoRow, i === valid.length - 1 && styles.infoRowLast]}
         >
           <Text style={styles.infoKey}>{item.key}</Text>
           <Text style={styles.infoValue}>{item.value}</Text>
@@ -437,10 +465,10 @@ function InfoSection({ icon, title, items, onEdit }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a2e',
+    backgroundColor: "#1a1a2e",
   },
   backgroundGradient: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     top: 0,
@@ -448,19 +476,19 @@ const styles = StyleSheet.create({
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingText: {
-    color: '#fff',
+    color: "#fff",
     marginTop: 16,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   errorText: {
-    color: '#e94560',
+    color: "#e94560",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   scrollContent: {
     paddingBottom: 40,
@@ -471,9 +499,9 @@ const styles = StyleSheet.create({
     margin: 20,
     marginTop: 60,
     borderRadius: 24,
-    overflow: 'hidden',
+    overflow: "hidden",
     elevation: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
@@ -485,22 +513,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   profileHeader: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   avatarWrapper: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 20,
   },
   avatarGlow: {
-    position: 'absolute',
+    position: "absolute",
     top: -8,
     left: -8,
     right: -8,
     bottom: -8,
     borderRadius: 80,
-    backgroundColor: '#e94560',
+    backgroundColor: "#e94560",
     opacity: 0.3,
-    shadowColor: '#e94560',
+    shadowColor: "#e94560",
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 20,
@@ -510,65 +538,65 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 4,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: "rgba(255,255,255,0.3)",
   },
   cameraIconContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 0,
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 2,
-    borderColor: '#fff',
+    borderColor: "#fff",
   },
   cameraIconGradient: {
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   cameraIcon: {
     fontSize: 20,
   },
   profileInfo: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   profileName: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
     marginBottom: 12,
   },
   metaRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
     marginBottom: 12,
   },
   metaChip: {
-    backgroundColor: 'rgba(233, 69, 96, 0.2)',
+    backgroundColor: "rgba(233, 69, 96, 0.2)",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(233, 69, 96, 0.3)',
+    borderColor: "rgba(233, 69, 96, 0.3)",
   },
   metaText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
   },
   locationIcon: {
     fontSize: 16,
   },
   locationText: {
-    color: 'rgba(255,255,255,0.8)',
+    color: "rgba(255,255,255,0.8)",
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 
   // Content
@@ -578,27 +606,27 @@ const styles = StyleSheet.create({
   glassCard: {
     marginBottom: 16,
     borderRadius: 20,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: "rgba(255,255,255,0.1)",
   },
   glassGradient: {
     padding: 20,
   },
   cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 16,
   },
   cardTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     flex: 1,
   },
   cardHeaderRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   cardIcon: {
@@ -607,19 +635,19 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
+    fontWeight: "700",
+    color: "#fff",
   },
   badge: {
-    backgroundColor: '#e94560',
+    backgroundColor: "#e94560",
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
   },
   badgeText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   cardContent: {
     // Content wrapper
@@ -627,7 +655,7 @@ const styles = StyleSheet.create({
   bioText: {
     fontSize: 16,
     lineHeight: 24,
-    color: 'rgba(255,255,255,0.9)',
+    color: "rgba(255,255,255,0.9)",
   },
 
   // Gallery
@@ -637,7 +665,7 @@ const styles = StyleSheet.create({
   galleryItem: {
     marginRight: 12,
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   galleryImage: {
     width: 140,
@@ -645,7 +673,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   galleryOverlay: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -654,25 +682,25 @@ const styles = StyleSheet.create({
 
   // Info Rows
   infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.05)',
+    borderBottomColor: "rgba(255,255,255,0.05)",
   },
   infoRowLast: {
     borderBottomWidth: 0,
   },
   infoKey: {
     fontSize: 15,
-    color: 'rgba(255,255,255,0.6)',
-    fontWeight: '500',
+    color: "rgba(255,255,255,0.6)",
+    fontWeight: "500",
   },
   infoValue: {
     fontSize: 15,
-    color: '#fff',
-    fontWeight: '600',
-    textAlign: 'right',
+    color: "#fff",
+    fontWeight: "600",
+    textAlign: "right",
     flex: 1,
     marginLeft: 16,
   },
@@ -680,13 +708,13 @@ const styles = StyleSheet.create({
   // Edit Button
   editButton: {
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'rgba(233, 69, 96, 0.4)',
+    borderColor: "rgba(233, 69, 96, 0.4)",
   },
   editButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 12,
     paddingVertical: 6,
     gap: 4,
@@ -695,31 +723,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   editText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   // Interests
   interestsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 10,
   },
   interestChip: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
-    borderColor: 'rgba(233, 69, 96, 0.3)',
+    borderColor: "rgba(233, 69, 96, 0.3)",
   },
   interestGradient: {
     paddingHorizontal: 16,
     paddingVertical: 10,
   },
   interestText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 
   // Actions
@@ -730,45 +758,45 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     elevation: 5,
-    shadowColor: '#e94560',
+    shadowColor: "#e94560",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
   },
   buttonGradient: {
     padding: 18,
-    alignItems: 'center',
+    alignItems: "center",
   },
   logoutText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 17,
-    fontWeight: '700',
+    fontWeight: "700",
   },
 
   // Footer
   footer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 20,
     gap: 16,
   },
   footerButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   footerIcon: {
     fontSize: 18,
   },
   footerText: {
-    color: '#e94560',
+    color: "#e94560",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   footerTextSecondary: {
-    color: 'rgba(255,255,255,0.5)',
+    color: "rgba(255,255,255,0.5)",
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

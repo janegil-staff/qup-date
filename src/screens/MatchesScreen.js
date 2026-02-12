@@ -13,7 +13,7 @@ import {
 import * as SecureStore from "expo-secure-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import GlassBackground from "../components/GlassBackground";
 import VerifiedBadge from "../components/VerifiedBadge";
 import UnreadBadge from "../components/UnreadBadge";
@@ -125,6 +125,13 @@ export default function MatchesScreen({ route, navigation }) {
                 colors={['transparent', 'rgba(0,0,0,0.6)']}
                 style={styles.imageOverlay}
               />
+              {/* LinkedIn Badge on image */}
+              {item.linkedin?.isVerified && (
+                <View style={styles.linkedinBadge}>
+                  <FontAwesome name="linkedin-square" size={10} color="#fff" />
+                  <Text style={styles.linkedinText}>Verified</Text>
+                </View>
+              )}
             </View>
           </TouchableOpacity>
 
@@ -286,7 +293,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   listContent: {
-    paddingBottom: 16, // Small padding, SafeBottomView handles the rest
+    paddingBottom: 16,
   },
 
   // Card
@@ -322,6 +329,25 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 60,
+  },
+
+  // LinkedIn Badge
+  linkedinBadge: {
+    position: "absolute",
+    bottom: 8,
+    left: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(10, 102, 194, 0.9)",
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 10,
+    gap: 3,
+  },
+  linkedinText: {
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: "700",
   },
 
   // Name

@@ -1,6 +1,6 @@
 import { refreshAccessToken } from "./auth";
 
-const API_URL = "https://qup.daing/api";
+const API_URL = "https://qup.dating/api";
 
 export async function apiRequest(
   endpoint,
