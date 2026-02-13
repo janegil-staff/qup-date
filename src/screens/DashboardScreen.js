@@ -20,6 +20,7 @@ import UserCard from "../components/UserCard";
 import ProfileCompletion from "../components/ProfileCompletion";
 import MatchCongrats from "../components/MatchCongrats";
 import theme from "../theme";
+import SafeBottomView from "../components/SafeBottomView";
 
 const { height } = Dimensions.get("window");
 
@@ -258,6 +259,7 @@ export default function DashboardScreen({ navigation }) {
       {showCongrats && (
         <MatchCongrats onClose={() => setShowCongrats(false)} />
       )}
+      <SafeBottomView />
     </GlassBackground>
   );
 }
