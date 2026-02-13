@@ -135,11 +135,9 @@ export default function ProfileScreen({ navigation }) {
             colors={["rgba(233, 69, 96, 0.1)", "rgba(15, 52, 96, 0.1)"]}
             style={styles.headerGradient}
           >
-            {!isVerified && (
-              <View style={styles.verifyBannerWrapper}>
-                <VerifyBanner user={profile} />
-              </View>
-            )}
+            <View style={styles.verifyBannerWrapper}>
+              <VerifyBanner user={profile} />
+            </View>
 
             <View style={styles.profileHeader}>
               {/* Avatar with Glow Effect */}
@@ -296,9 +294,7 @@ export default function ProfileScreen({ navigation }) {
           <InfoSection
             icon="🎓"
             title="Background"
-            onEdit={() =>
-              navigation.navigate("Edit", { screen: "EditCareer" })
-            }
+            onEdit={() => navigation.navigate("Edit", { screen: "EditCareer" })}
             items={[
               { key: "Faith", value: capitalize(profile.religion) },
               { key: "Career", value: capitalize(profile.occupation) },

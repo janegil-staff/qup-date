@@ -132,13 +132,29 @@ function PickerModal({ visible, title, options, selected, onSelect, onClose }) {
 
 export default function RegisterScreen({ navigation, route }) {
   const linkedinData = route?.params?.linkedinData || null;
-  const isLinkedIn = !!linkedinData;
+  const googleData = route?.params?.googleData || null;
+  const appleData = route?.params?.appleData || null;
+
+  const isSocialSignup = !!(linkedinData || googleData || appleData);
+  const socialProvider = linkedinData
+    ? "linkedin"
+    : googleData
+      ? "google"
+      : appleData
+        ? "apple"
+        : null;
+
+  // Get pre-filled data from whichever provider
+  const prefillName =
+    linkedinData?.name || googleData?.name || appleData?.name || "";
+  const prefillEmail =
+    linkedinData?.email || googleData?.email || appleData?.email || "";
 
   const [currentStep, setCurrentStep] = useState(1);
   const progressAnim = useRef(new Animated.Value(1)).current;
 
-  const [name, setName] = useState(linkedinData?.name || "");
-  const [email, setEmail] = useState(linkedinData?.email || "");
+  const [name, setName] = useState(prefillName);
+  const [email, setEmail] = useState(prefillEmail);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -185,7 +201,7 @@ export default function RegisterScreen({ navigation, route }) {
     const e = {};
     if (step === 1) {
       if (!name.trim()) e.name = "Name is required";
-      if (!isLinkedIn) {
+      if (!isSocialSignup) {
         if (!email.trim()) e.email = "Email is required";
         else if (!emailRegex.test(email)) e.email = "Invalid email format";
         if (!password) e.password = "Password is required";
@@ -256,73 +272,91 @@ export default function RegisterScreen({ navigation, route }) {
         uploadedImages = uploadData.images || [];
       }
 
-      if (isLinkedIn) {
-        const res = await fetch(
-          "https://qup.dating/api/mobile/linkedin/register",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              linkedinId: linkedinData.linkedinId,
-              linkedinName: linkedinData.name,
-              linkedinEmail: linkedinData.email,
-              linkedinPicture: linkedinData.picture,
-              linkedinGivenName: linkedinData.givenName,
-              linkedinFamilyName: linkedinData.familyName,
-              name,
-              gender,
-              birthdate: birthdate.toISOString(),
-              occupation,
-              company,
-              industry,
-              education,
-              bio,
-              images: uploadedImages,
-            }),
-          },
+      // ── Shared registration payload ──
+      const sharedPayload = {
+        name,
+        gender,
+        birthdate: birthdate.toISOString(),
+        occupation,
+        company,
+        industry,
+        education,
+        bio,
+        images: uploadedImages,
+      };
+
+      let res;
+
+      if (linkedinData) {
+        // ── LinkedIn registration ──
+        res = await fetch("https://qup.dating/api/mobile/linkedin/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...sharedPayload,
+            linkedinId: linkedinData.linkedinId,
+            linkedinName: linkedinData.name,
+            linkedinEmail: linkedinData.email,
+            linkedinPicture: linkedinData.picture,
+            linkedinGivenName: linkedinData.givenName,
+            linkedinFamilyName: linkedinData.familyName,
+          }),
+        });
+      } else if (googleData) {
+        // ── Google registration ──
+        res = await fetch("https://qup.dating/api/mobile/google/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...sharedPayload,
+            googleId: googleData.googleId,
+            email: googleData.email,
+            picture: googleData.picture,
+          }),
+        });
+      } else if (appleData) {
+        // ── Apple registration ──
+        res = await fetch("https://qup.dating/api/mobile/apple/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...sharedPayload,
+            appleUserId: appleData.appleUserId,
+            email: appleData.email,
+          }),
+        });
+      } else {
+        // ── Email/password registration ──
+        res = await fetch("https://qup.dating/api/mobile/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...sharedPayload,
+            email,
+            password,
+          }),
+        });
+      }
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        Alert.alert(
+          "Error",
+          data.error === "duplicate"
+            ? "Email already registered."
+            : data.error || "Something went wrong.",
         );
-        const data = await res.json();
-        if (!res.ok) {
-          Alert.alert(
-            "Error",
-            data.error === "duplicate"
-              ? "Email already registered."
-              : data.error || "Failed",
-          );
-          return;
-        }
+        return;
+      }
+
+      // Social sign-ups get logged in immediately
+      if (isSocialSignup) {
         await SecureStore.setItemAsync("authToken", data.token);
         await SecureStore.setItemAsync("userId", data.user._id);
         await SecureStore.setItemAsync("userEmail", data.user.email);
         navigation.navigate("MainTabs", { screen: "Dashboard" });
       } else {
-        const res = await fetch("https://qup.dating/api/mobile/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-            birthdate: birthdate.toISOString(),
-            gender,
-            occupation,
-            company,
-            industry,
-            education,
-            bio,
-            images: uploadedImages,
-          }),
-        });
-        if (!res.ok) {
-          const errData = await res.json();
-          Alert.alert(
-            "Error",
-            errData.error === "duplicate"
-              ? "Email already registered."
-              : "Something went wrong.",
-          );
-          return;
-        }
         Alert.alert("Welcome to QUP!", "Account created. Please log in.", [
           { text: "Log In", onPress: () => navigation.navigate("LoginForm") },
         ]);
@@ -342,6 +376,28 @@ export default function RegisterScreen({ navigation, route }) {
 
   const stepTitles = ["Account", "Personal", "Professional", "Finish"];
   const stepIcons = ["person", "heart", "briefcase", "camera"];
+
+  // ── Banner config for social providers ──
+  const socialBanner = {
+    linkedin: {
+      icon: <FontAwesome name="linkedin-square" size={20} color="#0A66C2" />,
+      label: "Signing up with LinkedIn",
+      color: "rgba(10,102,194,0.12)",
+      border: "rgba(10,102,194,0.25)",
+    },
+    google: {
+      icon: <FontAwesome name="google" size={20} color="#4285F4" />,
+      label: "Signing up with Google",
+      color: "rgba(66,133,244,0.12)",
+      border: "rgba(66,133,244,0.25)",
+    },
+    apple: {
+      icon: <Ionicons name="logo-apple" size={20} color="#fff" />,
+      label: "Signing up with Apple",
+      color: "rgba(255,255,255,0.08)",
+      border: "rgba(255,255,255,0.15)",
+    },
+  };
 
   return (
     <Screen style={{ backgroundColor: "#0f0f23" }}>
@@ -428,43 +484,74 @@ export default function RegisterScreen({ navigation, route }) {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          {isLinkedIn && currentStep === 1 && (
-            <View style={styles.linkedinBanner}>
-              <FontAwesome name="linkedin-square" size={20} color="#0A66C2" />
-              <View style={{ flex: 1, marginLeft: 10 }}>
-                <Text style={styles.bannerTitle}>Signing up with LinkedIn</Text>
-                <Text style={styles.bannerSub}>{linkedinData.email}</Text>
+          {/* Social provider banner */}
+          {isSocialSignup &&
+            currentStep === 1 &&
+            socialBanner[socialProvider] && (
+              <View
+                style={[
+                  styles.socialBanner,
+                  {
+                    backgroundColor: socialBanner[socialProvider].color,
+                    borderColor: socialBanner[socialProvider].border,
+                  },
+                ]}
+              >
+                {socialBanner[socialProvider].icon}
+                <View style={{ flex: 1, marginLeft: 10 }}>
+                  <Text style={styles.bannerTitle}>
+                    {socialBanner[socialProvider].label}
+                  </Text>
+                  <Text style={styles.bannerSub}>{prefillEmail}</Text>
+                </View>
+                <Ionicons name="checkmark-circle" size={22} color="#00D9A8" />
               </View>
-              <Ionicons name="checkmark-circle" size={22} color="#00D9A8" />
-            </View>
-          )}
+            )}
 
           {/* ── STEP 1 ── */}
           {currentStep === 1 && (
             <View>
               <Text style={styles.stepTitle}>Create Your Account</Text>
               <Text style={styles.stepSub}>
-                {isLinkedIn
+                {isSocialSignup
                   ? "Confirm your name to get started"
                   : "Enter your details to get started"}
               </Text>
 
-              {!isLinkedIn && (
+              {!isSocialSignup && (
                 <>
-                  <TouchableOpacity
-                    style={styles.linkedinBtn}
-                    onPress={() => navigation.navigate("LoginForm")}
-                    activeOpacity={0.8}
-                  >
-                    <FontAwesome
-                      name="linkedin-square"
-                      size={22}
-                      color="#fff"
-                    />
-                    <Text style={styles.linkedinBtnText}>
-                      Sign up with LinkedIn
-                    </Text>
-                  </TouchableOpacity>
+                  <View style={styles.socialRow}>
+                    <TouchableOpacity
+                      style={styles.socialIconBtn}
+                      onPress={() => navigation.navigate("LoginForm")}
+                      activeOpacity={0.8}
+                    >
+                      <FontAwesome
+                        name="linkedin-square"
+                        size={24}
+                        color="#0A66C2"
+                      />
+                    </TouchableOpacity>
+
+                    {Platform.OS === "ios" && (
+                      <TouchableOpacity
+                        style={styles.socialIconBtn}
+                        onPress={() => navigation.navigate("LoginForm")}
+                        activeOpacity={0.8}
+                      >
+                        <Ionicons name="logo-apple" size={24} color="#fff" />
+                      </TouchableOpacity>
+                    )}
+
+                    <TouchableOpacity
+                      style={styles.socialIconBtn}
+                      onPress={() => navigation.navigate("LoginForm")}
+                      activeOpacity={0.8}
+                    >
+                      <FontAwesome name="google" size={22} color="#4285F4" />
+                    </TouchableOpacity>
+                  </View>
+
                   <View style={styles.divider}>
                     <View style={styles.dividerLine} />
                     <Text style={styles.dividerText}>
@@ -484,7 +571,7 @@ export default function RegisterScreen({ navigation, route }) {
                 autoCapitalize="words"
               />
 
-              {!isLinkedIn && (
+              {!isSocialSignup && (
                 <>
                   <InputField
                     icon="mail-outline"
@@ -722,10 +809,7 @@ export default function RegisterScreen({ navigation, route }) {
               >
                 <Ionicons name="school-outline" size={20} color="#888" />
                 <Text
-                  style={[
-                    styles.selectText,
-                    !education && { color: "#555" },
-                  ]}
+                  style={[styles.selectText, !education && { color: "#555" }]}
                 >
                   {education || "Select Education Level"}
                 </Text>
@@ -861,7 +945,7 @@ export default function RegisterScreen({ navigation, route }) {
                   ) : (
                     <>
                       <Text style={styles.ctaText}>
-                        {isLinkedIn
+                        {isSocialSignup
                           ? "Create Profile & Sign In"
                           : "Create Account"}
                       </Text>
@@ -875,7 +959,7 @@ export default function RegisterScreen({ navigation, route }) {
                 </LinearGradient>
               </TouchableOpacity>
             )}
-            {currentStep === 1 && !isLinkedIn && (
+            {currentStep === 1 && !isSocialSignup && (
               <Text style={styles.loginLink}>
                 Already a member?{" "}
                 <Text
@@ -917,6 +1001,54 @@ export default function RegisterScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  socialRow: {
+  flexDirection: "row",
+  justifyContent: "center",
+  gap: 16,
+  marginBottom: 20,
+},
+socialIconBtn: {
+  width: 56,
+  height: 56,
+  borderRadius: 16,
+  backgroundColor: "rgba(255,255,255,0.08)",
+  justifyContent: "center",
+  alignItems: "center",
+  borderWidth: 1.5,
+  borderColor: "rgba(255,255,255,0.1)",
+},
+  appleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000",
+    padding: 16,
+    borderRadius: 12,
+    gap: 10,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+  },
+  googleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 12,
+    gap: 10,
+    marginBottom: 20,
+  },
+  socialBtnText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  googleBtnText: {
+    color: "#333",
+    fontWeight: "700",
+    fontSize: 16,
+  },
   header: {
     paddingTop: Platform.OS === "ios" ? 50 : 20,
     paddingHorizontal: 20,
@@ -987,15 +1119,13 @@ const styles = StyleSheet.create({
     marginBottom: 28,
     lineHeight: 21,
   },
-  linkedinBanner: {
+  socialBanner: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(10,102,194,0.12)",
     borderRadius: 12,
     padding: 14,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: "rgba(10,102,194,0.25)",
   },
   bannerTitle: { color: "#fff", fontSize: 14, fontWeight: "700" },
   bannerSub: { color: "rgba(255,255,255,0.5)", fontSize: 12, marginTop: 2 },
