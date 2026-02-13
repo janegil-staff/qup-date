@@ -34,11 +34,18 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 // Shared Screens
 import ChatScreen from "../screens/ChatScreen-Android";
 import UserProfileScreen from "../screens/UserProfileScreen";
-import SafetyGuidelinesScreen from "../screens/SafetyGuidelinesScreen";
 import ProfessionalOnboarding from "../screens/ProfessionalOnboarding";
 import LinkedInVerifyScreen from "../screens/LinkedInVerifyScreen";
 import EditCareerScreen from "../screens/edit/EditCareerScreen";
 import EditPreferencesScreen from "../screens/edit/EditPreferencesScreen";
+
+// Legal Screens
+import PrivacyPolicyScreen from "../screens/accept/PrivacyPolicyScreen";
+import TermsOfServiceScreen from "../screens/accept/TermsOfServiceScreen";
+import CommunityGuidelinesScreen from "../screens/accept/CommunityGuidelinesScreen";
+import CookiePolicyScreen from "../screens/accept/CookiePolicyScreen";
+import EULAScreen from "../screens/accept/EULAScreen";
+import SafetyGuidelinesScreen from "../screens/accept/SafetyGuidelinesScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -221,6 +228,7 @@ export default function AppNavigator() {
         >
           {/* Auth Flow */}
           <Stack.Screen name="TermsSafety" component={TermsSafetyScreen} />
+
           <Stack.Screen
             name="ProfessionalOnboarding"
             component={ProfessionalOnboarding}
@@ -236,6 +244,19 @@ export default function AppNavigator() {
             name="LinkedInVerify"
             component={LinkedInVerifyScreen}
           />
+
+          <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+          <Stack.Screen
+            name="TermsOfService"
+            component={TermsOfServiceScreen}
+          />
+          <Stack.Screen
+            name="CommunityGuidelines"
+            component={CommunityGuidelinesScreen}
+          />
+          <Stack.Screen name="CookiePolicy" component={CookiePolicyScreen} />
+          <Stack.Screen name="EULA" component={EULAScreen} />
+
           <Stack.Screen name="ProfileHome" component={ProfileScreen} />
           <Stack.Screen name="EditImages" component={EditImagesScreen} />
           {/* Main App */}

@@ -5,11 +5,11 @@ export default function TermsSafetyScreen({ navigation }) {
   const [agreed, setAgreed] = useState(false);
 
   const openTerms = () => {
-    Linking.openURL("https://gist.github.com/janegil-staff/2c58e9f7baba9b7327f6ceba41636de7");
+    navigation.navigate("TermsOfService")
   };
 
   const openPrivacy = () => {
-    Linking.openURL("https://gist.github.com/janegil-staff/70ae21183f3a9c48103dddfffea8c6f9");
+     navigation.navigate("PrivacyPolicy")
   };
 
   const continueToApp = () => {

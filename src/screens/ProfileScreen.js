@@ -17,12 +17,12 @@ import { useFocusEffect } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 import EnhancedImageViewing from "react-native-image-viewing";
-import Screen from "../components/Screen";
 import VerifyBanner from "../components/VerifyBanner";
 import DeleteProfileButton from "../components/DeleteProfileButton";
 import getAge from "../utils/getAge";
 import SafeBottomView from "../components/SafeBottomView";
 import LinkedInVerifiedBadge from "../components/LinkedInVerifiedBadge";
+import VerifiedBadge from "../components/VerifiedBadge";
 
 const { width, height } = Dimensions.get("window");
 
@@ -172,6 +172,11 @@ export default function ProfileScreen({ navigation }) {
               {/* Name & Info */}
               <View style={styles.profileInfo}>
                 <Text style={styles.profileName}>{profile.name}</Text>
+                {profile.isVerified && (
+                  <View style={{ marginBottom: 6 }}>
+                    <VerifiedBadge size="md" />
+                  </View>
+                )}
                 {profile.linkedin?.isVerified && (
                   <View style={{ marginBottom: 10 }}>
                     <LinkedInVerifiedBadge size="md" />

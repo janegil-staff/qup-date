@@ -11,7 +11,8 @@ import Toast from "react-native-toast-message";
 export default function VerifyBanner({ user }) {
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-
+  console.log("VerifyBanner - isVerified:", user.isVerified);
+  console.log("VerifyBanner - linkedin:", user.linkedin?.isVerified);
   // Hide if both are verified
   if (user.isVerified && user.linkedin?.isVerified) return null;
 
