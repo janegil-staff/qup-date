@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -46,6 +46,7 @@ import CommunityGuidelinesScreen from "../screens/accept/CommunityGuidelinesScre
 import CookiePolicyScreen from "../screens/accept/CookiePolicyScreen";
 import EULAScreen from "../screens/accept/EULAScreen";
 import SafetyGuidelinesScreen from "../screens/accept/SafetyGuidelinesScreen";
+import NewsTicker from "./NewsTicker";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -127,91 +128,96 @@ function ProfileStack() {
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
-
   // Calculate dynamic tab bar height based on device safe area
   const tabBarHeight =
     Platform.OS === "ios" ? 88 : 50 + Math.max(insets.bottom, 20); // Base 85px + system bar height (min 20px)
 
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
+    <View style={{ flex: 1, backgroundColor: "#1a1a2e" }}>
+      <View style={{ paddingTop: insets.top }}>
+        <NewsTicker />
+      </View>
 
-        // Tab Bar Styling
-        tabBarStyle: {
-          position: "absolute",
-          borderTopWidth: 0,
-          elevation: 0,
-          height: tabBarHeight, // Dynamic height
-          backgroundColor: "transparent",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: -4 },
-          shadowOpacity: 0.3,
-          shadowRadius: 8,
-          // Use actual inset with minimum fallback
-          paddingBottom:
-            Platform.OS === "android" ? Math.max(insets.bottom, 20) : 0,
-          paddingTop: Platform.OS === "android" ? 8 : 0,
-        },
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          headerShown: false,
 
-        // Glassmorphic Background
-        tabBarBackground: () => (
-          <LinearGradient
-            colors={["rgba(26, 26, 46, 0.95)", "rgba(22, 33, 62, 0.90)"]}
-            style={{ flex: 1 }}
-          />
-        ),
+          // Tab Bar Styling
+          tabBarStyle: {
+            position: "absolute",
+            borderTopWidth: 0,
+            elevation: 0,
+            height: tabBarHeight, // Dynamic height
+            backgroundColor: "transparent",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            // Use actual inset with minimum fallback
+            paddingBottom:
+              Platform.OS === "android" ? Math.max(insets.bottom, 20) : 0,
+            paddingTop: Platform.OS === "android" ? 8 : 0,
+          },
 
-        // Label Styling
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-          marginBottom: Platform.OS === "ios" ? 0 : 2, // Reduced since we have paddingBottom
-          letterSpacing: 0.5,
-        },
+          // Glassmorphic Background
+          tabBarBackground: () => (
+            <LinearGradient
+              colors={["rgba(26, 26, 46, 0.95)", "rgba(22, 33, 62, 0.90)"]}
+              style={{ flex: 1 }}
+            />
+          ),
 
-        // Colors
-        tabBarActiveTintColor: "#e94560",
-        tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
+          // Label Styling
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: "600",
+            marginBottom: Platform.OS === "ios" ? 0 : 2, // Reduced since we have paddingBottom
+            letterSpacing: 0.5,
+          },
 
-        // Icons
-        tabBarIcon: ({ color, size }) => {
-          let iconName;
+          // Colors
+          tabBarActiveTintColor: "#e94560",
+          tabBarInactiveTintColor: "rgba(255,255,255,0.5)",
 
-          switch (route.name) {
-            case "Dashboard":
-              iconName = "home";
-              break;
-            case "Matches":
-              iconName = "heart";
-              break;
-            case "Discover":
-              iconName = "search";
-              break;
-            case "Likes":
-              iconName = "thumbs-up";
-              break;
-            case "Edit":
-              iconName = "pencil";
-              break;
-            case "Profile":
-              iconName = "user";
-              break;
-            default:
-              iconName = "circle";
-          }
+          // Icons
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
 
-          return <FontAwesome name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name="Dashboard" component={DashboardStack} />
-      <Tab.Screen name="Matches" component={MatchesStack} />
-      <Tab.Screen name="Discover" component={DiscoverStack} />
-      <Tab.Screen name="Likes" component={LikesStack} />
-      <Tab.Screen name="Edit" component={EditStack} />
-      <Tab.Screen name="Profile" component={ProfileStack} />
-    </Tab.Navigator>
+            switch (route.name) {
+              case "Dashboard":
+                iconName = "home";
+                break;
+              case "Matches":
+                iconName = "heart";
+                break;
+              case "Discover":
+                iconName = "search";
+                break;
+              case "Likes":
+                iconName = "thumbs-up";
+                break;
+              case "Edit":
+                iconName = "pencil";
+                break;
+              case "Profile":
+                iconName = "user";
+                break;
+              default:
+                iconName = "circle";
+            }
+
+            return <FontAwesome name={iconName} size={size} color={color} />;
+          },
+        })}
+      >
+        <Tab.Screen name="Dashboard" component={DashboardStack} />
+        <Tab.Screen name="Matches" component={MatchesStack} />
+        <Tab.Screen name="Discover" component={DiscoverStack} />
+        <Tab.Screen name="Likes" component={LikesStack} />
+        <Tab.Screen name="Edit" component={EditStack} />
+        <Tab.Screen name="Profile" component={ProfileStack} />
+      </Tab.Navigator>
+    </View>
   );
 }
 

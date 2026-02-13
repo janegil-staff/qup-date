@@ -39,7 +39,7 @@ const slides = [
     id: '3',
     icon: 'people-outline',
     title: 'Quality Over Quantity',
-    description: 'Daily match limits encourage meaningful conversations, not endless swiping.',
+    description: 'No daily match limits encourage meaningful conversations.',
   },
   {
     id: '4',
