@@ -286,7 +286,7 @@ export default function LoginForm({ navigation }) {
         {/* Back Button */}
         <TouchableOpacity
           style={styles.backBtn}
-          onPress={() => navigation.goBack()}
+          onPress={() => navigation.push("LandingScreen")}
           activeOpacity={0.7}
         >
           <Ionicons name="arrow-back" size={24} color="#fff" />
@@ -343,7 +343,7 @@ export default function LoginForm({ navigation }) {
               </TouchableOpacity>
             )}
 
-            {/* Google */}
+            {/* Google 
             <TouchableOpacity
               style={styles.googleBtn}
               onPress={handleGooglePress}
@@ -359,6 +359,8 @@ export default function LoginForm({ navigation }) {
                 </>
               )}
             </TouchableOpacity>
+            
+            */}
           </View>
 
           {/* Divider */}

@@ -414,7 +414,7 @@ export default function RegisterScreen({ navigation, route }) {
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
-                onPress={() => navigation.goBack()}
+                onPress={() => navigation.push("LandingScreen")}
                 style={styles.backBtn}
               >
                 <Ionicons name="close" size={24} color="#fff" />
@@ -542,14 +542,15 @@ export default function RegisterScreen({ navigation, route }) {
                         <Ionicons name="logo-apple" size={24} color="#fff" />
                       </TouchableOpacity>
                     )}
-
-                    <TouchableOpacity
-                      style={styles.socialIconBtn}
-                      onPress={() => navigation.navigate("LoginForm")}
-                      activeOpacity={0.8}
-                    >
-                      <FontAwesome name="google" size={22} color="#4285F4" />
-                    </TouchableOpacity>
+                    {false && (
+                      <TouchableOpacity
+                        style={styles.socialIconBtn}
+                        onPress={() => navigation.navigate("LoginForm")}
+                        activeOpacity={0.8}
+                      >
+                        <FontAwesome name="google" size={22} color="#4285F4" />
+                      </TouchableOpacity>
+                    )}
                   </View>
 
                   <View style={styles.divider}>
@@ -1002,21 +1003,21 @@ export default function RegisterScreen({ navigation, route }) {
 
 const styles = StyleSheet.create({
   socialRow: {
-  flexDirection: "row",
-  justifyContent: "center",
-  gap: 16,
-  marginBottom: 20,
-},
-socialIconBtn: {
-  width: 56,
-  height: 56,
-  borderRadius: 16,
-  backgroundColor: "rgba(255,255,255,0.08)",
-  justifyContent: "center",
-  alignItems: "center",
-  borderWidth: 1.5,
-  borderColor: "rgba(255,255,255,0.1)",
-},
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 16,
+    marginBottom: 20,
+  },
+  socialIconBtn: {
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.1)",
+  },
   appleBtn: {
     flexDirection: "row",
     alignItems: "center",
