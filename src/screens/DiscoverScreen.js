@@ -298,7 +298,6 @@ export default function DiscoverScreen({ navigation }) {
           </View>
         </View>
       </Modal>
-       <SafeBottomView />
     </GlassBackground>
   );
 }

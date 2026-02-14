@@ -42,7 +42,7 @@ export default function DashboardScreen({ navigation }) {
     try {
       const token = await SecureStore.getItemAsync("authToken");
       const res = await fetch(
-        `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/users`,
+        `https://qup.dating/api/mobile/users`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -68,7 +68,7 @@ export default function DashboardScreen({ navigation }) {
       try {
         const token = await SecureStore.getItemAsync("authToken");
         const res = await fetch(
-          `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/me`,
+          `https://qup.dating/api/mobile/me`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (!res.ok) throw new Error("Failed to fetch user");
@@ -86,7 +86,7 @@ export default function DashboardScreen({ navigation }) {
       try {
         const token = await SecureStore.getItemAsync("authToken");
         const res = await fetch(
-          `${process.env.EXPO_PUBLIC_API_URL}/api/mobile/stats`,
+          `https://qup.dating/api/mobile/stats`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (res.ok) {
@@ -108,7 +108,7 @@ export default function DashboardScreen({ navigation }) {
       const endpoint =
         direction === "right" ? "/api/mobile/like" : "/api/mobile/dislike";
 
-      const res = await fetch(`${process.env.EXPO_PUBLIC_API_URL}${endpoint}`, {
+      const res = await fetch(`https://qup.dating${endpoint}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
